@@ -23,7 +23,7 @@ export const Navbar: FC<{ pageMap: PageMapItem[] }> = ({ pageMap }) => {
       }}
     >
       <div>Cloudea</div>
-      <Search/>
+      <Search />
       <ul
         style={{
           display: "flex",
@@ -45,7 +45,7 @@ export const Navbar: FC<{ pageMap: PageMapItem[] }> = ({ pageMap }) => {
           );
         })}
       </ul>
-      <ThemeSwitch/>
+      <ThemeSwitch />
     </div>
   );
 };

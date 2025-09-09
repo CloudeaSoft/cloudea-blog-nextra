@@ -1,33 +1,33 @@
-import { Link } from 'next-view-transitions'
-import type { FC, ReactNode } from 'react'
-import { GoBack } from './go-back'
+import { Link } from "next-view-transitions";
+import type { FC, ReactNode } from "react";
+import { GoBack } from "./go-back";
 
 export const Meta: FC<BlogMetadata & { children: ReactNode }> = ({
   author,
   tags,
   date,
   readingTime,
-  children
+  children,
 }) => {
-  const tagsEl = tags?.map(t => (
+  const tagsEl = tags?.map((t) => (
     <Link key={t} href={`/tags/${t}`} className="nextra-tag">
       {t}
     </Link>
-  ))
+  ));
 
-  const readingTimeText = readingTime?.text
+  const readingTimeText = readingTime?.text;
 
   return (
     <div
       className={
-        'x:mb-8 x:flex x:gap-3 ' +
-        (readingTimeText ? 'x:items-start' : 'x:items-center')
+        "x:mb-8 x:flex x:gap-3 " +
+        (readingTimeText ? "x:items-start" : "x:items-center")
       }
     >
       <div className="x:grow x:dark:text-gray-400 x:text-gray-600">
         <div className="x:flex x:flex-wrap x:items-center x:gap-1">
           {author}
-          {author && date && ','}
+          {author && date && ","}
 
           {children}
 
@@ -47,5 +47,5 @@ export const Meta: FC<BlogMetadata & { children: ReactNode }> = ({
       </div>
       <GoBack />
     </div>
-  )
-}
+  );
+};

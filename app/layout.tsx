@@ -3,7 +3,7 @@ import { Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
 import type { FC, ReactNode } from "react";
 import { CloudeaTheme } from "./_components/layout";
-import 'nextra-theme-docs/style.css'
+import "nextra-theme-docs/style.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://blog.cloudea.work"),
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     title: "Cloudeas Blog",
   },
-  icons:"/images/favicon-32.ico"
+  icons: "/images/favicon-32.ico",
 };
 
 const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {

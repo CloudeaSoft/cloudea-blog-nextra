@@ -13,7 +13,7 @@ export const Sidebar: FC<{ pageMap: PageMapItem[] }> = ({ pageMap }) => {
     route: pathname,
     underCurrentDocsRoot: true,
   });
-  return (<></>);
+  return <></>;
   return (
     <div
       style={{

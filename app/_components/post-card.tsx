@@ -1,20 +1,20 @@
-import { Link } from 'next-view-transitions'
-import type { FC } from 'react'
+import { Link } from "next-view-transitions";
+import type { FC } from "react";
 
 type PostCardProps = {
   post: {
-    route: string
-    frontMatter: BlogMetadata
-  }
-  readMore?: string
-}
+    route: string;
+    frontMatter: BlogMetadata;
+  };
+  readMore?: string;
+};
 
 export const PostCard: FC<PostCardProps> = ({
   post,
-  readMore = 'Read More →'
+  readMore = "Read More →",
 }) => {
-  const { description, date, title } = post.frontMatter
-  const dateObj = date && new Date(date)
+  const { description, date, title } = post.frontMatter;
+  const dateObj = date && new Date(date);
   return (
     <div key={post.route}>
       <h2 className="x:mt-6 x:mb-2 x:text-xl x:font-semibold">
@@ -41,5 +41,5 @@ export const PostCard: FC<PostCardProps> = ({
         </time>
       )}
     </div>
-  )
-}
+  );
+};

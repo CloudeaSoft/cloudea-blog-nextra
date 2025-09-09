@@ -5,7 +5,11 @@ export default async function TagPage(props) {
   return (
     <>
       <h1>Archives</h1>
-      {hito != null && <div>{hito.hitokoto} —— {hito.from_who ?? hito.from}</div>}
+      {hito != null && (
+        <div>
+          {hito.hitokoto} —— {hito.from_who ?? hito.from}
+        </div>
+      )}
     </>
   );
 }
