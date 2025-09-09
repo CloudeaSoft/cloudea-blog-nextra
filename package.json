@@ -1,7 +1,7 @@
 {
 	"name": "cloudea-blog-nextra",
 	"description": "Cloudea's Blog",
-	"repository": "https://github.com/CloudeaSoft/cloudea-blog",
+	"repository": "https://github.com/CloudeaSoft/cloudea-blog-nextra",
 	"author": "CloudeaSoft <cloudeasoft@qq.com>",
 	"license": "GPL-3.0-only",
 	"packageManager": "pnpm@9.15.9",
