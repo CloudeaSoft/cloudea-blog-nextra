@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     title: "Cloudeas Blog",
   },
+  icons:"/images/favicon-32.ico"
 };
 
 const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
