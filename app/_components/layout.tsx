@@ -1,6 +1,11 @@
 import { ThemeProvider } from "next-themes";
 import { ViewTransitions } from "next-view-transitions";
 import { FC, ReactNode, ComponentProps } from "react";
+import LoadingManager from "./loading-manager";
+import type { PageMapItem } from "nextra";
+import { Footer } from "./footer";
+import { Navbar } from "./navbar";
+import { Sidebar } from "./sidebar";
 
 const Layout: FC<{
   children: ReactNode;
@@ -21,24 +26,21 @@ const Layout: FC<{
   );
 };
 
-import type { PageMapItem } from "nextra";
-import version from "nextra/package.json";
-import { Footer } from "./footer";
-import { Navbar } from "./navbar";
-import { Sidebar } from "./sidebar";
-
 export const CloudeaTheme: FC<{
   children: ReactNode;
   pageMap: PageMapItem[];
 }> = ({ children, pageMap }) => {
   return (
-    <>
-      <Navbar pageMap={pageMap} />
-      <div style={{ display: "flex" }}>
-        <Sidebar pageMap={pageMap} />
-        <Layout>{children}</Layout>
+    <div>
+      <LoadingManager />
+      <div>
+        <Navbar pageMap={pageMap} />
+        <div style={{ display: "flex" }}>
+          <Sidebar pageMap={pageMap} />
+          <Layout>{children}</Layout>
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </>
+    </div>
   );
 };
