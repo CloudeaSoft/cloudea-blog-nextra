@@ -1,0 +1,122 @@
+---
+title: 将 Arcus.Security 对 xUnit 的依赖从v2迁移至v3
+date: 2025-09-08 17:18:11
+categories: 开源贡献
+tags: [Github, CSharp, Azure]
+---
+
+最近，我发现 Arcus.Security 项目有一个 Issue，内容是将 xUnit 从 v2 迁移至 v3，正好我也想多了解一下 xUnit 相关的知识，便承接了下来。
+
+## 为什么要升级？
+
+据 Arcus.Security 项目管理者的说法，虽然 v2 版本仍在维护，但未来不再进行非常专注的开发，因此需要迁移到 v3 来使用新特性和未来的支持。v3 是一次重大重写，带来了性能提升、新功能和架构变化，但迁移至过程会比较繁琐。保持依赖最新是必要的，可避免未来因版本过旧而陷入难以升级的窘境。
+
+> [_Core Framework v2 2.9.3 发布说明_:](https://xunit.net/releases/v2/2.9.3)
+> We anticipate this to be the last release of Core Framework v2, as all effort is focused on v3 now.
+> （我们预计这将是 Core Framework v2 的最后一个版本，因为所有精力现在都集中在 v3 上。）
+
+## 前期准备
+
+首先 Fork 并 Clone 了项目仓库。项目要求 .net 10 环境，但 VS2022 正式版尚未支持。因此，我将开发环境切换至 [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs/preview/) 并安装了 [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)。
+
+## 检查依赖
+
+首先打开 nuget 包管理器，检查与 xUnit 相关的包，得到以下清单：
+
+| 包名                                      | 当前   |
+| ----------------------------------------- | ------ |
+| xunit                                     | 1.0.3  |
+| xunit.runner.visualstudio                 | 2.4.3  |
+| Microsoft.NET.Test.Sdk                    | 16.7.1 |
+| Arcus.Testing.Core                        | 1.0.3  |
+| Arcus.Testing.Logging.Xunit               | 1.0.3  |
+| Arcus.Testing.Security.Providers.InMemory | 1.0.3  |
+
+## 迁移步骤步骤
+
+### 第一次尝试(失败)
+
+查看 xUnit 与 Arcus.Testing 的文档，发现针对 v2 和 v3，两个库都分别对其设计了 nuget 包，分别为`xunit.v3`与`Arcus.Testing.Logging.Xunit.v3`，同时 Arcus.Testing 还包含了 v2 和 v3 共用的`Arcus.Testing.Core`包。
+
+我尝试性地将所有包更新至最新，果不其然的引发了大量编译错误。这证实了迁移并非简单的版本号替换，于是我先回退了更改。
+
+### 第二次尝试(成功)
+
+1. **更新测试 SDK**
+
+首先将`Microsoft.NET.Test.Sdk`更至最新，运行正常。
+
+2. **更新 Arcus.Testing 至 v2 下的最新版本**
+
+接着将 Arcus.Testing 先更新至 v2 的最新版本，出现了一些名称变动与架构变动导致的直观错误，据[Arcus.Testing 迁移指南](https://testing.arcus-azure.net/Guidance/migrate-from-v1-to-v2)所述，其中一些类被移到了 archived 的包`Arcus.Testing.Logging.Core`中，全部处理后运行正常。
+
+3. **核心迁移：引入 xUnit v3**
+
+然后就是 xUnit 了，这是最关键的一步。
+
+`xunit`替换为`xunit.v3`，`Arcus.Testing.Logging.Xunit`替换为`Arcus.Testing.Logging.Xunit.v3`。
+
+将一些明显的错误(接口/类名，命名空间等)、以及新的项目文件设置，按照[xUnit 迁移指南](https://xunit.net/docs/getting-started/v3/migration)处理完后，项目可以进行构建。
+
+处理完这些后，在运行测试时，出现了大问题。
+
+4. **解决“测试消失”的问题**
+
+编译成功后，运行 `dotnet test` 却发现其中一个测试项目的所有测试都被跳过，无法被检测到。
+
+查看输出日志，发现了一个致命的错误：
+
+```log
+[ServerTestHost.OnCurrentDomainUnhandledException] System.IO.FileNotFoundException: Could not load file or assembly 'Arcus.Security.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null'. The system cannot find the file specified.
+File name: 'Arcus.Security.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null'
+   at System.Reflection.RuntimeAssembly.GetExportedTypes()
+   at Xunit.v3.XunitTestFrameworkDiscoverer.GetExportedTypes() in /_/src/xunit.v3.core/Framework/XunitTestFrameworkDiscoverer.cs:line 195
+   at Xunit.v3.TestFrameworkDiscoverer`1.<>c__DisplayClass10_0.<<Find>b__0>d.MoveNext() in /_/src/xunit.v3.core/Framework/TestFrameworkDiscoverer.cs:line 72
+--- End of stack trace from previous location ---
+   at System.Threading.Tasks.Task.<>c.<ThrowAsync>b__124_1(Object state)
+   at System.Threading.QueueUserWorkItemCallback.Execute()
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+   at System.Threading.Thread.StartCallback()
+```
+
+github 上有[相关的讨论信息](https://github.com/xunit/xunit/issues/3107)，但其中的解决方案并未起作用。再次检查日志，发现还有一些警告，其中有一条关键警告表示包依赖出现了版本不匹配的错误：
+
+```log
+warning NU1608: Detected package version outside of dependency constraint: Arcus.Testing.Logging.Xunit.v3 2.1.0 requires xunit.v3.extensibility.core (>= 2.0.3 && < 3.0.0) but version xunit.v3.extensibility.core 3.0.0 was resolved.
+```
+
+根据`Arcus.Testing.Logging.Xunit.v3`包的要求，将版本依次对齐，解决了该警告。
+
+但问题并未得到解决。
+
+5. **服务器端测试**
+
+最后尝试直接在 CI 服务器上进行测试，发现测试运行正常，单元测试全部通过。造成该情况的原因可能是由于 VS 与 xUnit 之间有兼容性问题，具体情况有待观察。
+
+至此，从 xUnit.v2 至 v3 的迁移全部完成。
+
+## 总结
+
+**更新内容**：
+
+| 包名                                      | 当前   | 目标                                 |
+| ----------------------------------------- | ------ | ------------------------------------ |
+| xunit                                     | 1.0.3  | xunit.v3@2.30.3                      |
+| xunit.runner.visualstudio                 | 2.4.3  | 3.0.0                                |
+| Microsoft.NET.Test.Sdk                    | 16.7.1 | 17.0.0                               |
+| Arcus.Testing.Core                        | 1.0.3  | 2.1.0                                |
+| Arcus.Testing.Logging.Xunit               | 1.0.3  | Arcus.Testing.Logging.Xunit.v3@2.1.0 |
+| Arcus.Testing.Logging.Core                | 新增   | 2.1.0                                |
+| Arcus.Testing.Security.Providers.InMemory | 1.0.3  | 1.2.0                                |
+
+**收获**：
+
+1.  **官方文档**：xUnit 和 Arcus.Testing 的迁移指南提供了最重要的信息。
+2.  **依赖兼容性**：迁移时不能盲目追求所有包的最新版本，必须仔细检查包之间的依赖约束。
+3.  **渐进式迁移**：采用分步骤、验证通过后再前进的策略，能有效定位问题。
+4.  **主动交流**：在遇到未知且难以解决的问题时，确切思考后，与他人交流不失为一种必要途径。
+
+**遗留观察**：
+
+xUnit.v3 的部分单元测试可以在 CI 服务器上运行，但无法通过`dotnet test`在 Visual Studio 环境下运行，这似乎是 xUnit v3 与测试工具之间一个已知的磨合期问题，开源社区仍有讨论。

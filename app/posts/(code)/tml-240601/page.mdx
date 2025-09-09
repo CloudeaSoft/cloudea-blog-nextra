@@ -1,0 +1,133 @@
+---
+title: tml开发记录-2024.06.01
+date: 2024-06-01 21:07:36
+categories: 技术
+tags: [CSharp, Terraria, 游戏开发]
+cover: "/images/covers/everglow.jpg"
+---
+
+第一次上手，本轮工作开发了 4 件简单饰品与 1 个钓竿，包括：
+
+- 饰品
+  - Heat Emblem
+  - Melter Gear
+  - Thermal Conductor
+  - Hot Air-balloon
+- 工具
+  - Thermostal Rod
+
+## 问题与解决方法
+
+### 饰品如何影响玩家状态？
+
+创建物品对应的 ModPlayer 子类，并重写所需的方法来控制玩家。tModLoader 会自动扫描项目中继承`ModPlayer`的类（猜测），并调用其中重写的方法。
+
+案例：Heat Emblem 会在玩家受伤时以一定概率为玩家附加一个持续 5s 的“着火了！”debuff
+
+```C#
+public class HeatEmblem : ModItem
+{
+  // 效果触发概率
+	public const float BuffTriggerRate = 0.33f;
+  // 异常状态持续时间（单位为帧，每秒60帧）
+	public const int BuffDuration = 300;
+
+	public override void SetDefaults()
+	{
+		Item.width = 44;
+		Item.height = 46;
+		Item.accessory = true;
+		Item.SetShopValues(ItemRarityColor.Blue1, Item.buyPrice(gold: 1, silver: 50));
+	}
+
+	public override void UpdateAccessory(Player player, bool hideVisual)
+	{
+		// ...
+
+		// 表示装备了Heat Emblem
+		player.GetModPlayer<HeatEmblemPlayer>().HeatEmblemEnable = true;
+	}
+}
+
+internal class HeatEmblemPlayer : ModPlayer
+{
+	public bool HeatEmblemEnable = false;
+
+	public override void ResetEffects()
+	{
+		HeatEmblemEnable = false;
+	}
+
+	// 在受伤时
+	public override void OnHurt(Player.HurtInfo info)
+	{
+    // 如果装备了Heat Emblem
+		if (HeatEmblemEnable)
+		{
+      // 有33%的概率
+			if (Main.rand.NextFloat() < HeatEmblem.BuffTriggerRate)
+			{
+        // 为玩家添加一个持续5s的"着火了！"debuff
+				Player.AddBuff(BuffID.OnFire, HeatEmblem.BuffDuration);
+			}
+		}
+	}
+}
+```
+
+注意点：
+
+1. tml 中的小数一般是 float 类型的
+2. 推荐用 const 变量来表示一些固定值，方便后续阅读与修改
+3. tml 中的持续时间一般是以帧作为单位的，且在系统中 1 秒为 60 帧，也就是 _最终设定值 = 实际时间（单位：秒）× 60_
+4. Terraria 专家/大师模式下，debuff 的持续时间会有相应的增加，请注意这个特性
+5. tml 中的随机数一般使用`Main.rand`全局随机数实例来创建
+
+### 如何添加移动特效？
+
+Terraria 中使用 Dust 来绘制特效。
+
+案例：Hot Air-balloon （基本逻辑同上不表，在此仅展示强相关的重写方法）
+
+```C#
+	public override void PreUpdate()
+	{
+		if (HotAirBalloonEnable)
+		{
+      // 检查玩家是否装备了Hot Air-balloon
+			if (!HotAirBalloonEnable)
+			{
+				return;
+			}
+
+			// 检查玩家是否在移动
+			if (Player.velocity == Vector2.Zero)
+			{
+				return;
+			}
+
+			// 绘制粒子
+			if (Main.rand.NextBool(1))
+			{
+				Dust.NewDust(Player.position, Player.width, Player.height, DustID.Torch);
+			}
+		}
+	}
+```
+
+虽然最终成品看着简单，但实际在寻找 创建粒子的方法、可用的粒子 ID 的过程中花了很多时间。
+
+### 平衡不同攻击频率武器的收益
+
+案例：Melter Gear 会在玩家击中地方目标时以一定概率为目标附加一个“着火了！”debuff；当目标处于“着火了！”状态下时，同时有一定概率为玩家附加一个“着火了！”debuff
+
+问题：前期如果使用迷你鲨（高攻击频率），那么会导致玩家长时间处于“着火了！”状态下，持续扣血，最终收益可能低于减益
+
+临时解决方法：在触发第二特性时，为玩家附加一个 buff，在该 buff 生效时第二特性不会被触发
+
+但该解决方法仍存在问题————高攻速武器可以非常稳定地触发第一个特性，而低攻速武器收益就相对较低了。后续的平衡方向可以是调整第二特性冷却时间的时长
+
+> 本期感想：
+>
+> - tml 的 api 真是复杂又难懂，很多地方连注释都没有（生气）
+> - 在编写物品时，也要注意思考物品各方面的合理性，从自己的角度提出一些反馈，帮助策划后续调整

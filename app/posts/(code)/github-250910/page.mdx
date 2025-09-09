@@ -1,0 +1,18 @@
+---
+title: 优化dotnet/runtime中StreamReader/Writer构造函数的一致性
+date: 2025-09-10 20:37:46
+categories: 开源贡献
+tags: [Github, CSharp, dotnet]
+---
+
+之前在 Github 上发现 dotnet/runtime 有一个适合新手的 issue，立刻将其承接了下来（毕竟给 dotnet/runtime 提交 pr 算是我的梦想之一）。
+
+该 Issue 的内容是—— StreamReader/Writer 中有两大类构造函数，在默认缓冲区大小和参数验证逻辑上存在几处不一致的行为。这虽然不是一个影响功能的致命错误，但却违背了 API 设计应遵循的一致性原则，会让开发者感到困惑。
+
+具体来说，这个 Issue 指出了 2 个核心问题：
+
+1. 默认缓冲区大小的不一致：当使用接收 FileStreamOptions 的新构造函数时，StreamWriter 错误地使用了 4096 作为字符缓冲区 char[] 的默认大小，而其他所有构造函数都使用 1024。
+
+2. 参数验证的逻辑矛盾：对于 bufferSize 参数为 -1（表示使用默认大小）的情况，传入 Stream 对象的构造函数会接受，而传入文件路径的构造函数则会抛出 `ArgumentOutOfRangeException` 异常。
+
+对于一个像 dotnet/runtime 这样被数百万开发者使用的基础库而言，保证其 API 的清晰、一致和可预测至关重要。

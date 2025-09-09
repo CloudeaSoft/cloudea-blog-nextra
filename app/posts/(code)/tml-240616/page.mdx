@@ -1,0 +1,111 @@
+---
+title: tml开发记录-2024.06.16
+date: 2024-06-16 22:53:20
+categories: 技术
+tags: [CSharp, Terraria, 游戏开发]
+cover: "/images/covers/everglow.jpg"
+---
+
+本轮工作开发了 3 件武器，包括：
+
+- 武器
+
+  - Auburn Bell (召唤)
+  - Rod Spear (近战)
+  - Feathered Staff (魔法)
+
+## 问题与解决方法
+
+### 如何设计并实现敌人状态？
+
+使用 State Machine 的设计方法，确定：
+
+- 总共有哪些状态
+- 这些状态分别能切换到哪些状态
+- 切换条件是什么
+- 切换过程是怎么样的
+
+### 如何使用精灵图来绘制节肢类 NPC？
+
+使用 PreDraw 方法，分割选取精灵图中各个部分，并设置位置偏移后绘制
+
+```CSharp
+public override bool PreDraw(ref Color lightColor)
+{
+	int BodyLength = 12;
+
+	SpriteBatch spriteBatch = Main.spriteBatch;
+
+	Texture2D texture = (Texture2D)ModContent.Request<Texture2D>(Texture);
+
+	SpriteBatchState sBS = GraphicsUtils.GetState(spriteBatch).Value;
+	spriteBatch.End();
+	spriteBatch.Begin(
+		SpriteSortMode.Deferred,
+		BlendState.NonPremultiplied,
+		Main.DefaultSamplerState,
+		DepthStencilState.None,
+		RasterizerState.CullNone,
+		null,
+		Main.GameViewMatrix.TransformationMatrix);
+
+	List<Vertex2D> bars = new List<Vertex2D>();
+	Vector2 drawCenter = Projectile.Center - Main.screenPosition + new Vector2(BodyLength * 5f * 0.75f, 0).RotatedBy(Projectile.rotation) * Projectile.scale;
+	for (int i = 0; i < BodyLength; i++)
+	{
+		Color drawColor = lightColor;
+		float jointIndex = i / (float)BodyLength;
+		int frameY = (int)(Projectile.frame + i) % Main.projFrames[Projectile.type];
+		float frameYValue = frameY / (float)Main.projFrames[Projectile.type];
+		float deltaYValue = 1 / (float)Main.projFrames[Projectile.type];
+		float jointScale = 0.5f + 0.5f * MathF.Sin(jointIndex * MathHelper.Pi);
+
+		bars.Add(
+			drawCenter + new Vector2(-20, -20).RotatedBy(Projectile.rotation) * jointScale * Projectile.scale,
+			drawColor,
+			new Vector3(0, frameYValue, 0));
+		bars.Add(
+			drawCenter + new Vector2(-20, 20).RotatedBy(Projectile.rotation) * jointScale * Projectile.scale,
+			drawColor,
+			new Vector3(0, frameYValue + deltaYValue, 0));
+		bars.Add(
+			drawCenter + new Vector2(20, -20).RotatedBy(Projectile.rotation) * jointScale * Projectile.scale,
+			drawColor,
+			new Vector3(1, frameYValue, 0));
+		bars.Add(
+			drawCenter + new Vector2(20, -20).RotatedBy(Projectile.rotation) * jointScale * Projectile.scale,
+			drawColor,
+			new Vector3(1, frameYValue, 0));
+		bars.Add(
+			drawCenter + new Vector2(-20, 20).RotatedBy(Projectile.rotation) * jointScale * Projectile.scale,
+			drawColor,
+			new Vector3(0, frameYValue + deltaYValue, 0));
+		bars.Add(
+			drawCenter + new Vector2(20, 20).RotatedBy(Projectile.rotation) * jointScale * Projectile.scale,
+			drawColor,
+			new Vector3(1, frameYValue + deltaYValue, 0));
+
+		drawCenter -= new Vector2(10, 0).RotatedBy(Projectile.rotation) * jointScale * Projectile.scale;
+	}
+
+	Main.graphics.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+	Main.graphics.GraphicsDevice.Textures[0] = texture;
+	Main.graphics.GraphicsDevice.SamplerStates[0] = SamplerState.PointWrap;
+	if (bars.Count > 3)
+	{
+		Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, bars.ToArray(), 0, bars.Count / 3);
+	}
+
+	spriteBatch.End();
+	spriteBatch.Begin(sBS);
+
+	// Loop frame count.
+	Projectile.frame = ++Projectile.frame % Main.projFrames[Projectile.type];
+
+	return false;
+}
+```
+
+### 怎么做武器蓄力？
+
+###
