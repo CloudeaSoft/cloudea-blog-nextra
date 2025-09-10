@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import "./loading-manager.scss";
+import "./loading.scss";
 import { CloudeaImage } from "./image";
 import { M_PLUS_Rounded_1c } from "next/font/google";
 
@@ -10,7 +10,7 @@ const mPlusRounded1c = M_PLUS_Rounded_1c({
   subsets: ["latin"],
 });
 
-export default function TagPage(props) {
+export const Loading = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     // 在客户端执行
@@ -72,4 +72,4 @@ export default function TagPage(props) {
       )}
     </>
   );
-}
+};

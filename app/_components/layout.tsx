@@ -1,46 +1,43 @@
 import { ThemeProvider } from "next-themes";
 import { ViewTransitions } from "next-view-transitions";
-import { FC, ReactNode, ComponentProps } from "react";
-import LoadingManager from "./loading-manager";
-import type { PageMapItem } from "nextra";
+import { FC } from "react";
+import { Loading } from "./loading";
+
 import { Footer } from "./footer";
 import { Navbar } from "./navbar";
 import { Sidebar } from "./sidebar";
+import { LayoutProps } from "../../types/layout-props";
 
-const Layout: FC<{
-  children: ReactNode;
-  nextThemes?: Omit<ComponentProps<typeof ThemeProvider>, "children">;
-  banner?: ReactNode;
-}> = ({ children, nextThemes, banner }) => {
-  return (
-    <ThemeProvider attribute="class" {...nextThemes}>
-      {banner}
-      <article
-        className="x:container x:px-4 x:prose x:max-md:prose-sm x:dark:prose-invert"
-        dir="ltr"
-        data-pagefind-body
-      >
-        <ViewTransitions>{children}</ViewTransitions>
-      </article>
-    </ThemeProvider>
-  );
-};
+import "./theme.scss";
 
-export const CloudeaTheme: FC<{
-  children: ReactNode;
-  pageMap: PageMapItem[];
-}> = ({ children, pageMap }) => {
+export const Layout: FC<LayoutProps> = ({ children, ...themeConfig }) => {
+  const { footer, navbar, pageMap, nextThemes, banner, ...rest } = themeConfig;
+
   return (
-    <div>
-      <LoadingManager />
+    <ThemeProvider
+      attribute="class"
+      enableColorScheme
+      themes={["light", "dark"]}
+      {...nextThemes}
+    >
+      <Loading />
       <div>
         <Navbar pageMap={pageMap} />
         <div style={{ display: "flex" }}>
           <Sidebar pageMap={pageMap} />
-          <Layout>{children}</Layout>
+          <div>
+            {banner}
+            <article
+              className="x:container x:px-4 x:prose x:max-md:prose-sm x:dark:prose-invert"
+              dir="ltr"
+              data-pagefind-body
+            >
+              <ViewTransitions>{children}</ViewTransitions>
+            </article>
+          </div>
         </div>
         <Footer />
       </div>
-    </div>
+    </ThemeProvider>
   );
 };

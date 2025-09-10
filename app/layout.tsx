@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
 import type { FC, ReactNode } from "react";
-import { CloudeaTheme } from "./_components/layout";
-import "nextra-theme-docs/style.css";
+import { Layout } from "./_components/layout";
 import { getImageUrl } from "../utils/get-resources-url";
+
+import "nextra-theme-docs/style.css";
+import "./global.scss";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://blog.cloudea.work"),
@@ -31,7 +33,7 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head faviconGlyph="✦" />
       <body style={{ margin: 0, padding: 0 }}>
-        <CloudeaTheme pageMap={pageMap}>{children}</CloudeaTheme>
+        <Layout pageMap={pageMap}>{children}</Layout>
       </body>
     </html>
   );

@@ -1,0 +1,13 @@
+:root {
+  --fg: skyblue;
+  --bg: darkred;
+}
+
+.dark {
+  --fg: purple;
+  --bg: green;
+}
+
+h1 {
+  color: var(--bg) !important;
+}

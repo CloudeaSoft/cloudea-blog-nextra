@@ -11,19 +11,30 @@ export function ThemeSwitch() {
   const isDark = resolvedTheme === "dark";
 
   // TODO: system theme
-  const toggleTheme = () => {
-    setTheme(isDark ? "light" : "dark");
+  const setThemeLight = () => {
+    setTheme("light");
   };
 
-  const IconToUse = mounted && isDark ? MoonIcon : SunIcon;
+  const setThemeDark = () => {
+    setTheme("dark");
+  };
 
   return (
-    <Button
-      aria-label="Toggle Dark Mode"
-      className="x:p-2"
-      onClick={toggleTheme}
-    >
-      <IconToUse height="14" />
-    </Button>
+    <div style={{ display: "flex" }}>
+      <Button
+        aria-label="Toggle Light Mode"
+        className="x:p-2"
+        onClick={setThemeLight}
+      >
+        <SunIcon height="14" />
+      </Button>
+      <Button
+        aria-label="Toggle Dark Mode"
+        className="x:p-2"
+        onClick={setThemeDark}
+      >
+        <MoonIcon height="14" />
+      </Button>
+    </div>
   );
 }
