@@ -3,6 +3,12 @@
 import { useState, useEffect } from "react";
 import "./loading-manager.scss";
 import { CloudeaImage } from "./image";
+import { M_PLUS_Rounded_1c } from "next/font/google";
+
+const mPlusRounded1c = M_PLUS_Rounded_1c({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 export default function TagPage(props) {
   const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +48,7 @@ export default function TagPage(props) {
             height: 100 + "%",
           }}
         >
-          <p id="loading" className="font01">
+          <p id="loading" className={mPlusRounded1c.className}>
             <span className="spac">
               その歌声は
               <span style={{ display: "inline-block", marginRight: "-0.3rem" }}>
