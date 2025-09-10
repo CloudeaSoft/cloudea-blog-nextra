@@ -1,7 +1,7 @@
 name: Deploy Next.js site to Pages
 
 env:
-  BASE_PATH: '/cloudea-blog-nextra'
+  NEXT_PUBLIC_BASE_PATH: '/cloudea-blog-nextra'
 
 on:
   # Runs on pushes targeting the main branch

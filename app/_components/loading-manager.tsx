@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import "./loading-manager.scss";
-import { getImageUrl } from "../../utils/get-resources-url";
-import Image from "next/image";
+import { CloudeaImage } from "./image";
 
 export default function TagPage(props) {
   const [isLoading, setIsLoading] = useState(true);
@@ -54,12 +53,13 @@ export default function TagPage(props) {
             ──
           </p>
           <div className="loading-bg">
-            <Image
+            <CloudeaImage
               className="sakura-1"
-              src={getImageUrl("loading-bg.gif")}
+              src="loading-bg.gif"
               alt="sakura"
               width={240}
               height={240}
+              priority={true}
             />
           </div>
         </div>

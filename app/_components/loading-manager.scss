@@ -28,6 +28,7 @@
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   text-align: center;
+  user-select: none;
 }
 
 #loading {
@@ -58,7 +59,7 @@
 }
 
 .font01 {
-  font-family: "Rounded Mplus 1c", sans-serif;
+  font-family: "M PLUS Rounded 1c", sans-serif;
 }
 
 @keyframes saku1 {

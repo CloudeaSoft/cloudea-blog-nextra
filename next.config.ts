@@ -10,7 +10,7 @@ const withNextra = nextra({
 });
 
 export default withNextra({
-  basePath: process.env.BASE_PATH,
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   reactStrictMode: true,
   cleanDistDir: true,
   output: "export", // Enable when deploying to github page
