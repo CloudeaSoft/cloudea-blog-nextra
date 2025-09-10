@@ -9,7 +9,8 @@
 		"dev": "next",
 		"build": "next build",
 		"start": "next start",
-		"postbuild": "pagefind --site .next/server/app --output-path public/_pagefind"
+		"postbuild": "pagefind --site .next/server/app --output-path out/_pagefind",
+		"export": "next build && next export"
 	},
 	"dependencies": {
 		"@tailwindcss/typography": "^0.5.16",

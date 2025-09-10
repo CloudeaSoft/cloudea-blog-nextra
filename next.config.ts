@@ -12,4 +12,8 @@ const withNextra = nextra({
 export default withNextra({
   reactStrictMode: true,
   cleanDistDir: true,
+  output: "export", // Enable when deploying to github page
+  images: {
+    unoptimized: true, // Enable when deploying to github page
+  },
 });
