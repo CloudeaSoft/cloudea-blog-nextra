@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import "./loading-manager.scss";
+import { getImageUrl } from "../../utils/get-resources-url";
+import Image from "next/image";
 
 export default function TagPage(props) {
   const [isLoading, setIsLoading] = useState(true);
@@ -52,11 +54,12 @@ export default function TagPage(props) {
             ──
           </p>
           <div className="loading-bg">
-            <img
+            <Image
               className="sakura-1"
-              src="images/loading-bg.gif"
-              alt=""
-              width="240"
+              src={getImageUrl("loading-bg.gif")}
+              alt="sakura"
+              width={240}
+              height={240}
             />
           </div>
         </div>
