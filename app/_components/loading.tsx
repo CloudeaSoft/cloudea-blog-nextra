@@ -37,39 +37,38 @@ export const Loading = (props) => {
 
   return (
     <>
-      {isLoading && (
-        <div
-          className="loader-bg"
-          style={{
-            position: "fixed",
-            background: "white",
-            zIndex: 9999,
-            width: 100 + "%",
-            height: 100 + "%",
-          }}
-        >
-          <p id="loading" className={mPlusRounded1c.className}>
-            <span className="spac">
-              その歌声は
-              <span style={{ display: "inline-block", marginRight: "-0.3rem" }}>
-                、
-              </span>
-              春風と共に
+      <div
+        className="loader-bg"
+        style={{
+          position: "fixed",
+          background: "white",
+          zIndex: 9999,
+          width: 100 + "%",
+          height: 100 + "%",
+          display: isLoading ? "block" : "none",
+        }}
+      >
+        <p id="loading" className={mPlusRounded1c.className}>
+          <span className="spac">
+            その歌声は
+            <span style={{ display: "inline-block", marginRight: "-0.3rem" }}>
+              、
             </span>
-            ──
-          </p>
-          <div className="loading-bg">
-            <CloudeaImage
-              className="sakura-1"
-              src="loading-bg.gif"
-              alt="sakura"
-              width={240}
-              height={240}
-              priority={true}
-            />
-          </div>
+            春風と共に
+          </span>
+          ──
+        </p>
+        <div className="loading-bg">
+          <CloudeaImage
+            className="sakura-1"
+            src="loading-bg.gif"
+            alt="sakura"
+            width={240}
+            height={240}
+            priority={true}
+          />
         </div>
-      )}
+      </div>
     </>
   );
 };

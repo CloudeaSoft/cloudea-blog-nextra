@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import Image from "next/image";
@@ -11,10 +11,14 @@ type CloudeaImageProps = {
   height?: number;
   alt: string;
   sizes?: string;
-  priority?:boolean
+  priority?: boolean;
 };
 
-export const CloudeaImage = (props: CloudeaImageProps) => {
+export const CloudeaImage = (
+  props: CloudeaImageProps &
+    React.RefAttributes<HTMLImageElement | null> &
+    React.ImgHTMLAttributes<HTMLImageElement>
+) => {
   const src =
     typeof props.src === "string" ? getImageUrl(props.src) : props.src;
 
@@ -28,6 +32,7 @@ export const CloudeaImage = (props: CloudeaImageProps) => {
         height={props.height}
         sizes={props.sizes}
         priority={props.priority}
+        style={props.style}
       ></Image>
     </>
   );

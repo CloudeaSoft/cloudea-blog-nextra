@@ -4,15 +4,15 @@ import { FC } from "react";
 import { Loading } from "./loading";
 
 import { Footer } from "./footer";
-import { Navbar } from "./navbar";
+import { Navbar } from "./navbar/navbar";
 import { Sidebar } from "./sidebar";
 import { LayoutProps } from "../../types/layout-props";
 
 import "./theme.scss";
+import { Background } from "./background";
 
 export const Layout: FC<LayoutProps> = ({ children, ...themeConfig }) => {
   const { footer, navbar, pageMap, nextThemes, banner, ...rest } = themeConfig;
-
   return (
     <ThemeProvider
       attribute="class"
@@ -25,7 +25,7 @@ export const Layout: FC<LayoutProps> = ({ children, ...themeConfig }) => {
         <Navbar pageMap={pageMap} />
         <div style={{ display: "flex" }}>
           <Sidebar pageMap={pageMap} />
-          <div>
+          <div style={{ width: "100%" }}>
             {banner}
             <article
               className="x:container x:px-4 x:prose x:max-md:prose-sm x:dark:prose-invert"
@@ -38,6 +38,7 @@ export const Layout: FC<LayoutProps> = ({ children, ...themeConfig }) => {
         </div>
         <Footer />
       </div>
+      <Background/>
     </ThemeProvider>
   );
 };
