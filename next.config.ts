@@ -7,6 +7,16 @@ const withNextra = nextra({
     codeblocks: true,
   },
   staticImage: true,
+  mdxOptions: {
+    rehypePrettyCodeOptions: {
+      theme: {
+        default: "dark-plus",
+        light: "light-plus",
+        dark: "dark-plus",
+        sepia: "monokai",
+      },
+    },
+  },
 });
 
 export default withNextra({
