@@ -13,7 +13,6 @@
 		"export": "next build && next export"
 	},
 	"dependencies": {
-		"@tailwindcss/typography": "^0.5.16",
 		"@vitejs/plugin-react": "^5.0.2",
 		"next": "^15.5.2",
 		"next-themes": "^0.4.6",
@@ -26,12 +25,8 @@
 		"vitest": "^3.2.4"
 	},
 	"devDependencies": {
-		"@tailwindcss/cli": "^4.1.13",
-		"@tailwindcss/postcss": "^4.1.13",
 		"@types/node": "24.3.1",
 		"@types/react": "19.1.12",
-		"pagefind": "^1.4.0",
-		"postcss": "^8.5.6",
-		"tailwindcss": "^4.1.13"
+		"pagefind": "^1.4.0"
 	}
 }
