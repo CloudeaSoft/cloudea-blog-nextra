@@ -5,8 +5,7 @@ import type { FC, ReactNode } from "react";
 import { Layout } from "./_components/layout";
 import { getImageUrl } from "../utils/get-resources-url";
 
-import "nextra-theme-docs/style.css";
-import "./global.scss";
+import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://blog.cloudea.work"),
