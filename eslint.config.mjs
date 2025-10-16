@@ -62,9 +62,6 @@ export default defineConfig([
 			tseslint.configs.recommended,
 			stylistic.configs.recommended,
 		],
-	},
-	{
-		files: ["**/*.{js,jsx,mjs,ts,tsx,mts}"],
 		plugins: {
 			"@typescript-eslint": tseslint.plugin,
 			"@stylistic": stylistic,
