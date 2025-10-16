@@ -12,7 +12,11 @@
 		"postbuild": "pagefind --site .next/server/app --output-path out/_pagefind",
 		"export": "next build && next export"
 	},
+	"lint-staged": {
+		"*": "eslint --fix"
+	},
 	"dependencies": {
+		"@stylistic/eslint-plugin": "^5.4.0",
 		"@tailwindcss/postcss": "^4.1.14",
 		"@vitejs/plugin-react": "^5.0.2",
 		"next": "^15.5.2",
@@ -25,11 +29,16 @@
 		"react-dom": "^19.1.1",
 		"sass": "^1.92.1",
 		"tailwindcss": "^4.1.14",
+		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.46.1",
 		"vitest": "^3.2.4"
 	},
 	"devDependencies": {
+		"@eslint/js": "^9.37.0",
 		"@types/node": "24.3.1",
 		"@types/react": "19.1.12",
+		"eslint": "^9.37.0",
+		"eslint-config-prettier": "^10.1.8",
 		"pagefind": "^1.4.0"
 	}
 }
