@@ -3,6 +3,9 @@ import { CloudeaImage } from "../image";
 import { Noto_Sans } from "next/font/google";
 
 const notoSans = Noto_Sans({ weight: "500", subsets: ["latin"] });
+const url =
+	process.env.NEXT_PUBLIC_BASE_URL! + process.env.NEXT_PUBLIC_BASE_PATH;
+const homeURL = new URL(url);
 
 export const Stack = () => {
 	return (
@@ -13,7 +16,7 @@ export const Stack = () => {
 				padding: "0 3rem",
 				gap: 20,
 			}}
-			href={process.env.NEXT_PUBLIC_BASE_PATH}
+			href={homeURL}
 		>
 			<CloudeaImage
 				src="favicon-96.ico"

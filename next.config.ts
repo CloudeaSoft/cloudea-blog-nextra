@@ -27,4 +27,8 @@ export default withNextra({
 	images: {
 		unoptimized: true, // Enable when deploying to github page
 	},
+	eslint: {
+		ignoreDuringBuilds: false,
+		dirs: ["utils", "types"],
+	},
 });
