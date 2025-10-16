@@ -18,7 +18,7 @@ const commonRules = {
 	"no-console": "off",
 	"no-unsafe-optional-chaining": "error",
 	"comma-dangle": ["error", "always-multiline"],
-	"no-unreachable": "off",
+	"no-unreachable": "warn",
 };
 
 const stylisticRules = {
