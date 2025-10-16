@@ -1,6 +1,6 @@
-const HITOKOTO_URL: string = "https://v1.hitokoto.cn";
+const HITOKOTO_URL = "https://v1.hitokoto.cn";
 
-export const GetHitokoto = async (): Promise<Hitokoto> => {
+export const GetHitokoto = async (): Promise<Hitokoto | null> => {
 	try {
 		const response = await fetch(HITOKOTO_URL);
 		const data = await response.json();

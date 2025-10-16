@@ -35,10 +35,10 @@ export const Meta: FC<BlogMetadata & { children: ReactNode }> = ({
 
 					{children}
 
-					{(author || date) && (readingTime || tags?.length) && (
+					{(author ?? date) && (readingTime ?? tags?.length) && (
 						<span className="x:px-1">•</span>
 					)}
-					{readingTimeText || tagsEl}
+					{readingTimeText ?? tagsEl}
 				</div>
 				{readingTime && (
 					<div className="x:mt-1 x:flex x:flex-wrap x:items-center x:gap-1">

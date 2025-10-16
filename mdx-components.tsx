@@ -77,9 +77,7 @@ const DEFAULT_COMPONENTS = getNextraMDXComponents({
 
 export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
 	T extends BlogMDXComponents,
->(
-	comp?: T,
-) => {
+>(comp?: T) => {
 	const { DateFormatter, ...components } = comp ?? {};
 	return {
 		...DEFAULT_COMPONENTS,

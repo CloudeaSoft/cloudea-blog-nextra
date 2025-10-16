@@ -4,7 +4,7 @@ import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import Image from "next/image";
 import { getImageUrl } from "../../utils/get-resources-url";
 
-type CloudeaImageProps = {
+interface CloudeaImageProps {
 	className?: string;
 	src: string | StaticImport;
 	width?: number;
@@ -12,7 +12,7 @@ type CloudeaImageProps = {
 	alt: string;
 	sizes?: string;
 	priority?: boolean;
-};
+}
 
 export const CloudeaImage = (
 	props: CloudeaImageProps

@@ -1,8 +1,8 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import js from "@eslint/js";
-import eslintConfigPrettier from "eslint-config-prettier";
 import stylistic from "@stylistic/eslint-plugin";
 import tseslint from "typescript-eslint";
+import * as mdx from "eslint-plugin-mdx";
 
 const GLOBAL_IGNORES = [
 	"node_modules/**",
@@ -12,11 +12,13 @@ const GLOBAL_IGNORES = [
 ];
 
 const commonRules = {
-	"no-unused-vars": "warn",
+	"indent": ["error", "tab"],
+	"no-unused-vars": "off", // handled by @typescript-eslint/no-unused-vars
 	"no-undef": "off",
 	"no-console": "off",
 	"no-unsafe-optional-chaining": "error",
 	"comma-dangle": ["error", "always-multiline"],
+	"no-unreachable": "warn",
 };
 
 const stylisticRules = {
@@ -47,19 +49,38 @@ const stylisticRules = {
 };
 
 const typescriptRules = {
+	"@typescript-eslint/no-unused-vars": "warn",
 	"@typescript-eslint/triple-slash-reference": "off",
 };
 
 export default defineConfig([
 	globalIgnores(GLOBAL_IGNORES),
-	eslintConfigPrettier,
 	{
-		files: ["**/*.js", "**/*.jsx", "**/*.mjs"],
+		files: ["**/*.{js,jsx,mjs,ts,tsx,mts}"],
+		extends: [
+			js.configs.recommended,
+			tseslint.configs.recommended,
+			stylistic.configs.recommended,
+		],
 		plugins: {
-			js,
-			stylistic,
+			"@typescript-eslint": tseslint.plugin,
+			"@stylistic": stylistic,
 		},
-		extends: ["js/recommended", "stylistic/recommended"],
+		languageOptions: {
+			parser: tseslint.parser,
+			parserOptions: {
+				projectService: {
+					allowDefaultProject: [
+						"eslint.config.mjs",
+						"build/*.ts",
+						"postcss.config.mjs",
+					],
+					defaultProject: "tsconfig.json",
+				},
+				tsconfigRootDir: import.meta.dirname,
+				sourceType: "module",
+			},
+		},
 		rules: {
 			...commonRules,
 			...stylisticRules,
@@ -67,16 +88,12 @@ export default defineConfig([
 		},
 	},
 	{
-		files: ["**/*.ts", "**/*.tsx"],
-		plugins: {
-			stylistic,
-			tseslint,
-		},
-		extends: ["tseslint/recommended", "stylistic/recommended"],
+		...mdx.flat,
+	},
+	{
+		...mdx.flatCodeBlocks,
 		rules: {
-			...commonRules,
-			...stylisticRules,
-			...typescriptRules,
+			"react/jsx-no-undef": "off",
 		},
 	},
 ]);

@@ -1,13 +1,13 @@
 import { Link } from "next-view-transitions";
 import type { FC } from "react";
 
-type PostCardProps = {
+interface PostCardProps {
 	post: {
 		route: string;
 		frontMatter: BlogMetadata;
 	};
 	readMore?: string;
-};
+}
 
 export const PostCard: FC<PostCardProps> = ({
 	post,
