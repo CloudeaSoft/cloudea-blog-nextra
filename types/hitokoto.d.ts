@@ -1,4 +1,4 @@
-type Hitokoto = {
+interface Hitokoto {
 	id: number;
 	uuid: string;
 	hitokoto: string;
@@ -11,4 +11,4 @@ type Hitokoto = {
 	commit_from: string;
 	created_at: string;
 	length: number;
-};
+}
