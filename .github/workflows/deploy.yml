@@ -1,6 +1,7 @@
 name: Deploy Next.js site to Pages
 
 env:
+  NEXT_PUBLIC_BASE_URL: 'https://cloudeasoft.github.io'
   NEXT_PUBLIC_BASE_PATH: '/cloudea-blog-nextra'
 
 on:

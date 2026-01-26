@@ -1,8 +1,8 @@
-type BlogMetadata = {
-  author?: string;
-  date?: string;
-  description?: string;
-  readingTime?: ReadingTime;
-  tags?: [];
-  title?: string;
-};
+interface BlogMetadata {
+	author?: string;
+	date?: string;
+	description?: string;
+	readingTime?: ReadingTime;
+	tags?: [];
+	title?: string;
+}
