@@ -1,0 +1,8 @@
+.sidebar-links > * {
+	padding: 5px 10px;
+	border-radius: 8px;
+}
+
+.sidebar-links > *:hover {
+	background-color: var(--background-color);
+}

@@ -5,4 +5,6 @@ interface BlogMetadata {
 	readingTime?: ReadingTime;
 	tags?: [];
 	title?: string;
+	categories?: string;
+	cover?: string;
 }

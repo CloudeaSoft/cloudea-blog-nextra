@@ -1,7 +1,7 @@
-"use-client";
+"use client";
 
 import Link from "next/link";
-import { MenuIcon } from "nextra/icons";
+import { Icon } from "@iconify-icon/react";
 
 const mail = "cloudeasoft@qq.com";
 
@@ -18,7 +18,10 @@ export const Email = () => {
 				href={`mailto:${mail}`}
 				target="_blank"
 			>
-				<MenuIcon height="24" />
+				<Icon
+					icon="lucide:mail"
+					height="24"
+				/>
 			</Link>
 		</div>
 	);

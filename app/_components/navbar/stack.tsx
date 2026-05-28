@@ -26,7 +26,11 @@ export const Stack = () => {
 			/>
 			<h1
 				className={notoSans.className}
-				style={{ fontSize: "1.7rem", fontWeight: "520" }}
+				style={{
+					fontSize: "1.7rem",
+					fontWeight: "520",
+					color: "var(--first-text-color)",
+				}}
 			>
 				Cloudea's Blog
 			</h1>

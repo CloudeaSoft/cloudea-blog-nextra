@@ -1,9 +1,9 @@
 "use client";
 
+import { Icon } from "@iconify-icon/react";
 import { useTheme } from "next-themes";
 import { Button } from "nextra/components";
 import { useMounted } from "nextra/hooks";
-import { MoonIcon, SunIcon } from "nextra/icons";
 
 export function ThemeSwitch() {
 	const { setTheme, resolvedTheme } = useTheme();
@@ -14,7 +14,11 @@ export function ThemeSwitch() {
 		setTheme(isDark ? "light" : "dark");
 	};
 
-	const ShowIcon = mounted && isDark ? MoonIcon : SunIcon;
+	const iconName =
+		mounted && isDark
+			? "line-md:sunny-outline-to-moon-loop-transition"
+			: "line-md:moon-filled-alt-to-sunny-filled-loop-transition";
+	const iconColor = mounted && isDark ? "#2731f1" : "#fb7f24";
 
 	return (
 		<div
@@ -26,8 +30,6 @@ export function ThemeSwitch() {
 		>
 			<div
 				style={{
-					borderRadius: "12px",
-					border: "1px solid",
 					width: 24,
 					height: 24,
 					display: "flex",
@@ -39,8 +41,17 @@ export function ThemeSwitch() {
 					aria-label="Toggle Color Mode"
 					className="x:p-2"
 					onClick={toggleTheme}
+					style={{
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+					}}
 				>
-					<ShowIcon height="12" />
+					<Icon
+						icon={iconName}
+						height="24"
+						style={{ color: iconColor }}
+					/>
 				</Button>
 			</div>
 		</div>
