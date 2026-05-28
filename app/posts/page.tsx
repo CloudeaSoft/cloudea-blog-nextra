@@ -1,12 +1,13 @@
 import { PostCard } from "../_components/post-card";
-import { Item } from "nextra/normalize-pages";
 import "./page.css";
+import { getPosts } from "./get-posts";
 
 export const metadata = {
 	title: "Posts",
 };
 
-export default async function PostsPage({ posts }: { posts: Item[] }) {
+export default async function PostsPage() {
+	const posts = await getPosts();
 	return (
 		<div data-pagefind-ignore="all">
 			<ul>
