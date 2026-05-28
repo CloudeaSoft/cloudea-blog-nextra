@@ -68,10 +68,10 @@ const Banner = async () => {
 	);
 };
 
-const Content = async () => {
+const Content = async ({ children }) => {
 	const tags = await getTags();
-	const posts = await getPosts();
 	const uniqueTagsCount = new Set(tags).size;
+	const posts = await getPosts();
 
 	return (
 		<div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
@@ -154,7 +154,9 @@ const Content = async () => {
 									/>
 									<span>Tags</span>
 								</div>
-								<div className="font-bold text-[1.1rem] mt-1">{uniqueTagsCount}</div>
+								<div className="font-bold text-[1.1rem] mt-1">
+									{uniqueTagsCount}
+								</div>
 							</Link>
 							<Link
 								href="/posts"
@@ -173,7 +175,9 @@ const Content = async () => {
 									/>
 									<span>Posts</span>
 								</div>
-								<div className="font-bold text-[1.1rem] mt-1">{posts.length}</div>
+								<div className="font-bold text-[1.1rem] mt-1">
+									{posts.length}
+								</div>
 							</Link>
 						</div>
 					</div>
@@ -187,7 +191,7 @@ const Content = async () => {
 					minHeight: "100%",
 				}}
 			>
-				<PostsPage posts={posts} />
+				{children}
 			</div>
 		</div>
 	);
@@ -197,7 +201,9 @@ export default async function Index() {
 	return (
 		<>
 			<Banner />
-			<Content />
+			<Content>
+				<PostsPage />
+			</Content>
 		</>
 	);
 }
