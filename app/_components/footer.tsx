@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { FC } from "react";
+import { CloudeaImage } from "./image";
 
 export const Footer: FC = () => {
 	return (
@@ -27,13 +28,14 @@ export const Footer: FC = () => {
 						}}
 					>
 						<span>
-							<img
-								src="/images/nextra.svg"
+							<CloudeaImage
+								src="nextra.svg"
 								style={{
 									display: "inline-block",
 								}}
 								width={14}
 								height={14}
+								alt="Nextra Logo"
 							/>
 						</span>
 						Nextra
@@ -41,7 +43,10 @@ export const Footer: FC = () => {
 				</div>
 				<div>
 					THEME&nbsp;
-					<Link href="https://github.com/CloudeaSoft/cloudea-blog-nextra" target="_blank">
+					<Link
+						href="https://github.com/CloudeaSoft/cloudea-blog-nextra"
+						target="_blank"
+					>
 						Cloudea
 					</Link>
 				</div>

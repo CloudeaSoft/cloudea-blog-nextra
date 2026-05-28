@@ -27,12 +27,13 @@ export const CloudeaImage = (
 			<Image
 				className={props.className}
 				src={src}
-				alt={props.alt}
+				alt={props.alt ?? ""}
 				width={props.width}
 				height={props.height}
 				sizes={props.sizes}
 				priority={props.priority}
 				style={props.style}
+				fill={!(props.width || props.height)}
 			></Image>
 		</>
 	);
