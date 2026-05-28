@@ -71,12 +71,7 @@ const Banner = async () => {
 const Content = async () => {
 	const tags = await getTags();
 	const posts = await getPosts();
-
-	const allTags = Object.create(null);
-
-	for (const tag of tags) {
-		allTags[tag] ??= 0;
-	}
+	const uniqueTagsCount = new Set(tags).size;
 
 	return (
 		<div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
@@ -159,7 +154,7 @@ const Content = async () => {
 									/>
 									<span>Tags</span>
 								</div>
-								<div className="font-bold text-[1.1rem] mt-1">{Object.keys(allTags).length}</div>
+								<div className="font-bold text-[1.1rem] mt-1">{uniqueTagsCount}</div>
 							</Link>
 							<Link
 								href="/posts"

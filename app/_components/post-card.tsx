@@ -12,27 +12,22 @@ interface PostCardProps {
 export const PostCard: FC<PostCardProps> = ({ post }) => {
 	const { description, date, title } = post.frontMatter;
 	const dateObj = date && new Date(date);
-	console.log(post);
 	return (
 		<div key={post.route}>
-			{post.frontMatter.cover
-				&& (() => {
-					const cover = post.frontMatter.cover!;
-					return (
-						<div
-							className="w-full h-[150px]"
-							style={{ backgroundImage: `url(${cover})` }}
-						>
-							<Link href={post.route}>
-								<img
-									src={cover}
-									alt={title}
-									className="w-full h-full object-cover"
-								/>
-							</Link>
-						</div>
-					);
-				})()}
+			{post.frontMatter.cover && (
+				<div
+					className="w-full h-37.5"
+					style={{ backgroundImage: `url(${post.frontMatter.cover})` }}
+				>
+					<Link href={post.route}>
+						<img
+							src={post.frontMatter.cover}
+							alt={title}
+							className="w-full h-full object-cover"
+						/>
+					</Link>
+				</div>
+			)}
 			<div
 				className={`${post.frontMatter.cover ? "pt-5" : "pt-7"} pb-7 px-7 gap-5 flex-col flex`}
 			>
