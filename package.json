@@ -16,9 +16,13 @@
 		"*": "eslint --fix"
 	},
 	"dependencies": {
+		"@iconify-json/line-md": "^1.2.16",
+		"@iconify-json/mdi": "^1.2.3",
+		"@iconify-json/mdi-light": "^1.2.2",
 		"@stylistic/eslint-plugin": "^5.4.0",
 		"@tailwindcss/postcss": "^4.1.14",
 		"@vitejs/plugin-react": "^5.0.2",
+		"jotai": "^2.15.0",
 		"next": "^15.5.2",
 		"next-themes": "^0.4.6",
 		"next-view-transitions": "^0.3.4",
@@ -35,6 +39,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.37.0",
+		"@iconify-icon/react": "^3.0.3",
 		"@types/node": "24.3.1",
 		"@types/react": "19.1.12",
 		"eslint": "^9.37.0",

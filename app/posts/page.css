@@ -1,0 +1,7 @@
+.post-card {
+	box-shadow: var(--cloudea-box-shadow);
+}
+
+.post-card:hover {
+	box-shadow: var(--cloudea-box-shadow-hover);
+}

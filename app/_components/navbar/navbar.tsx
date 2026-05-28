@@ -7,7 +7,7 @@ import { normalizePages } from "nextra/normalize-pages";
 import type { FC } from "react";
 import { Stack } from "./stack";
 import { ThemeSwitch } from "./theme-switch";
-import { Github } from "./github";
+import { GithubNav } from "./github";
 
 export const Navbar: FC<{ pageMap: PageMapItem[] }> = ({ pageMap }) => {
 	const pathname = usePathname();
@@ -25,7 +25,7 @@ export const Navbar: FC<{ pageMap: PageMapItem[] }> = ({ pageMap }) => {
 			<div
 				style={{
 					display: "flex",
-					background: "green",
+
 					justifyContent: "center",
 					height: "4rem",
 					position: "fixed",
@@ -33,6 +33,11 @@ export const Navbar: FC<{ pageMap: PageMapItem[] }> = ({ pageMap }) => {
 					left: 0,
 					right: 0,
 					zIndex: 1,
+
+					background:
+						"linear-gradient(120deg, rgba(247, 135, 54, 0.208) 0%, rgba(54, 125, 247, 0.208) 100%)",
+					backdropFilter: "blur(10px)",
+					borderBottom: "1px solid var(--border-color)",
 				}}
 			>
 				<div
@@ -51,7 +56,6 @@ export const Navbar: FC<{ pageMap: PageMapItem[] }> = ({ pageMap }) => {
 							listStyleType: "none",
 							padding: 20,
 							gap: 20,
-							background: "lightcoral",
 							margin: 0,
 						}}
 					>
@@ -61,7 +65,7 @@ export const Navbar: FC<{ pageMap: PageMapItem[] }> = ({ pageMap }) => {
 								<li key={route}>
 									<Anchor
 										href={route}
-										style={{ textDecoration: "none" }}
+										style={{ textDecoration: "none", fontSize: "1.2rem" }}
 									>
 										{item.title}
 									</Anchor>
@@ -74,7 +78,6 @@ export const Navbar: FC<{ pageMap: PageMapItem[] }> = ({ pageMap }) => {
 						style={{
 							display: "flex",
 							listStyleType: "none",
-							background: "lightcoral",
 							margin: 0,
 							alignItems: "center",
 							gap: 20,
@@ -85,7 +88,7 @@ export const Navbar: FC<{ pageMap: PageMapItem[] }> = ({ pageMap }) => {
 							<ThemeSwitch />
 						</li>
 						<li>
-							<Github />
+							<GithubNav />
 						</li>
 					</ul>
 				</div>

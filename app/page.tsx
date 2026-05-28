@@ -4,9 +4,14 @@ import { Github } from "./_components/navbar/github";
 import { Email } from "./_components/navbar/email";
 import { CloudeaImage } from "./_components/image";
 import Link from "next/link";
+import { Icon } from "@iconify-icon/react";
+
+import "./page.css";
+import { getPosts, getTags } from "./posts/get-posts";
 
 const Banner = async () => {
 	const hito = await GetHitokoto();
+
 	return (
 		<div
 			style={{
@@ -27,13 +32,15 @@ const Banner = async () => {
 					display: "flex",
 					flexDirection: "column",
 					gap: 30,
+
+					color: "var(--home-banner-text-color)",
 				}}
 			>
 				Hi! Here is Cloudea.
 				{hito != null && (
 					<p style={{ fontSize: "1.5rem" }}>
 						{hito.hitokoto}
-						——
+						鈥斺€?
 						{hito.from_who ?? hito.from}
 					</p>
 				)}
@@ -61,24 +68,36 @@ const Banner = async () => {
 	);
 };
 
-const Content = async ({ children }) => {
+const Content = async () => {
+	const tags = await getTags();
+	const posts = await getPosts();
+
+	const allTags = Object.create(null);
+
+	for (const tag of tags) {
+		allTags[tag] ??= 0;
+	}
+
 	return (
-		<div style={{ display: "flex" }}>
+		<div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
 			<div style={{ width: "240px", height: "auto", margin: "0 38px" }}>
-				<div style={{ position: "sticky", top: "4rem" }}>
+				<div style={{ position: "sticky", top: "8rem" }}>
 					<div
 						style={{
-							padding: "20px",
 							borderRadius: "18px",
 							textAlign: "center",
 							alignItems: "center",
-							background: "gray",
+							background: "var(--background-color-transparent-80)",
+							boxShadow: "var(--cloudea-box-shadow)",
+							overflow: "hidden",
 						}}
 					>
 						<div
 							style={{
+								padding: "20px",
 								display: "flex",
 								justifyContent: "center",
+								background: "var(--background-color-transparent-80)",
 							}}
 						>
 							<CloudeaImage
@@ -94,31 +113,87 @@ const Content = async ({ children }) => {
 								height={80}
 							/>
 						</div>
-						<div>
-							<div>Cloudea</div>
-							<div>---</div>
+						<div
+							style={{
+								padding: "0 20px 20px",
+								background: "var(--background-color-transparent-80)",
+							}}
+						>
+							<div style={{ fontSize: "1.1rem" }}>Cloudea</div>
+							<div
+								style={{
+									marginTop: "20px",
+									fontSize: "0.9rem",
+									color: "var(--third-text-color)",
+									fontStyle: "italic",
+								}}
+							>
+								意思が希望を生んで、希望が夢を育てて、夢が世界を変えるんだ
+							</div>
 						</div>
-						<div style={{ display: "flex" }}>
-							<div style={{ width: "5rem" }}>xxx</div>
-							<div style={{ width: "5rem" }}>xxx</div>
-							<div style={{ width: "5rem" }}>xxx</div>
+						<div
+							className="sidebar-links"
+							style={{
+								padding: "20px",
+								display: "flex",
+								gap: "10px",
+								alignItems: "center",
+								justifyContent: "center",
+								borderTop: "1px solid var(--border-color)",
+							}}
+						>
+							<Link
+								href="/tags"
+								style={{
+									display: "flex",
+									alignItems: "center",
+									justifyContent: "center",
+									flexDirection: "column",
+								}}
+							>
+								<div>
+									<Icon
+										icon="lucide:tag"
+										style={{ marginRight: "0.4rem" }}
+										width={18}
+									/>
+									<span>Tags</span>
+								</div>
+								<div className="font-bold text-[1.1rem] mt-1">{Object.keys(allTags).length}</div>
+							</Link>
+							<Link
+								href="/posts"
+								style={{
+									display: "flex",
+									alignItems: "center",
+									justifyContent: "center",
+									flexDirection: "column",
+								}}
+							>
+								<div>
+									<Icon
+										icon="lucide:folder"
+										style={{ marginRight: "0.4rem" }}
+										width={18}
+									/>
+									<span>Posts</span>
+								</div>
+								<div className="font-bold text-[1.1rem] mt-1">{posts.length}</div>
+							</Link>
 						</div>
-					</div>
-					<div
-						style={{
-							marginTop: "20px",
-							padding: "20px",
-							borderRadius: "18px",
-							textAlign: "center",
-							alignItems: "center",
-							background: "gray",
-						}}
-					>
-						<Link href="/tags">Tags</Link>
 					</div>
 				</div>
 			</div>
-			{children}
+			<div
+				style={{
+					position: "relative",
+					width: "80%",
+					maxWidth: "1000px",
+					minHeight: "100%",
+				}}
+			>
+				<PostsPage posts={posts} />
+			</div>
 		</div>
 	);
 };
@@ -127,9 +202,7 @@ export default async function Index() {
 	return (
 		<>
 			<Banner />
-			<Content>
-				<PostsPage />
-			</Content>
+			<Content />
 		</>
 	);
 }

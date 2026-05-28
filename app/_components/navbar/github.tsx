@@ -1,9 +1,17 @@
-"use-client";
+"use client";
 
+import { Icon } from "@iconify-icon/react";
 import Link from "next/link";
-import { GitHubIcon } from "nextra/icons";
 
 export const Github = () => {
+	return GithubBase("lucide:github", 24);
+};
+
+export const GithubNav = () => {
+	return GithubBase("line-md:github-twotone", 24);
+};
+
+const GithubBase = (icon: string, size: number) => {
 	return (
 		<div
 			style={{
@@ -16,7 +24,10 @@ export const Github = () => {
 				href="https://github.com/CloudeaSoft"
 				target="_blank"
 			>
-				<GitHubIcon height="24" />
+				<Icon
+					icon={icon}
+					height={size}
+				/>
 			</Link>
 		</div>
 	);
