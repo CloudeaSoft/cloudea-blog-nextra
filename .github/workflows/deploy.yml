@@ -1,8 +1,8 @@
 name: Deploy Next.js site to Pages
 
 env:
-  NEXT_PUBLIC_BASE_URL: 'https://cloudeasoft.github.io'
-  NEXT_PUBLIC_BASE_PATH: '/cloudea-blog-nextra'
+  NEXT_PUBLIC_BASE_URL: ${{ vars.BASE_URL }}
+  NEXT_PUBLIC_BASE_PATH: ${{ vars.BASE_PATH }}
 
 on:
   # Runs on pushes targeting the main branch
