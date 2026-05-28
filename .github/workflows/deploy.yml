@@ -2,7 +2,6 @@ name: Deploy Next.js site to Pages
 
 env:
   NEXT_PUBLIC_BASE_URL: ${{ vars.BASE_URL }}
-  NEXT_PUBLIC_BASE_PATH: ${{ vars.BASE_PATH }}
 
 on:
   # Runs on pushes targeting the main branch
@@ -29,6 +28,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Set dynamic env vars
+        run: |
+          if [ "${{ vars.BASE_PATH }}" = "/" ]; then
+            echo "BASE_PATH is root, setting to empty string"
+            echo "NEXT_PUBLIC_BASE_PATH=" >> $GITHUB_ENV
+          else
+            echo "BASE_PATH is not root, using provided value"
+            echo "NEXT_PUBLIC_BASE_PATH=${{ vars.BASE_PATH }}" >> $GITHUB_ENV
+          fi
+
       - name: Checkout
         uses: actions/checkout@v5
         with:
