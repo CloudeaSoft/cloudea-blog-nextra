@@ -40,7 +40,7 @@ const Banner = async () => {
 				{hito != null && (
 					<p style={{ fontSize: "1.5rem" }}>
 						{hito.hitokoto}
-						鈥斺€?
+						&nbsp;——&nbsp;
 						{hito.from_who ?? hito.from}
 					</p>
 				)}
