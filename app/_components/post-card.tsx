@@ -14,7 +14,17 @@ export const PostCard: FC<PostCardProps> = ({ post }) => {
 	const { description, date, title } = post.frontMatter;
 	const dateObj = date && new Date(date);
 	return (
-		<div key={post.route}>
+		<li
+			className="post-card"
+			style={{
+				position: "relative",
+				borderRadius: "18px",
+				boxSizing: "border-box",
+				background: "var(--background-color-transparent-80)",
+				marginBottom: "38px",
+				overflow: "hidden",
+			}}
+		>
 			{post.frontMatter.cover && (
 				<div
 					className="w-full h-37.5"
@@ -122,6 +132,6 @@ export const PostCard: FC<PostCardProps> = ({ post }) => {
 					</Link>
 				</div>
 			</div>
-		</div>
+		</li>
 	);
 };

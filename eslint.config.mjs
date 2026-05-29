@@ -3,6 +3,7 @@ import js from "@eslint/js";
 import stylistic from "@stylistic/eslint-plugin";
 import tseslint from "typescript-eslint";
 import * as mdx from "eslint-plugin-mdx";
+import nextPlugin from "@next/eslint-plugin-next";
 
 const GLOBAL_IGNORES = [
 	"node_modules/**",
@@ -94,6 +95,15 @@ export default defineConfig([
 		...mdx.flatCodeBlocks,
 		rules: {
 			"react/jsx-no-undef": "off",
+		},
+	},
+	{
+		files: ["**/*.{js,jsx,ts,tsx}"],
+		plugins: {
+			"@next/next": nextPlugin,
+		},
+		rules: {
+			...nextPlugin.configs.recommended.rules,
 		},
 	},
 ]);
