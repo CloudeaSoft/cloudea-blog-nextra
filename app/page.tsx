@@ -9,6 +9,17 @@ import { Icon } from "@iconify-icon/react";
 import "./page.css";
 import { getPosts, getTags } from "./posts/get-posts";
 
+export default async function Index() {
+	return (
+		<>
+			<Banner />
+			<Content>
+				<PostsPage />
+			</Content>
+		</>
+	);
+}
+
 const Banner = async () => {
 	const hito = await GetHitokoto();
 
@@ -52,7 +63,7 @@ const Banner = async () => {
 					left: "50%",
 					transform: "translateX(-50%)",
 					padding: "15px 20px",
-					background: "rgba(200,200,200,0.2)",
+					background: "var(--background-color-transparent-40)",
 					backdropFilter: "blur(16px)",
 					border: "1px solid rgba(100,100,100,0.5)",
 					borderRadius: "30px",
@@ -98,6 +109,7 @@ const Content = async ({ children }) => {
 							<CloudeaImage
 								style={{
 									borderRadius: "16px",
+									border: "2px solid var(--border-color)",
 									overflow: "hidden",
 									width: "80px",
 									height: "80px",
@@ -196,14 +208,3 @@ const Content = async ({ children }) => {
 		</div>
 	);
 };
-
-export default async function Index() {
-	return (
-		<>
-			<Banner />
-			<Content>
-				<PostsPage />
-			</Content>
-		</>
-	);
-}

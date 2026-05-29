@@ -1,7 +1,5 @@
-// throws TypeError: Cannot read properties of null (reading 'useMemo')
 "use no memo";
 
-/* eslint sort-keys: error */
 import {
 	Callout,
 	Code,
@@ -17,6 +15,7 @@ import type { MDXComponents, UseMDXComponents } from "nextra/mdx-components";
 import type { ComponentProps, FC } from "react";
 import { Meta } from "./app/_components/meta";
 import { isValidDate } from "./utils/is-valid-date";
+import { TOC } from "./app/_components/toc";
 
 const createHeading = (
 	Tag: `h${2 | 3 | 4 | 5 | 6}`,
@@ -77,11 +76,13 @@ const DEFAULT_COMPONENTS = getNextraMDXComponents({
 
 export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
 	T extends BlogMDXComponents,
->(comp?: T) => {
+>(
+	comp?: T,
+) => {
 	const { DateFormatter, ...components } = comp ?? {};
 	return {
 		...DEFAULT_COMPONENTS,
-		wrapper({ children, metadata }) {
+		wrapper({ toc, children, metadata }) {
 			const date = metadata.date as string;
 			if (date && !isValidDate(date)) {
 				throw new Error(
@@ -90,23 +91,34 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
 			}
 			const dateObj = date && new Date(date);
 			return (
-				<>
-					<h1>{metadata.title}</h1>
-					<Meta {...(metadata as BlogMetadata)}>
-						{dateObj && (
-							<time dateTime={dateObj.toISOString()}>
-								{DateFormatter
-									? (
-										<DateFormatter date={dateObj} />
-									)
-									: (
-										dateObj.toLocaleDateString()
-									)}
-							</time>
-						)}
-					</Meta>
-					{children}
-				</>
+				<div className="flex px-10 py-10 gap-10">
+					<article
+						className="container px-4 py-6 prose max-md:prose-sm dark:prose-invert backdrop-blur-2xl rounded-2xl border-2 border-solid"
+						dir="ltr"
+						data-pagefind-body
+						style={{
+							borderColor: "var(--border-color)",
+							backgroundColor: "var(--background-color-transparent-80)",
+						}}
+					>
+						<h1>{metadata.title}</h1>
+						<Meta {...(metadata as BlogMetadata)}>
+							{dateObj && (
+								<time dateTime={dateObj.toISOString()}>
+									{DateFormatter
+										? (
+											<DateFormatter date={dateObj} />
+										)
+										: (
+											dateObj.toLocaleDateString()
+										)}
+								</time>
+							)}
+						</Meta>
+						{children}
+					</article>
+					<TOC toc={toc} />
+				</div>
 			);
 		},
 		...components,
