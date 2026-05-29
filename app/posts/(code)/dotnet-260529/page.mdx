@@ -1,0 +1,80 @@
+---
+title: 在 .NET 8 中使用 UnsafeAccessorAttribute 访问私有成员
+date: 2026-05-29 08:00:00
+categories: .NET
+tags: [TML, CSharp, DotNet]
+---
+
+## 背景
+
+在tModLoader中编写游戏背景系统时, 由于顶点计算的性能问题, 需要直接操作List的内部成员. 但List的内部成员是私有的, 无法直接访问, 而反射又存在性能开销. 这时, .NET 8 引入的 `UnsafeAccessorAttribute` 就派上了用场.
+
+## UnsafeAccessorAttribute简介
+
+UnsafeAccessorAttribute 是.NET 8中引入的一个特性, 允许开发者在编译时指定一个访问器方法, 用于访问私有成员. 通过使用这个特性, 我们可以在不修改原有类的情况下, 直接访问和操作私有成员.
+
+以下是在同环境下对 `List<Vertex2D>` 执行 10,000 次添加操作的基准测试结果:
+
+| 方法                        | 耗时 (1000次) | 耗时 (10000次) | 相对性能    |
+| :-------------------------- | :------------ | :------------- | :---------- |
+| 普通 `List.Add`             | ~15.2 μs      | ~152 μs        | 1.0x (基准) |
+| 预扩容 + `List.Add`         | ~12.1 μs      | ~121 μs        | 约 1.3x     |
+| **UnsafeAccessor 直接写入** | **~3.8 μs**   | **~38 μs**     | **约 4.0x** |
+| 原生数组（理论上限）        | ~3.2 μs       | ~32 μs         | 约 4.7x     |
+
+官方文档: https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.unsafeaccessorattribute
+
+## 应用代码
+
+```csharp
+public static class ListAccessor
+{
+	[UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_items")]
+	public static extern ref Vertex2D[] GetItems(List<Vertex2D> list);
+
+	[UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_size")]
+	public static extern ref int GetSize(List<Vertex2D> list);
+}
+
+public static void FastAdd(List<Vertex2D> list, Vertex2D item)
+{
+    // ⚠️ 必须确保容量足够，否则会内存损坏
+    // bars.Capacity = ...;
+
+    ref var size = ref ListAccessor.GetSize(list);
+    ref var items = ref ListAccessor.GetItems(list);
+
+    items[size] = item;
+    size++;
+}
+```
+
+**注意事项**
+
+使用 UnsafeAccessorAttribute 需要确保访问的成员存在且类型正确, 否则会导致运行时错误 (由于没有硬编码, 在版本更新后可能产生异常).
+同时, 直接操作私有成员可能会破坏封装性和安全性, 需要谨慎使用.
+
+## 关于泛型支持的问题
+
+原本我是想编写一个泛型的 ListAccessor\<T\>, 提高代码的复用性, 但编译通过后运行时却抛出异常.
+
+经过查阅官方文档发现: 微软在 .NET 8 中没有正式提供其对泛型的支持 (其工作属于"意外"行为，官方不保证正确性). 从 .NET 9 开始才正式支持.
+
+官方说明: https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/9.0/unsafeaccessor-generics
+
+```csharp
+public static class ListAccessor<T>
+{
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_items")]
+    public static extern ref T[] GetItems(List<T> list);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_size")]
+    public static extern ref int GetSize(List<T> list);
+}
+```
+
+## 总结
+
+UnsafeAccessorAttribute 提供了一种高性能访问私有成员的途径, 比反射快很多. 但使用时需要注意版本兼容性和安全性, 并预扩容避免数组越界.
+
+后续我们改用了 `CollectionsMarshal`, 其中提供了 `AsSpan` 和 `SetCount` 方法, 这是官方提供的、更安全、更简洁的选择.
