@@ -15,7 +15,6 @@ export const PostCard: FC<PostCardProps> = ({ post }) => {
 	const dateObj = date && new Date(date);
 	return (
 		<li
-			key={post.route}
 			className="post-card"
 			style={{
 				position: "relative",

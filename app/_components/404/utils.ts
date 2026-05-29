@@ -1,15 +1,18 @@
 "use no memo";
 
 export function gitUrlParse(url: string) {
-	const { href, origin, pathname } = new URL(url);
-
-	const [, owner, name] = pathname.split("/", 3);
-	return {
-		href,
-		origin,
-		owner,
-		name,
-	};
+	try {
+		const { href, origin, pathname } = new URL(url);
+		const [, owner, name] = pathname.split("/", 3);
+		return {
+			href,
+			origin,
+			owner,
+			name,
+		};
+	} catch {
+		return null;
+	}
 }
 
 export function getGitIssueUrl({
@@ -22,6 +25,10 @@ export function getGitIssueUrl({
 	labels?: string;
 }): string {
 	const repo = gitUrlParse(repository);
+	if (!repo) {
+		return "#";
+	}
+
 	if (repo.origin.includes("gitlab")) {
 		return `${repo.origin}/${repo.owner}/${
 			repo.name

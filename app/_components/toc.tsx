@@ -3,7 +3,6 @@ import type { Heading } from "nextra";
 import type { FC } from "react";
 
 export const TOC: FC<{ toc: Heading[] }> = ({ toc }) => {
-	console.log(toc);
 	return (
 		<div
 			className="w-50 rounded-2xl border-2 border-solid h-fit p-5"

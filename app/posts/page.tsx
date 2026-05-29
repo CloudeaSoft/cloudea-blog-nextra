@@ -12,7 +12,10 @@ export default async function PostsPage() {
 		<div data-pagefind-ignore="all">
 			<ul>
 				{posts.map((post) => (
-					<PostCard post={post} />
+					<PostCard
+						key={post.route}
+						post={post}
+					/>
 				))}
 			</ul>
 		</div>

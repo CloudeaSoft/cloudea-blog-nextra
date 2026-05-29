@@ -4,14 +4,12 @@ import { usePathname } from "next/navigation";
 import { useMounted } from "nextra/hooks";
 import type { FC, ReactNode } from "react";
 import { getGitIssueUrl } from "./utils";
-import { useThemeConfig } from "nextra-theme-docs";
 import Link from "next/link";
 
 export const NotFoundLink: FC<{
 	children: ReactNode;
 	labels: string;
 }> = ({ children, labels }) => {
-	const config = useThemeConfig();
 	const pathname = usePathname();
 	const mounted = useMounted();
 	const ref = mounted && document.referrer;

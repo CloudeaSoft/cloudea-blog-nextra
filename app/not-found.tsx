@@ -2,6 +2,6 @@
 
 import { NotFoundPage } from "./_components/404";
 
-export default () => {
+export default function NotFound() {
 	return <NotFoundPage />;
-};
+}
