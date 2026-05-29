@@ -84,23 +84,19 @@ export const PostCard: FC<PostCardProps> = ({ post }) => {
 							</div>
 						)}
 						{post.frontMatter.category! && (
-							<div>
+							<div className="flex items-center">
 								<Icon
 									icon="line-md:folder"
 									width={20}
 									style={{ paddingRight: "0.4rem" }}
 								/>
-								{post.frontMatter.category}
+								<Link href={`/categories/${post.frontMatter.category}`}>
+									{post.frontMatter.category}
+								</Link>
 							</div>
 						)}
 						{post.frontMatter.tags?.length && (
-							<div
-								className="text-[0.95rem]"
-								style={{
-									display: "flex",
-									alignItems: "center",
-								}}
-							>
+							<div className="flex items-center text-[0.95rem]">
 								<Icon
 									icon="lucide:tag"
 									width={18}
