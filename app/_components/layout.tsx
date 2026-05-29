@@ -5,7 +5,6 @@ import { Loading } from "./loading";
 
 import { Footer } from "./footer";
 import { Navbar } from "./navbar/navbar";
-import { Sidebar } from "./sidebar";
 import { LayoutProps } from "../../types/layout-props";
 
 import "./theme.scss";
@@ -24,16 +23,9 @@ export const Layout: FC<LayoutProps> = ({ children, ...themeConfig }) => {
 			<div>
 				<Navbar pageMap={pageMap} />
 				<div style={{ display: "flex" }}>
-					<Sidebar pageMap={pageMap} />
 					<div style={{ width: "100%" }}>
 						{banner}
-						<article
-							className="x:container x:px-4 x:prose x:max-md:prose-sm x:dark:prose-invert"
-							dir="ltr"
-							data-pagefind-body
-						>
-							<ViewTransitions>{children}</ViewTransitions>
-						</article>
+						<ViewTransitions>{children}</ViewTransitions>
 					</div>
 				</div>
 				<Footer />
