@@ -83,14 +83,14 @@ export const PostCard: FC<PostCardProps> = ({ post }) => {
 								{dateObj.toLocaleDateString("en-CA")}
 							</div>
 						)}
-						{post.frontMatter.categories! && (
+						{post.frontMatter.category! && (
 							<div>
 								<Icon
 									icon="line-md:folder"
 									width={20}
 									style={{ paddingRight: "0.4rem" }}
 								/>
-								{post.frontMatter.categories}
+								{post.frontMatter.category}
 							</div>
 						)}
 						{post.frontMatter.tags?.length && (

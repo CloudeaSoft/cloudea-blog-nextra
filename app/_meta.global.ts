@@ -10,23 +10,20 @@ export default {
 	//     "one-level": "",
 	//   },
 	// },
-	// posts: {
-	//   title: "Posts",
-	//   type: "page",
-	// },
 	// archive: {
 	//   title: "Timeline",
 	//   type: "page",
 	// },
+	// posts: {
+	// 	title: "Posts",
+	// 	type: "page",
+	// },
+	categories: {
+		title: "Categories",
+		type: "page",
+	},
 	about: {
 		title: "About",
 		type: "page",
-		href: "https://github.com/CloudeaSoft",
-		items: {
-			github: {
-				title: "Github",
-				href: "https://github.com/CloudeaSoft",
-			},
-		},
 	},
 };
