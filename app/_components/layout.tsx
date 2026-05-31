@@ -4,7 +4,7 @@ import { FC } from "react";
 import { Loading } from "./loading";
 
 import { Footer } from "./footer";
-import { Navbar } from "./navbar/navbar";
+import { Navbar } from "./navbar";
 import { LayoutProps } from "../../types/layout-props";
 
 import "./theme.scss";
@@ -20,14 +20,14 @@ export const Layout: FC<LayoutProps> = ({ children, ...themeConfig }) => {
 			{...nextThemes}
 		>
 			<Loading />
-			<div>
+			<div className="flex flex-col min-h-dvh">
 				<Navbar pageMap={pageMap} />
-				<div style={{ display: "flex" }}>
-					<div style={{ width: "100%" }}>
-						{banner}
-						<ViewTransitions>{children}</ViewTransitions>
-					</div>
-				</div>
+
+				<main className="flex-1 w-full">
+					{banner}
+					<ViewTransitions>{children}</ViewTransitions>
+				</main>
+
 				<Footer />
 			</div>
 			<Background />

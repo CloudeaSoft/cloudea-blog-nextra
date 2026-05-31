@@ -8,13 +8,14 @@ export async function generateMetadata(props) {
 	};
 }
 
+// output: export
 export async function generateStaticParams(): Promise<{ tag }[]> {
 	const allTags = await getTags();
 	return [...new Set(allTags)].map((tag) => ({ tag }));
 }
 
 export default async function TagPage(props) {
-	const params = await props.params;
+	const params = props.params;
 	const { title } = await generateMetadata({ params });
 	const posts = await getPosts();
 	return (

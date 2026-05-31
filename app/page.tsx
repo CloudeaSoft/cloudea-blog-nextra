@@ -1,5 +1,5 @@
-import { GetHitokoto } from "../utils/hitokoto";
 import PostsPage from "./posts/page";
+import { Hitokoto } from "./_components/hitokoto";
 import { Github } from "./_components/navbar/github";
 import { Email } from "./_components/navbar/email";
 import { CloudeaImage } from "./_components/image";
@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Icon } from "@iconify-icon/react";
 
 import "./page.css";
-import { getPosts, getTags } from "./posts/get-posts";
+import { getCategories, getPosts, getTags } from "./posts/get-posts";
 
 export default async function Index() {
 	return (
@@ -21,8 +21,6 @@ export default async function Index() {
 }
 
 const Banner = async () => {
-	const hito = await GetHitokoto();
-
 	return (
 		<div
 			style={{
@@ -34,27 +32,9 @@ const Banner = async () => {
 				alignItems: "center",
 			}}
 		>
-			<div
-				style={{
-					textAlign: "center",
-					fontSize: "3rem",
-					lineHeight: 1.2,
-
-					display: "flex",
-					flexDirection: "column",
-					gap: 30,
-
-					color: "var(--home-banner-text-color)",
-				}}
-			>
-				Hi! Here is Cloudea.
-				{hito != null && (
-					<p style={{ fontSize: "1.5rem" }}>
-						{hito.hitokoto}
-						&nbsp;——&nbsp;
-						{hito.from_who ?? hito.from}
-					</p>
-				)}
+			<div className="flex flex-col gap-7.5 text-center text-[3rem] leading-[1.2] text-(--home-banner-text-color)">
+				<span>Hi! Here is Cloudea.</span>
+				<Hitokoto />
 			</div>
 			<div
 				style={{
@@ -83,6 +63,24 @@ const Content = async ({ children }) => {
 	const tags = await getTags();
 	const uniqueTagsCount = new Set(tags).size;
 	const posts = await getPosts();
+	const categories = await getCategories();
+	const uniqueCategoriesCount = new Set(categories).size;
+
+	const sideLinks = [
+		{
+			name: "Categories",
+			icon: "lucide:bookmark",
+			link: "/categories",
+			count: uniqueCategoriesCount,
+		},
+		{ name: "Tags", icon: "lucide:tag", link: "/tags", count: uniqueTagsCount },
+		{
+			name: "Posts",
+			icon: "lucide:folder",
+			link: "/posts",
+			count: posts.length,
+		},
+	];
 
 	return (
 		<div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
@@ -138,59 +136,23 @@ const Content = async ({ children }) => {
 								意思が希望を生んで、希望が夢を育てて、夢が世界を変えるんだ
 							</div>
 						</div>
-						<div
-							className="sidebar-links"
-							style={{
-								padding: "20px",
-								display: "flex",
-								gap: "10px",
-								alignItems: "center",
-								justifyContent: "center",
-								borderTop: "1px solid var(--border-color)",
-							}}
-						>
-							<Link
-								href="/tags"
-								style={{
-									display: "flex",
-									alignItems: "center",
-									justifyContent: "center",
-									flexDirection: "column",
-								}}
-							>
-								<div>
+						<div className="sidebar-links grid grid-cols-3 gap-2 p-3 border-t border-(--border-color)">
+							{sideLinks.map((linkItem) => (
+								<Link
+									key={linkItem.link}
+									href={linkItem.link}
+									className="flex flex-col items-center justify-center gap-1"
+								>
 									<Icon
-										icon="lucide:tag"
-										style={{ marginRight: "0.4rem" }}
+										icon={linkItem.icon}
 										width={18}
 									/>
-									<span>Tags</span>
-								</div>
-								<div className="font-bold text-[1.1rem] mt-1">
-									{uniqueTagsCount}
-								</div>
-							</Link>
-							<Link
-								href="/posts"
-								style={{
-									display: "flex",
-									alignItems: "center",
-									justifyContent: "center",
-									flexDirection: "column",
-								}}
-							>
-								<div>
-									<Icon
-										icon="lucide:folder"
-										style={{ marginRight: "0.4rem" }}
-										width={18}
-									/>
-									<span>Posts</span>
-								</div>
-								<div className="font-bold text-[1.1rem] mt-1">
-									{posts.length}
-								</div>
-							</Link>
+									<span className="text-xs">{linkItem.name}</span>
+									<div className="font-bold text-[1.1rem]">
+										{linkItem.count}
+									</div>
+								</Link>
+							))}
 						</div>
 					</div>
 				</div>

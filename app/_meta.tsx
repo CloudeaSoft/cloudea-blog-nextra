@@ -1,4 +1,6 @@
-export default {
+import { MetaRecord } from "nextra";
+
+const meta: MetaRecord = {
 	index: {
 		title: "Home",
 		type: "page",
@@ -10,23 +12,24 @@ export default {
 	//     "one-level": "",
 	//   },
 	// },
-	// posts: {
-	//   title: "Posts",
-	//   type: "page",
-	// },
 	// archive: {
 	//   title: "Timeline",
 	//   type: "page",
 	// },
+	categories: {
+		title: "Categories",
+		type: "page",
+	},
 	about: {
 		title: "About",
-		type: "page",
-		href: "https://github.com/CloudeaSoft",
+		type: "menu",
 		items: {
-			github: {
-				title: "Github",
-				href: "https://github.com/CloudeaSoft",
+			me: {
+				title: "Me",
+				href: "/about",
 			},
 		},
 	},
 };
+
+export default meta;
