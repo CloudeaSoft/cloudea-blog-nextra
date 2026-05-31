@@ -51,13 +51,13 @@ export const Footer: FC = () => {
 					</Link>
 				</div>
 			</div>
-			<div>
+			<div className="text-center">
 				{`© 2022 - ${new Date().getFullYear()} Cloudea`}
 				<br />
 				12 posts in total 8.4k words in total
 				<br />
 			</div>
-			<div>
+			<div className="text-right">
 				VISITOR COUNT 666
 				<br />
 				TOTAL PAGE VIEWS 1142
