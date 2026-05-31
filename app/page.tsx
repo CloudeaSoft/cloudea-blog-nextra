@@ -1,6 +1,6 @@
 import { GetHitokoto } from "../utils/hitokoto";
 import PostsPage from "./posts/page";
-import { Github } from "./_components/navbar";
+import { Github } from "./_components/navbar/github";
 import { Email } from "./_components/navbar/email";
 import { CloudeaImage } from "./_components/image";
 import Link from "next/link";
@@ -156,22 +156,19 @@ const Content = async ({ children }) => {
 								意思が希望を生んで、希望が夢を育てて、夢が世界を変えるんだ
 							</div>
 						</div>
-						<div className="sidebar-links grid grid-cols-3 gap-1 p-5 border-t border-(--border-color)">
+						<div className="sidebar-links grid grid-cols-3 gap-2 p-3 border-t border-(--border-color)">
 							{sideLinks.map((linkItem) => (
 								<Link
 									key={linkItem.link}
 									href={linkItem.link}
-									className="flex flex-col items-center justify-center"
+									className="flex flex-col items-center justify-center gap-1"
 								>
-									<div>
-										<Icon
-											icon={linkItem.icon}
-											width={18}
-											className="mr-1"
-										/>
-										<span className="text-xs">{linkItem.name}</span>
-									</div>
-									<div className="font-bold text-[1.1rem] mt-1">
+									<Icon
+										icon={linkItem.icon}
+										width={18}
+									/>
+									<span className="text-xs">{linkItem.name}</span>
+									<div className="font-bold text-[1.1rem]">
 										{linkItem.count}
 									</div>
 								</Link>
