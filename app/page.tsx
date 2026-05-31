@@ -1,5 +1,5 @@
-import { GetHitokoto } from "../utils/hitokoto";
 import PostsPage from "./posts/page";
+import { Hitokoto } from "./_components/hitokoto";
 import { Github } from "./_components/navbar/github";
 import { Email } from "./_components/navbar/email";
 import { CloudeaImage } from "./_components/image";
@@ -21,8 +21,6 @@ export default async function Index() {
 }
 
 const Banner = async () => {
-	const hito = await GetHitokoto();
-
 	return (
 		<div
 			style={{
@@ -34,27 +32,9 @@ const Banner = async () => {
 				alignItems: "center",
 			}}
 		>
-			<div
-				style={{
-					textAlign: "center",
-					fontSize: "3rem",
-					lineHeight: 1.2,
-
-					display: "flex",
-					flexDirection: "column",
-					gap: 30,
-
-					color: "var(--home-banner-text-color)",
-				}}
-			>
-				Hi! Here is Cloudea.
-				{hito != null && (
-					<p style={{ fontSize: "1.5rem" }}>
-						{hito.hitokoto}
-						&nbsp;——&nbsp;
-						{hito.from_who ?? hito.from}
-					</p>
-				)}
+			<div className="flex flex-col gap-7.5 text-center text-[3rem] leading-[1.2] text-(--home-banner-text-color)">
+				<span>Hi! Here is Cloudea.</span>
+				<Hitokoto />
 			</div>
 			<div
 				style={{

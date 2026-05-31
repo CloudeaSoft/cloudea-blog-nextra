@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import "./loading.scss";
 import { CloudeaImage } from "./image";
 import { M_PLUS_Rounded_1c } from "next/font/google";
+import cn from "clsx";
 
 const mPlusRounded1c = M_PLUS_Rounded_1c({
 	weight: "400",
@@ -38,14 +39,13 @@ export const Loading = () => {
 	return (
 		<>
 			<div
-				className="loader-bg"
+				className={cn("loader-bg", { "fade-out": !isLoading })}
 				style={{
 					position: "fixed",
 					background: "white",
 					zIndex: 9999,
 					width: 100 + "%",
 					height: 100 + "%",
-					display: isLoading ? "block" : "none",
 				}}
 			>
 				<p

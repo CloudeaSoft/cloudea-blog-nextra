@@ -1,4 +1,6 @@
-export default {
+import { MetaRecord } from "nextra";
+
+const meta: MetaRecord = {
 	index: {
 		title: "Home",
 		type: "page",
@@ -14,16 +16,20 @@ export default {
 	//   title: "Timeline",
 	//   type: "page",
 	// },
-	// posts: {
-	// 	title: "Posts",
-	// 	type: "page",
-	// },
 	categories: {
 		title: "Categories",
 		type: "page",
 	},
 	about: {
 		title: "About",
-		type: "page",
+		type: "menu",
+		items: {
+			me: {
+				title: "Me",
+				href: "/about",
+			},
+		},
 	},
 };
+
+export default meta;

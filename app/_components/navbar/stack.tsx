@@ -16,7 +16,7 @@ export const Stack = () => {
 				padding: "0 3rem",
 				gap: 20,
 			}}
-			href={homeURL}
+			href={homeURL.toString()}
 		>
 			<CloudeaImage
 				src="favicon-96.ico"
