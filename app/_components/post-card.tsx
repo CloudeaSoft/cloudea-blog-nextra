@@ -83,7 +83,7 @@ export const PostCard: FC<PostCardProps> = ({ post }) => {
 								{dateObj.toLocaleDateString("en-CA")}
 							</div>
 						)}
-						{post.frontMatter.category! && (
+						{post.frontMatter.category && (
 							<div className="flex items-center">
 								<Icon
 									icon="line-md:folder"

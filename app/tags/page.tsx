@@ -4,7 +4,7 @@ import { getDistinctTags } from "../posts/get-posts";
 export default async function TagsPage() {
 	const tags = await getDistinctTags();
 
-	if (tags.length <= 0) {
+	if (Object.keys(tags).length === 0) {
 		return (
 			<p className="text-gray-500 dark:text-gray-400 text-center py-12">
 				暂无标签

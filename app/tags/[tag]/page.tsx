@@ -1,21 +1,19 @@
 import { PostCard } from "../../_components/post-card";
-import { getPosts, getTags } from "../../posts/get-posts";
+import { getPosts } from "../../posts/get-posts";
 
-export async function generateMetadata(props) {
-	const params = await props.params;
+interface TagPageProps {
+	params: { tag: string };
+}
+
+async function generateMetadata(tag: string) {
 	return {
-		title: `Posts Tagged with “${decodeURIComponent(params.tag)}”`,
+		title: `Posts Tagged with “${decodeURIComponent(tag)}”`,
 	};
 }
 
-export async function generateStaticParams(): Promise<{ tag }[]> {
-	const allTags = await getTags();
-	return [...new Set(allTags)].map((tag) => ({ tag }));
-}
-
-export default async function TagPage(props) {
-	const params = await props.params;
-	const { title } = await generateMetadata({ params });
+export default async function TagPage(props: TagPageProps) {
+	const params = props.params;
+	const { title } = await generateMetadata(params.tag);
 	const posts = await getPosts();
 	return (
 		<>

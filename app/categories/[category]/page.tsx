@@ -1,21 +1,19 @@
 import { PostCard } from "../../_components/post-card";
-import { getPosts, getCategories } from "../../posts/get-posts";
+import { getPosts } from "../../posts/get-posts";
 
-export async function generateMetadata(props) {
-	const params = await props.params;
+interface CategoryPageProps {
+	params: { category: string };
+}
+
+async function generateMetadata(category: string) {
 	return {
-		title: `Posts Categorized with “${decodeURIComponent(params.category)}”`,
+		title: `Posts Categorized with “${decodeURIComponent(category)}”`,
 	};
 }
 
-export async function generateStaticParams(): Promise<{ category }[]> {
-	const allCategories = await getCategories();
-	return [...new Set(allCategories)].map((category) => ({ category }));
-}
-
-export default async function CategoryPage(props) {
-	const params = await props.params;
-	const { title } = await generateMetadata({ params });
+export default async function CategoryPage(props: CategoryPageProps) {
+	const params = props.params;
+	const { title } = await generateMetadata(params.category);
 	const posts = await getPosts();
 	return (
 		<>

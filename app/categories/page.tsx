@@ -4,7 +4,7 @@ import { getDistinctCategories } from "../posts/get-posts";
 export default async function CategoriesPage() {
 	const categories = await getDistinctCategories();
 
-	if (categories.length <= 0) {
+	if (Object.keys(categories).length === 0) {
 		return (
 			<p className="text-gray-500 dark:text-gray-400 text-center py-12">
 				暂无分类

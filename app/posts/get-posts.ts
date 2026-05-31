@@ -19,13 +19,15 @@ export async function getTags() {
 
 export async function getDistinctTags() {
 	const tags = await getTags();
-	return getDistinct(tags);
+	const validTags = tags.filter((tag): tag is string => !!tag);
+	return getDistinct(validTags);
 }
 
 export async function getCategories() {
 	const posts = await getPosts();
-	const categories = posts.map((post) => post.frontMatter.category);
-	return categories;
+	return posts
+		.map((post) => post.frontMatter.category)
+		.filter((category): category is string => !!category);
 }
 
 export async function getDistinctCategories() {
