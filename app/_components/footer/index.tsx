@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { FC } from "react";
-import { CloudeaImage } from "./image";
+import { CloudeaImage } from "../image";
+import { ClientFooter } from "./index.client";
 
 export const Footer: FC = () => {
 	return (
@@ -58,9 +59,7 @@ export const Footer: FC = () => {
 				<br />
 			</div>
 			<div className="text-right">
-				VISITOR COUNT 666
-				<br />
-				TOTAL PAGE VIEWS 1142
+				<ClientFooter />
 			</div>
 		</footer>
 	);

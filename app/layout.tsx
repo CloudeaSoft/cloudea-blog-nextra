@@ -34,7 +34,9 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
 			dir="ltr"
 			suppressHydrationWarning
 		>
-			<Head faviconGlyph="✦" />
+			<Head faviconGlyph="✦">
+				<script defer src="https://events.vercount.one/js"></script>
+			</Head>
 			<body style={{ margin: 0, padding: 0 }}>
 				<Layout pageMap={pageMap}>{children}</Layout>
 			</body>
