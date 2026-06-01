@@ -12,10 +12,10 @@ const meta: MetaRecord = {
 	//     "one-level": "",
 	//   },
 	// },
-	// archive: {
-	//   title: "Timeline",
-	//   type: "page",
-	// },
+	archives: {
+		title: "Archives",
+		type: "page",
+	},
 	categories: {
 		title: "Categories",
 		type: "page",
