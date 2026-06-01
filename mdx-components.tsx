@@ -16,6 +16,7 @@ import type { ComponentProps, FC } from "react";
 import { Meta } from "./app/_components/meta";
 import { isValidDate } from "./utils/is-valid-date";
 import { TOC } from "./app/_components/toc";
+import cn from "clsx";
 
 const createHeading = (
 	Tag: `h${2 | 3 | 4 | 5 | 6}`,
@@ -91,9 +92,17 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
 			}
 			const dateObj = date && new Date(date);
 			return (
-				<div className="flex px-10 py-10 gap-10">
+				<div
+					className={cn(
+						"flex px-10 py-10 gap-10",
+						"max-lg:px-0 max-lg:py-0 max-lg:h-full max-lg:w-full",
+					)}
+				>
 					<article
-						className="container px-4 py-6 prose max-md:prose-sm dark:prose-invert backdrop-blur-2xl rounded-2xl border-2 border-solid"
+						className={cn(
+							"lg:container px-4 py-6 prose max-md:prose-sm dark:prose-invert backdrop-blur-2xl rounded-2xl border-2 border-solid",
+							"max-lg:rounded-none max-lg:border-none! w-full min-h-full",
+						)}
 						dir="ltr"
 						data-pagefind-body
 						style={{
@@ -117,7 +126,10 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
 						</Meta>
 						{children}
 					</article>
-					<TOC toc={toc} />
+					<TOC
+						toc={toc}
+						className="max-lg:hidden"
+					/>
 				</div>
 			);
 		},

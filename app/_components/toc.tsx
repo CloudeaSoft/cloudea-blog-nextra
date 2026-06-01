@@ -1,11 +1,12 @@
 import Link from "next/link";
 import type { Heading } from "nextra";
 import type { FC } from "react";
+import cn from "clsx";
 
-export const TOC: FC<{ toc: Heading[] }> = ({ toc }) => {
+export const TOC: FC<{ toc: Heading[]; className?: string }> = ({ toc, className }) => {
 	return (
 		<div
-			className="w-50 rounded-2xl border-2 border-solid h-fit p-5"
+			className={cn("w-50 rounded-2xl border-2 border-solid h-fit p-5", className)}
 			style={{
 				backgroundColor: "var(--background-color-transparent-80)",
 				borderColor: "var(--border-color)",
