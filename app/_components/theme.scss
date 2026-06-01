@@ -86,7 +86,7 @@
 		var(--shadow-color-1) 0px 0px 0px 1px inset;
 }
 
-* {
+body * {
 	transition-property: color, background, box-shadow, border-color;
 	transition-delay: 0s, 0s, 0s, 0s;
 	transition-duration: 0.2s, 0.2s, 0.2s, 0.2s;

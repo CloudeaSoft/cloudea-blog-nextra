@@ -1,4 +1,4 @@
-import PostsPage from "./posts/page";
+import PostsPage from "./_components/post-list";
 import { Hitokoto } from "./_components/hitokoto";
 import { Github } from "./_components/navbar/github";
 import { Email } from "./_components/navbar/email";
@@ -69,14 +69,14 @@ const Content = async ({ children }) => {
 	const sideLinks = [
 		{
 			name: "Categories",
-			icon: "lucide:bookmark",
+			icon: "lucide:folder",
 			link: "/categories",
 			count: uniqueCategoriesCount,
 		},
 		{ name: "Tags", icon: "lucide:tag", link: "/tags", count: uniqueTagsCount },
 		{
 			name: "Posts",
-			icon: "lucide:folder",
+			icon: "lucide:archive",
 			link: "/posts",
 			count: posts.length,
 		},

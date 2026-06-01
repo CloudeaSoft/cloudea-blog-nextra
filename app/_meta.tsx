@@ -15,10 +15,7 @@ const meta: MetaRecord = {
 	archives: {
 		title: "Archives",
 		type: "page",
-	},
-	categories: {
-		title: "Categories",
-		type: "page",
+		href: "/posts",
 	},
 	about: {
 		title: "About",
