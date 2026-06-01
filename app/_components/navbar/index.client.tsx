@@ -20,7 +20,7 @@ import type { PageMapItem } from "nextra";
 import { Icon } from "@iconify-icon/react";
 import { useAtom } from "jotai";
 import { menuAtom } from "../../../stores/menu";
-import Link from "next/dist/client/link";
+import Link from "next/link";
 
 const classes = {
 	link: cn(
@@ -278,7 +278,7 @@ export const MobileNavbar = ({
 			<div className="mt-16 px-4 flex flex-col h-full justify-between">
 				<ul className="flex flex-col justify-center items-start">
 					<li className="flex flex-col w-full my-1.5">
-						<Search className="x:lg:w-64 [&>input]:lg:w-64! [&_input]:md:w-full! [&_kbd]:max-lg:hidden" />
+						<Search className="lg:w-64 [&>input]:lg:w-64! [&_input]:md:w-full! [&_kbd]:max-lg:hidden" />
 					</li>
 					{topLevelNavbarItems.map((page) => {
 						const route = page.route || ("href" in page ? page.href! : "");
