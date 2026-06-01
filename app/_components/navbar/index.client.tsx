@@ -267,14 +267,10 @@ export const MobileNavbar = ({
 	return (
 		<div
 			className={cn(
-				// 基础样式
 				"fixed top-0 right-0 h-dvh w-full z-50 flex flex-col",
 				"bg-(--background-color)",
-				// 动画：只过渡 transform
 				"transition-transform! duration-300 ease-out",
-				// 显示/隐藏
 				menu ? "translate-x-0" : "translate-x-full",
-				// 只在移动端显示
 				"max-lg:visible",
 				"invisible",
 			)}

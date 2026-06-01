@@ -5,10 +5,12 @@ import { ClientNavbar, MobileNavbar } from "./index.client";
 import { getCategories, getPosts, getTags } from "../../posts/get-posts";
 
 export const Navbar: FC<{ pageMap: PageMapItem[] }> = async ({ pageMap }) => {
-	const tags = await getTags();
+	const [tags, posts, categories] = await Promise.all([
+		getTags(),
+		getPosts(),
+		getCategories(),
+	]);
 	const uniqueTagsCount = new Set(tags).size;
-	const posts = await getPosts();
-	const categories = await getCategories();
 	const uniqueCategoriesCount = new Set(categories).size;
 
 	const sideLinks = [
