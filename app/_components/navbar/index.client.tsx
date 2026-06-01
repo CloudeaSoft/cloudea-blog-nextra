@@ -20,7 +20,7 @@ import type { PageMapItem } from "nextra";
 import { Icon } from "@iconify-icon/react";
 import { useAtom } from "jotai";
 import { menuAtom } from "../../../stores/menu";
-import Link from "next/dist/client/link";
+import Link from "next/link";
 
 const classes = {
 	link: cn(
