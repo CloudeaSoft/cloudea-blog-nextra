@@ -58,7 +58,7 @@ export default async function TagPage() {
 													{Object.entries(posts).map(([_, post]) => (
 														<Link
 															key={post.route}
-															href="#"
+															href={post.route}
 														>
 															<span
 																className={cn(
