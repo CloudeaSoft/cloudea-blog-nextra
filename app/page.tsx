@@ -5,6 +5,7 @@ import { Email } from "./_components/navbar/email";
 import { CloudeaImage } from "./_components/image";
 import Link from "next/link";
 import { Icon } from "@iconify-icon/react";
+import cn from "clsx";
 
 import "./page.css";
 import { getCategories, getPosts, getTags } from "./posts/get-posts";
@@ -83,8 +84,8 @@ const Content = async ({ children }) => {
 	];
 
 	return (
-		<div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
-			<div style={{ width: "240px", height: "auto", margin: "0 38px" }}>
+		<div className="flex justify-center w-full px-5">
+			<div className={cn("w-60 h-auto mr-9", "max-lg:hidden")}>
 				<div style={{ position: "sticky", top: "8rem" }}>
 					<div
 						style={{
@@ -157,14 +158,7 @@ const Content = async ({ children }) => {
 					</div>
 				</div>
 			</div>
-			<div
-				style={{
-					position: "relative",
-					width: "80%",
-					maxWidth: "1000px",
-					minHeight: "100%",
-				}}
-			>
+			<div className={cn("relative w-[80%] max-w-250 min-h-full", "max-lg:w-[95%]")}>
 				{children}
 			</div>
 		</div>

@@ -24,9 +24,19 @@ export default async function PostPage() {
 	);
 
 	return (
-		<div className="pt-10 flex justify-center">
-			<div className="max-w-250 relative w-[80%] h-full">
-				<div className="p-7.5 mb-7.5 border border-solid rounded-[18px] border-(--border-color) shadow-(--cloudea-box-shadow) bg-(--background-color-transparent-80)">
+		<div
+			className={cn(
+				"pt-10 mb-7.5 flex justify-center",
+				"max-lg:pt-0 max-lg:mb-0",
+			)}
+		>
+			<div className={cn("max-w-250 relative w-[80%] h-full", "max-lg:w-full")}>
+				<div
+					className={cn(
+						"p-7.5 border border-solid rounded-[18px] border-(--border-color) shadow-(--cloudea-box-shadow) bg-(--background-color-transparent-80)",
+						"max-lg:p-5 max-lg:rounded-none",
+					)}
+				>
 					<div>
 						{sortedYears.map((year) => {
 							const yearMonths = groupedByYear[year];
@@ -36,7 +46,10 @@ export default async function PostPage() {
 							);
 
 							return (
-								<section key={year} className="mb-2">
+								<section
+									key={year}
+									className="mb-2"
+								>
 									<div className="flex items-center mb-2">
 										<span className="font-semibold text-3xl mr-2">{year}</span>
 										<span className="text-xs font-bold rounded-sm bg-(--third-background-color) border py-0.5 px-2.5 border-(--border-color)">

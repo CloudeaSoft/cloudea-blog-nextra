@@ -1,9 +1,32 @@
 import type { PageMapItem } from "nextra";
 import type { FC } from "react";
 import { Stack } from "./stack";
-import { ClientNavbar } from "./index.client";
+import { ClientNavbar, MobileNavbar } from "./index.client";
+import { getCategories, getPosts, getTags } from "../../posts/get-posts";
 
-export const Navbar: FC<{ pageMap: PageMapItem[] }> = ({ pageMap }) => {
+export const Navbar: FC<{ pageMap: PageMapItem[] }> = async ({ pageMap }) => {
+	const tags = await getTags();
+	const uniqueTagsCount = new Set(tags).size;
+	const posts = await getPosts();
+	const categories = await getCategories();
+	const uniqueCategoriesCount = new Set(categories).size;
+
+	const sideLinks = [
+		{
+			name: "Categories",
+			icon: "lucide:folder",
+			link: "/categories",
+			count: uniqueCategoriesCount,
+		},
+		{ name: "Tags", icon: "lucide:tag", link: "/tags", count: uniqueTagsCount },
+		{
+			name: "Posts",
+			icon: "lucide:archive",
+			link: "/posts",
+			count: posts.length,
+		},
+	];
+
 	return (
 		<header
 			style={{
@@ -28,18 +51,16 @@ export const Navbar: FC<{ pageMap: PageMapItem[] }> = ({ pageMap }) => {
 					borderBottom: "1px solid var(--border-color)",
 				}}
 			>
-				<div
-					style={{
-						display: "flex",
-						justifyContent: "space-between",
-						width: "100%",
-						maxWidth: "1200px",
-					}}
-				>
+				<div className="flex justify-between w-full max-w-300 z-1005">
 					<Stack />
 
 					<ClientNavbar pageMap={pageMap} />
 				</div>
+
+				<MobileNavbar
+					links={sideLinks}
+					pageMap={pageMap}
+				/>
 			</nav>
 		</header>
 	);
