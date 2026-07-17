@@ -1,0 +1,67 @@
+/* Styles for rendered Markdown (MDX) post content.
+ *
+ * Scoped to `.markdown-body` (added to the article wrapper in
+ * `mdx-components.tsx`) so it never leaks into other parts of the site.
+ * Colors reference the theme tokens defined in `app/_components/theme.scss`,
+ * so everything adapts automatically between light and dark mode. */
+
+.markdown-body {
+	text-wrap: pretty;
+}
+
+/* Brand-colored text selection while reading. */
+.markdown-body ::selection {
+	background-color: var(--selection-color);
+	color: #fff;
+}
+
+/* Keep anchored headings clear of the sticky navbar when jumped to. */
+.markdown-body :is(h1, h2, h3, h4, h5, h6) {
+	scroll-margin-top: 6rem;
+}
+
+/* Inline links: brand color with an underline that grows on hover.
+ * Uses a background-image underline instead of `text-decoration` so it
+ * survives the global `text-decoration: none !important` rule and animates.
+ * The `subheading-anchor` (the `#` permalink) is excluded. */
+.markdown-body a:not(.subheading-anchor) {
+	color: var(--primary-color);
+	text-decoration: none;
+	background-image: linear-gradient(var(--primary-color), var(--primary-color));
+	background-position: 0 100%;
+	background-repeat: no-repeat;
+	background-size: 0% 1.5px;
+	padding-bottom: 1px;
+	transition: background-size 0.25s ease, color 0.2s ease;
+}
+
+.markdown-body a:not(.subheading-anchor):hover {
+	color: var(--primary-color);
+	background-size: 100% 1.5px;
+}
+
+/* Tint inline code (but not fenced code blocks) with the brand color. */
+.markdown-body :not(pre) > code {
+	color: var(--primary-color);
+}
+
+/* Brand-colored list markers. */
+.markdown-body :is(ul, ol) li::marker {
+	color: var(--primary-color);
+}
+
+/* Rounded, softly bordered images centered in the reading column. */
+.markdown-body img {
+	display: block;
+	margin-inline: auto;
+	border-radius: 0.75rem;
+	border: 1px solid var(--border-color);
+	box-shadow: var(--cloudea-box-shadow-flat);
+}
+
+/* Subtle themed horizontal rule. */
+.markdown-body hr {
+	border: none;
+	border-top: 1px solid var(--border-color);
+	margin: 2rem 0;
+}

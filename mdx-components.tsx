@@ -17,6 +17,7 @@ import { Meta } from "./app/_components/meta";
 import { isValidDate } from "./utils/is-valid-date";
 import { TOC } from "./app/_components/toc";
 import cn from "clsx";
+import "./markdown.css";
 
 const createHeading = (
 	Tag: `h${2 | 3 | 4 | 5 | 6}`,
@@ -100,7 +101,7 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
 				>
 					<article
 						className={cn(
-							"lg:container px-4 py-6 prose max-md:prose-sm dark:prose-invert backdrop-blur-2xl rounded-2xl border-2 border-solid",
+							"markdown-body lg:container px-4 py-6 prose max-md:prose-sm dark:prose-invert backdrop-blur-2xl rounded-2xl border-2 border-solid",
 							"max-lg:rounded-none max-lg:border-none! w-full min-h-full",
 						)}
 						dir="ltr"
