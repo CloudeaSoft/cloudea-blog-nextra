@@ -50,13 +50,15 @@
 	color: var(--primary-color);
 }
 
-/* Rounded, softly bordered images centered in the reading column. */
+/* Rounded, softly bordered images centered in the reading column.
+ * Uses the same elevation as post cards (see app/_components/post-list.css)
+ * so images feel consistent with the rest of the site. */
 .markdown-body img {
 	display: block;
 	margin-inline: auto;
 	border-radius: 0.75rem;
 	border: 1px solid var(--border-color);
-	box-shadow: var(--cloudea-box-shadow-flat);
+	box-shadow: var(--cloudea-box-shadow);
 }
 
 /* Subtle themed horizontal rule. */
