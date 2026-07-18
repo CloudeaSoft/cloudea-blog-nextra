@@ -14,9 +14,9 @@ export const GoBack: FC = () => {
 	return (
 		<Button
 			onClick={router.back}
-			className="x:print:hidden x:underline"
+			className="x:print:hidden x:underline x:mb-6 x:inline-block"
 		>
-			Back
+			← Back
 		</Button>
 	);
 };

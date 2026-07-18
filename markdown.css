@@ -57,6 +57,15 @@
 	border-bottom: 1px solid var(--border-color);
 }
 
+/* The post title is grouped with its meta row, so it drops the content-h1
+ * divider line and tightens its spacing. */
+.markdown-body h1.post-title {
+	margin-top: 0;
+	margin-bottom: 0.5rem;
+	padding-bottom: 0;
+	border-bottom: 0;
+}
+
 .markdown-body h2 {
 	font-size: 1.5em;
 	padding-bottom: 0.3em;
@@ -107,6 +116,12 @@
 .markdown-body h6:hover > .subheading-anchor,
 .markdown-body .subheading-anchor:focus {
 	opacity: 1;
+}
+
+/* Nextra's bundled theme also renders a `#` via `.subheading-anchor::after`.
+ * Suppress it so only the brand-colored `::before` permalink above shows. */
+.markdown-body .subheading-anchor::after {
+	content: none;
 }
 
 /* Keep anchored headings clear of the sticky navbar when jumped to. */
