@@ -15,7 +15,7 @@ import cn from "clsx";
  * Rendered as a sibling of the article (outside `.markdown-body`) so the
  * markdown post styles never apply to its list.
  */
-export const MobileToc: FC<{ toc: Heading[] }> = ({ toc }) => {
+export const MobileToc: FC<{ toc?: Heading[] }> = ({ toc = [] }) => {
 	const [open, setOpen] = useState(false);
 
 	if (!toc.length) return null;
@@ -35,6 +35,7 @@ export const MobileToc: FC<{ toc: Heading[] }> = ({ toc }) => {
 				type="button"
 				onClick={() => setOpen((v) => !v)}
 				aria-expanded={open}
+				aria-controls="mobile-toc-list"
 				className="w-full flex items-center justify-between gap-2 px-5 py-3 text-left text-sm font-medium"
 				style={{ color: "var(--first-text-color)" }}
 			>
@@ -56,6 +57,7 @@ export const MobileToc: FC<{ toc: Heading[] }> = ({ toc }) => {
 			</button>
 			{open && (
 				<ul
+					id="mobile-toc-list"
 					className="max-h-[50vh] overflow-y-auto px-3 pb-3 flex flex-col text-sm"
 					style={{ color: "var(--second-text-color)" }}
 				>
