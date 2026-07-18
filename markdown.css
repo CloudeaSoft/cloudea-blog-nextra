@@ -163,8 +163,10 @@
 /* Inline links: brand color with an underline that grows on hover.
  * Uses a background-image underline instead of `text-decoration` so it
  * survives the global `text-decoration: none !important` rule and animates.
- * The `subheading-anchor` (the `#` permalink) is excluded. */
-.markdown-body a:not(.subheading-anchor) {
+ * The `subheading-anchor` (the `#` permalink) is excluded, and so are links
+ * that wrap an image (e.g. `[![alt](img)](url)`) — the background-image
+ * underline would otherwise render as a line beneath the image. */
+.markdown-body a:not(.subheading-anchor):not(:has(img)) {
 	color: var(--primary-color);
 	text-decoration: none;
 	background-image: linear-gradient(var(--primary-color), var(--primary-color));
@@ -175,7 +177,7 @@
 	transition: background-size 0.25s ease, color 0.2s ease;
 }
 
-.markdown-body a:not(.subheading-anchor):hover {
+.markdown-body a:not(.subheading-anchor):not(:has(img)):hover {
 	color: var(--primary-color);
 	background-size: 100% 1.5px;
 }
