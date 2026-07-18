@@ -80,13 +80,15 @@
 	color: var(--third-text-color);
 }
 
-/* The `#` permalink that appears in the left gutter on heading hover. */
+/* The `#` permalink that appears just left of the heading on hover.
+ * `right: 100%` pins it to the heading's left edge and `margin-right` sets a
+ * small, consistent gap regardless of the heading's font size. */
 .markdown-body .subheading-anchor {
 	position: absolute;
-	left: -0.9em;
-	width: 0.9em;
-	text-align: center;
+	right: 100%;
+	margin-right: 0.2em;
 	opacity: 0;
+	white-space: nowrap;
 	text-decoration: none;
 	transition: opacity 0.15s ease;
 }
@@ -115,6 +117,23 @@
 .markdown-body h5,
 .markdown-body h6 {
 	scroll-margin-top: 6rem;
+}
+
+/* Nextra's <Summary> (foldable header) lays out an arrow icon, an <h3> label,
+ * and a link icon with flexbox. Don't apply content-heading sizing/margins to
+ * that label or it drops onto its own line below the arrow. */
+.markdown-body summary :is(h1, h2, h3, h4, h5, h6) {
+	margin: 0;
+	font-size: 1em;
+	font-weight: 600;
+	line-height: inherit;
+	padding-bottom: 0;
+	border-bottom: 0;
+}
+
+.markdown-body summary a:not(.subheading-anchor) {
+	background-image: none;
+	padding-bottom: 0;
 }
 
 /* -------------------------------------------------------------------------- */
