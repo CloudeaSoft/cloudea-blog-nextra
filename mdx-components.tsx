@@ -14,9 +14,11 @@ import { useMDXComponents as getNextraMDXComponents } from "nextra/mdx-component
 import type { MDXComponents, UseMDXComponents } from "nextra/mdx-components";
 import type { ComponentProps, FC } from "react";
 import { Meta } from "./app/_components/meta";
+import { GoBack } from "./app/_components/go-back";
 import { isValidDate } from "./utils/is-valid-date";
 import { TOC } from "./app/_components/toc";
 import cn from "clsx";
+import "./markdown.css";
 
 const createHeading = (
 	Tag: `h${2 | 3 | 4 | 5 | 6}`,
@@ -100,7 +102,7 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
 				>
 					<article
 						className={cn(
-							"lg:container px-4 py-6 prose max-md:prose-sm dark:prose-invert backdrop-blur-2xl rounded-2xl border-2 border-solid",
+							"markdown-body lg:container px-8 py-8 max-lg:px-5 max-lg:py-6 prose max-md:prose-sm dark:prose-invert backdrop-blur-2xl rounded-2xl border-2 border-solid",
 							"max-lg:rounded-none max-lg:border-none! w-full min-h-full",
 						)}
 						dir="ltr"
@@ -110,20 +112,23 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
 							backgroundColor: "var(--background-color-transparent-80)",
 						}}
 					>
-						<h1>{metadata.title}</h1>
-						<Meta {...(metadata as BlogMetadata)}>
-							{dateObj && (
-								<time dateTime={dateObj.toISOString()}>
-									{DateFormatter
-										? (
-											<DateFormatter date={dateObj} />
-										)
-										: (
-											dateObj.toLocaleDateString()
-										)}
-								</time>
-							)}
-						</Meta>
+						<GoBack />
+						<header className="mb-8">
+							<h1 className="post-title">{metadata.title}</h1>
+							<Meta {...(metadata as BlogMetadata)}>
+								{dateObj && (
+									<time dateTime={dateObj.toISOString()}>
+										{DateFormatter
+											? (
+												<DateFormatter date={dateObj} />
+											)
+											: (
+												dateObj.toLocaleDateString()
+											)}
+									</time>
+								)}
+							</Meta>
+						</header>
 						{children}
 					</article>
 					<TOC
