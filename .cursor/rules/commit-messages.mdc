@@ -1,0 +1,35 @@
+---
+description: Git commit message convention (Conventional Commits) used across this repository
+alwaysApply: true
+---
+
+# Commit message convention
+
+This repository follows [Conventional Commits](https://www.conventionalcommits.org/).
+Every commit message subject MUST match:
+
+```
+type(scope): description
+```
+
+## Rules
+
+- `type` MUST be one of: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`.
+- `scope` is optional, wrapped in parentheses, and lowercase (e.g. `ci`, `build`, `deps`, `home`, `markdown`).
+- `description`:
+  - lowercase first letter,
+  - imperative mood ("add", "fix", "refine", not "added"/"adds"),
+  - no trailing period,
+  - concise (aim for ≤ 72 characters).
+- Do NOT append the PR number (e.g. `(#12)`) — GitHub adds it automatically on squash-merge.
+- Add a blank line and a body only when extra context is genuinely useful.
+- Keep one logical change per commit.
+
+## Examples (from this repo's history)
+
+- `feat: mobile adaptation`
+- `feat(home): implement main page layout and styling`
+- `fix: amend path of image url`
+- `fix(build): recover params to fit the requirement of nextra`
+- `chore(ci): change fixed path to github variables`
+- `docs: add CONTRIBUTING.md`
