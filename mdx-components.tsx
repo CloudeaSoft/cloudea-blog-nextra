@@ -17,6 +17,7 @@ import { Meta } from "./app/_components/meta";
 import { GoBack } from "./app/_components/go-back";
 import { isValidDate } from "./utils/is-valid-date";
 import { TOC } from "./app/_components/toc";
+import { MobileToc } from "./app/_components/toc-mobile";
 import cn from "clsx";
 import "./markdown.css";
 
@@ -97,9 +98,10 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
 				<div
 					className={cn(
 						"flex px-10 py-10 gap-10",
-						"max-lg:px-0 max-lg:py-0 max-lg:h-full max-lg:w-full",
+						"max-lg:flex-col max-lg:gap-0 max-lg:px-0 max-lg:py-0 max-lg:h-full max-lg:w-full",
 					)}
 				>
+					<MobileToc toc={toc} />
 					<article
 						className={cn(
 							"markdown-body lg:container px-8 py-8 max-lg:px-5 max-lg:py-6 prose max-md:prose-sm dark:prose-invert backdrop-blur-2xl rounded-2xl border-2 border-solid",
