@@ -1,11 +1,20 @@
-/* Styles for rendered Markdown (MDX) post content.
+/* GitHub-flavored styling for rendered Markdown (MDX) post content.
  *
  * Scoped to `.markdown-body` (added to the article wrapper in
  * `mdx-components.tsx`) so it never leaks into other parts of the site.
- * Colors reference the theme tokens defined in `app/_components/theme.scss`,
- * so everything adapts automatically between light and dark mode. */
+ * Sizing and spacing follow GitHub's markdown rendering, while all colors
+ * reference the theme tokens in `app/_components/theme.scss`, so everything
+ * adapts automatically between light and dark mode.
+ *
+ * Note: some elements are replaced by Nextra React components and are styled
+ * elsewhere (fenced code via rehype-pretty-code / `Pre`, GFM tables via
+ * `Table`, GitHub alert blockquotes via `Callout`). This file styles the
+ * remaining native elements plus a few shared concerns. */
 
 .markdown-body {
+	line-height: 1.5;
+	color: var(--default-text-color);
+	word-wrap: break-word;
 	text-wrap: pretty;
 }
 
@@ -15,9 +24,106 @@
 	color: #fff;
 }
 
+/* Collapse the outer margins so the article padding stays even. */
+.markdown-body > :first-child {
+	margin-top: 0;
+}
+
+.markdown-body > :last-child {
+	margin-bottom: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Headings                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+	position: relative;
+	margin-top: 1.5em;
+	margin-bottom: 1rem;
+	font-weight: 600;
+	line-height: 1.25;
+	color: var(--first-text-color);
+}
+
+.markdown-body h1 {
+	font-size: 2em;
+	padding-bottom: 0.3em;
+	border-bottom: 1px solid var(--border-color);
+}
+
+.markdown-body h2 {
+	font-size: 1.5em;
+	padding-bottom: 0.3em;
+	border-bottom: 1px solid var(--border-color);
+}
+
+.markdown-body h3 {
+	font-size: 1.25em;
+}
+
+.markdown-body h4 {
+	font-size: 1em;
+}
+
+.markdown-body h5 {
+	font-size: 0.875em;
+}
+
+.markdown-body h6 {
+	font-size: 0.85em;
+	color: var(--third-text-color);
+}
+
+/* The `#` permalink that appears in the left gutter on heading hover. */
+.markdown-body .subheading-anchor {
+	position: absolute;
+	left: -0.9em;
+	width: 0.9em;
+	text-align: center;
+	opacity: 0;
+	text-decoration: none;
+	transition: opacity 0.15s ease;
+}
+
+.markdown-body .subheading-anchor::before {
+	content: "#";
+	font-weight: 600;
+	color: var(--primary-color);
+}
+
+.markdown-body h1:hover > .subheading-anchor,
+.markdown-body h2:hover > .subheading-anchor,
+.markdown-body h3:hover > .subheading-anchor,
+.markdown-body h4:hover > .subheading-anchor,
+.markdown-body h5:hover > .subheading-anchor,
+.markdown-body h6:hover > .subheading-anchor,
+.markdown-body .subheading-anchor:focus {
+	opacity: 1;
+}
+
 /* Keep anchored headings clear of the sticky navbar when jumped to. */
-.markdown-body :is(h1, h2, h3, h4, h5, h6) {
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
 	scroll-margin-top: 6rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Text blocks                                                                 */
+/* -------------------------------------------------------------------------- */
+
+.markdown-body p {
+	margin-top: 0;
+	margin-bottom: 1rem;
 }
 
 /* Inline links: brand color with an underline that grows on hover.
@@ -40,30 +146,115 @@
 	background-size: 100% 1.5px;
 }
 
-/* Tint inline code (but not fenced code blocks) with the brand color. */
-.markdown-body :not(pre) > code {
-	color: var(--primary-color);
+/* Blockquotes (non-alert). GitHub-style muted text with a left rule. */
+.markdown-body blockquote {
+	margin: 0 0 1rem;
+	padding: 0 1em;
+	color: var(--third-text-color);
+	border-left: 0.25em solid var(--border-color);
+}
+
+.markdown-body blockquote > :first-child {
+	margin-top: 0;
+}
+
+.markdown-body blockquote > :last-child {
+	margin-bottom: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Lists                                                                       */
+/* -------------------------------------------------------------------------- */
+
+.markdown-body ul,
+.markdown-body ol {
+	margin-top: 0;
+	margin-bottom: 1rem;
+	padding-left: 2em;
+}
+
+.markdown-body ul {
+	list-style: disc;
+}
+
+.markdown-body ol {
+	list-style: decimal;
+}
+
+.markdown-body ul ul {
+	list-style: circle;
+}
+
+.markdown-body ul ul ul {
+	list-style: square;
+}
+
+.markdown-body li + li {
+	margin-top: 0.25em;
+}
+
+/* Nested lists shouldn't add extra vertical space. */
+.markdown-body li > ul,
+.markdown-body li > ol {
+	margin-top: 0.25em;
+	margin-bottom: 0;
 }
 
 /* Brand-colored list markers. */
-.markdown-body :is(ul, ol) li::marker {
+.markdown-body ul li::marker,
+.markdown-body ol li::marker {
 	color: var(--primary-color);
 }
+
+/* GFM task lists. */
+.markdown-body li.task-list-item {
+	list-style: none;
+}
+
+.markdown-body li.task-list-item > input[type="checkbox"] {
+	margin: 0 0.35em 0.25em -1.4em;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Inline code (fenced blocks are handled by Nextra's Pre component)           */
+/* -------------------------------------------------------------------------- */
+
+.markdown-body :not(pre) > code {
+	padding: 0.2em 0.4em;
+	margin: 0;
+	font-size: 85%;
+	white-space: break-spaces;
+	background-color: var(--third-background-color);
+	border: 1px solid var(--border-color);
+	border-radius: 6px;
+}
+
+.markdown-body pre {
+	margin-top: 0;
+	margin-bottom: 1rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Media & rules                                                               */
+/* -------------------------------------------------------------------------- */
 
 /* Rounded, softly bordered images centered in the reading column.
  * Uses the same elevation as post cards (see app/_components/post-list.css)
  * so images feel consistent with the rest of the site. */
 .markdown-body img {
 	display: block;
-	margin-inline: auto;
+	max-width: 100%;
+	margin: 0.5rem auto 1rem;
 	border-radius: 0.75rem;
 	border: 1px solid var(--border-color);
 	box-shadow: var(--cloudea-box-shadow);
 }
 
-/* Subtle themed horizontal rule. */
+/* GitHub-style horizontal rule. */
 .markdown-body hr {
-	border: none;
-	border-top: 1px solid var(--border-color);
-	margin: 2rem 0;
+	height: 0.25em;
+	padding: 0;
+	margin: 1.5rem 0;
+	border: 0;
+	background-color: var(--border-color);
 }
