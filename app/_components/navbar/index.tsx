@@ -45,7 +45,7 @@ export const Navbar: FC<{ pageMap: PageMapItem[] }> = async ({ pageMap }) => {
 					top: 0,
 					left: 0,
 					right: 0,
-					zIndex: 1,
+					zIndex: 50,
 
 					background:
 						"linear-gradient(120deg, rgba(247, 135, 54, 0.208) 0%, rgba(54, 125, 247, 0.208) 100%)",
