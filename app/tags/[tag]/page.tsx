@@ -1,5 +1,5 @@
-import { PostCard } from "../../_components/post-card";
-import { getPosts, getTags } from "../../posts/get-posts";
+import { PostCard } from "@/app/_components/posts/post-card";
+import { getPosts, getTags } from "@/app/posts/get-posts";
 
 export async function generateMetadata(props) {
 	const params = await props.params;

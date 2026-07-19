@@ -1,6 +1,6 @@
-import { PostCard } from "../_components/post-card";
+import { PostCard } from "./post-card";
 import "./post-list.css";
-import { getPosts } from "../posts/get-posts";
+import { getPosts } from "@/app/posts/get-posts";
 
 export const metadata = {
 	title: "Posts",

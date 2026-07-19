@@ -1,6 +1,6 @@
 import { normalizePages } from "nextra/normalize-pages";
 import { getPageMap } from "nextra/page-map";
-import sortDate from "../../utils/sort-date";
+import sortDate from "@/utils/sort-date";
 
 export async function getPosts() {
 	const { directories } = normalizePages({

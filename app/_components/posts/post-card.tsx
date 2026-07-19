@@ -1,7 +1,7 @@
 import { Icon } from "@iconify-icon/react";
 import { Link } from "next-view-transitions";
 import type { FC } from "react";
-import { CloudeaImage } from "./image";
+import { CloudeaImage } from "@/app/_components/ui/image";
 
 interface PostCardProps {
 	post: {
@@ -26,18 +26,16 @@ export const PostCard: FC<PostCardProps> = ({ post }) => {
 			}}
 		>
 			{post.frontMatter.cover && (
-				<div
-					className="w-full h-37.5"
-					style={{ position: "relative" }}
+				<Link
+					href={post.route}
+					className="relative block w-full h-37.5"
 				>
-					<Link href={post.route}>
-						<CloudeaImage
-							src={post.frontMatter.cover}
-							alt={title ?? "Post Cover"}
-							className="w-full h-full object-cover"
-						/>
-					</Link>
-				</div>
+					<CloudeaImage
+						src={post.frontMatter.cover}
+						alt={title ?? "Post Cover"}
+						className="object-cover"
+					/>
+				</Link>
 			)}
 			<div
 				className={`${post.frontMatter.cover ? "pt-5" : "pt-7"} pb-7 px-7 gap-5 flex-col flex`}

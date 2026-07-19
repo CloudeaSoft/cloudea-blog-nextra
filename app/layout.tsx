@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
 import type { FC, ReactNode } from "react";
-import { Layout } from "./_components/layout";
-import { getImageUrl } from "../utils/get-resources-url";
+import { Layout } from "@/app/_components/layout";
+import { getImageUrl } from "@/utils/get-resources-url";
 
 import "./globals.css";
 
