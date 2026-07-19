@@ -5,3 +5,14 @@
 .post-card:hover {
 	box-shadow: var(--cloudea-box-shadow-hover);
 }
+
+.post-card-foot {
+	color: var(--third-text-color);
+}
+
+/* Lighten the footer meta text on mobile only (< md breakpoint). */
+@media (max-width: 767.98px) {
+	.post-card-foot {
+		color: color-mix(in srgb, var(--third-text-color), transparent 35%);
+	}
+}
