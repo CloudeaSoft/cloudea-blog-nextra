@@ -15,7 +15,7 @@ import { normalizePages } from "nextra/normalize-pages";
 import { ThemeSwitch } from "./theme-switch";
 import { GithubNav } from "./github";
 import { MenuItem } from "nextra/normalize-pages";
-import { FC, ReactNode, useEffect } from "react";
+import { FC, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import type { PageMapItem } from "nextra";
 import { Icon } from "@iconify-icon/react";
 import { useAtom } from "jotai";
@@ -261,6 +261,28 @@ export const MobileNavbar = ({
 		list: pageMap,
 		route: pathname,
 	});
+
+	// Lock background scroll while the mobile drawer is open. useLayoutEffect
+	// avoids a flash of a scrollable body during the open transition, and only
+	// runs on the client so SSR markup is unaffected.
+	const prevOverflow = useRef<string | null>(null);
+	useLayoutEffect(() => {
+		if (typeof document === "undefined") return;
+		const { body } = document;
+		if (menu) {
+			prevOverflow.current = body.style.overflow;
+			body.style.overflow = "hidden";
+		} else if (prevOverflow.current !== null) {
+			body.style.overflow = prevOverflow.current;
+			prevOverflow.current = null;
+		}
+		return () => {
+			if (prevOverflow.current !== null) {
+				body.style.overflow = prevOverflow.current;
+				prevOverflow.current = null;
+			}
+		};
+	}, [menu]);
 
 	useEffect(() => {
 		if (menu) {
