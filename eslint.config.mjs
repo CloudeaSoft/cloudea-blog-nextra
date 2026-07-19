@@ -10,6 +10,8 @@ const GLOBAL_IGNORES = [
 	".next/**", // Next.js build artifacts
 	"out/**", // Build artifacts
 	"public/_pagefind/**", // Pagefind search index
+	"next-env.d.ts",
+	"build/**",
 ];
 
 const commonRules = {
