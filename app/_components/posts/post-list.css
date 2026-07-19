@@ -10,9 +10,13 @@
 	color: var(--third-text-color);
 }
 
-/* Lighten the footer meta text on mobile only (< md breakpoint). */
+/* Lighten the static footer meta on mobile only (< md breakpoint), but keep
+   interactive links at full color so they stay above WCAG AA contrast. */
 @media (max-width: 767.98px) {
 	.post-card-foot {
 		color: color-mix(in srgb, var(--third-text-color), transparent 35%);
+	}
+	.post-card-foot a {
+		color: var(--third-text-color);
 	}
 }
