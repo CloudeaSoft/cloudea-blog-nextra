@@ -168,7 +168,11 @@ export const ClientNavbar = ({
 				onClick={toggleMenu}
 			>
 				<Icon
-					icon={menu ? "lucide:list-x" : "lucide:list"}
+					icon={
+						menu
+							? "line-md:menu-to-close-transition"
+							: "line-md:close-to-menu-transition"
+					}
 					height={24}
 				/>
 			</Button>
@@ -269,7 +273,12 @@ export const MobileNavbar = ({
 			className={cn(
 				"fixed top-0 right-0 h-dvh w-full z-50 flex flex-col",
 				"bg-(--background-color)",
-				"transition-[transform,visibility]! duration-300 ease-out lg:hidden",
+				// Match transition-transform's property list (transform, translate,
+				// scale, rotate) and add visibility: translate-x-* in Tailwind v4
+				// animates the `translate` property, so it must be listed or the
+				// drawer teleports instead of sliding. visibility is delayed so the
+				// drawer stays focusable during the slide and hides after it.
+				"transition-[transform,translate,scale,rotate,visibility]! duration-300 ease-out lg:hidden",
 				menu ? "translate-x-0 visible" : "translate-x-full invisible",
 			)}
 		>
