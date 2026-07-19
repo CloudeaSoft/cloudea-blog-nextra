@@ -269,10 +269,8 @@ export const MobileNavbar = ({
 			className={cn(
 				"fixed top-0 right-0 h-dvh w-full z-50 flex flex-col",
 				"bg-(--background-color)",
-				"transition-transform! duration-300 ease-out",
-				menu ? "translate-x-0" : "translate-x-full",
-				"max-lg:visible",
-				"invisible",
+				"transition-[transform,visibility]! duration-300 ease-out lg:hidden",
+				menu ? "translate-x-0 visible" : "translate-x-full invisible",
 			)}
 		>
 			<div className="mt-16 px-4 flex flex-col h-full justify-between">

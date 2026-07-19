@@ -24,7 +24,7 @@ export default async function TagsPage() {
 						<Link
 							key={tag}
 							href={`/tags/${tag}`}
-							className="inline-flex items-center gap-1 px-6 py-3 text-sm rounded-full transition-all! duration-200 hover:scale-110 border border-solid"
+							className="inline-flex items-center gap-1 px-6 py-3 text-sm rounded-full transition-transform! duration-200 hover:scale-110 border border-solid"
 							style={{
 								backgroundColor: "var(--background-color-transparent-80)",
 								borderColor: "var(--border-color)",

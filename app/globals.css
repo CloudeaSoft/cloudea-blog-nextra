@@ -14,3 +14,82 @@ body {
 iconify-icon {
 	vertical-align: middle;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Page (view) transitions                                                     */
+/* -------------------------------------------------------------------------- */
+
+/* Subtle cross-fade: the outgoing page fades out while the incoming page
+ * fades in with a slight rise. Driven by next-view-transitions. */
+@keyframes vt-fade-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes vt-fade-in {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+::view-transition-old(root) {
+	animation: 0.15s ease-in both vt-fade-out;
+}
+
+::view-transition-new(root) {
+	animation: 0.25s ease-out both vt-fade-in;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Typing effect cursor                                                        */
+/* -------------------------------------------------------------------------- */
+
+@keyframes typing-cursor-blink {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0;
+	}
+}
+
+.typing-cursor {
+	animation: typing-cursor-blink 1s step-end infinite;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Motion preferences                                                          */
+/* -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+
+	/* View-transition pseudo-elements are not reachable via the universal
+	 * selector above; cut them to an instant swap explicitly. */
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation: none !important;
+	}
+}

@@ -52,7 +52,7 @@ export const Loading = () => {
 					id="loading"
 					className={mPlusRounded1c.className}
 				>
-					<span className="spac">
+					<span>
 						その歌声は
 						<span style={{ display: "inline-block", marginRight: "-0.3rem" }}>
 							、
