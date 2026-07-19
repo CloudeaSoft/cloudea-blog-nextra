@@ -26,17 +26,15 @@ export const PostCard: FC<PostCardProps> = ({ post }) => {
 			}}
 		>
 			{post.frontMatter.cover && (
-				<Link href={post.route}>
-					<div
-						className="w-full h-37.5"
-						style={{ position: "relative" }}
-					>
-						<CloudeaImage
-							src={post.frontMatter.cover}
-							alt={title ?? "Post Cover"}
-							className="w-full h-full object-cover"
-						/>
-					</div>
+				<Link
+					href={post.route}
+					className="relative block w-full h-37.5"
+				>
+					<CloudeaImage
+						src={post.frontMatter.cover}
+						alt={title ?? "Post Cover"}
+						className="object-cover"
+					/>
 				</Link>
 			)}
 			<div
