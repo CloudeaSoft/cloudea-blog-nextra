@@ -15,7 +15,7 @@ import { normalizePages } from "nextra/normalize-pages";
 import { ThemeSwitch } from "./theme-switch";
 import { GithubNav } from "./github";
 import { MenuItem } from "nextra/normalize-pages";
-import { FC, ReactNode, useEffect } from "react";
+import { FC, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import type { PageMapItem } from "nextra";
 import { Icon } from "@iconify-icon/react";
 import { useAtom } from "jotai";
@@ -168,7 +168,11 @@ export const ClientNavbar = ({
 				onClick={toggleMenu}
 			>
 				<Icon
-					icon={menu ? "lucide:list-x" : "lucide:list"}
+					icon={
+						menu
+							? "line-md:menu-to-close-transition"
+							: "line-md:close-to-menu-transition"
+					}
 					height={24}
 				/>
 			</Button>
@@ -258,6 +262,28 @@ export const MobileNavbar = ({
 		route: pathname,
 	});
 
+	// Lock background scroll while the mobile drawer is open. useLayoutEffect
+	// avoids a flash of a scrollable body during the open transition, and only
+	// runs on the client so SSR markup is unaffected.
+	const prevOverflow = useRef<string | null>(null);
+	useLayoutEffect(() => {
+		if (typeof document === "undefined") return;
+		const { body } = document;
+		if (menu) {
+			prevOverflow.current = body.style.overflow;
+			body.style.overflow = "hidden";
+		} else if (prevOverflow.current !== null) {
+			body.style.overflow = prevOverflow.current;
+			prevOverflow.current = null;
+		}
+		return () => {
+			if (prevOverflow.current !== null) {
+				body.style.overflow = prevOverflow.current;
+				prevOverflow.current = null;
+			}
+		};
+	}, [menu]);
+
 	useEffect(() => {
 		if (menu) {
 			setMenu(false);
@@ -269,10 +295,13 @@ export const MobileNavbar = ({
 			className={cn(
 				"fixed top-0 right-0 h-dvh w-full z-50 flex flex-col",
 				"bg-(--background-color)",
-				"transition-transform! duration-300 ease-out",
-				menu ? "translate-x-0" : "translate-x-full",
-				"max-lg:visible",
-				"invisible",
+				// Match transition-transform's property list (transform, translate,
+				// scale, rotate) and add visibility: translate-x-* in Tailwind v4
+				// animates the `translate` property, so it must be listed or the
+				// drawer teleports instead of sliding. visibility is delayed so the
+				// drawer stays focusable during the slide and hides after it.
+				"transition-[transform,translate,scale,rotate,visibility]! duration-300 ease-out lg:hidden",
+				menu ? "translate-x-0 visible" : "translate-x-full invisible",
 			)}
 		>
 			<div className="mt-16 px-4 flex flex-col h-full justify-between">

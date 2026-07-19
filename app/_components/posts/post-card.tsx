@@ -28,7 +28,7 @@ export const PostCard: FC<PostCardProps> = ({ post }) => {
 			{post.frontMatter.cover && (
 				<Link
 					href={post.route}
-					className="relative block w-full h-37.5"
+					className="post-card-cover relative block w-full h-37.5 overflow-hidden"
 				>
 					<CloudeaImage
 						src={post.frontMatter.cover}

@@ -41,7 +41,7 @@ export const TypingEffect = ({
 				<span
 					className={cn(
 						className,
-						"inline-block w-0.5 h-5 bg-current ml-0.5 align-middle",
+						"typing-cursor inline-block w-0.5 h-5 bg-current ml-0.5 align-middle",
 					)}
 				/>
 			)}

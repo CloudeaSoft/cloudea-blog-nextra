@@ -11,6 +11,10 @@ export const GoBack: FC = () => {
 
 	const isNestedPage = segments.length > 2;
 	if (!isNestedPage) return null;
+
+	// history.back() is safe here: InPageAnchors rewrites in-page #anchor
+	// clicks to replaceState, so no hash entries stand between this page and
+	// the real previous one.
 	return (
 		<Button
 			onClick={router.back}

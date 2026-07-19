@@ -55,28 +55,35 @@ export const MobileToc: FC<{ toc?: Heading[] }> = ({ toc = [] }) => {
 					)}
 				/>
 			</button>
-			{open && (
-				<ul
-					id="mobile-toc-list"
-					className="max-h-[50vh] overflow-y-auto px-3 pb-3 flex flex-col text-sm"
-					style={{ color: "var(--second-text-color)" }}
-				>
-					{toc.map((heading) => (
-						<li key={heading.id}>
-							<Link
-								href={`#${heading.id}`}
-								onClick={() => setOpen(false)}
-								className="block truncate rounded-md py-1.5 opacity-80 hover:opacity-100"
-								style={{
-									paddingInlineStart: `${0.5 + Math.max(0, heading.depth - 2) * 0.85}rem`,
-								}}
-							>
-								{heading.value}
-							</Link>
-						</li>
-					))}
-				</ul>
-			)}
+			<div
+				className={cn(
+					"grid transition-[grid-template-rows,visibility] duration-200 ease-out",
+					open ? "grid-rows-[1fr] visible" : "grid-rows-[0fr] invisible",
+				)}
+			>
+				<div className="overflow-hidden">
+					<ul
+						id="mobile-toc-list"
+						className="max-h-[50vh] overflow-y-auto px-3 pb-3 flex flex-col text-sm"
+						style={{ color: "var(--second-text-color)" }}
+					>
+						{toc.map((heading) => (
+							<li key={heading.id}>
+								<Link
+									href={`#${heading.id}`}
+									onClick={() => setOpen(false)}
+									className="block truncate rounded-md py-1.5 opacity-80 hover:opacity-100"
+									style={{
+										paddingInlineStart: `${0.5 + Math.max(0, heading.depth - 2) * 0.85}rem`,
+									}}
+								>
+									{heading.value}
+								</Link>
+							</li>
+						))}
+					</ul>
+				</div>
+			</div>
 		</div>
 	);
 };

@@ -15,6 +15,7 @@ import type { MDXComponents, UseMDXComponents } from "nextra/mdx-components";
 import type { ComponentProps, FC } from "react";
 import { Meta } from "@/app/_components/mdx/meta";
 import { GoBack } from "@/app/_components/mdx/go-back";
+import { InPageAnchors } from "@/app/_components/mdx/in-page-anchors";
 import { isValidDate } from "@/utils/is-valid-date";
 import { TOC } from "@/app/_components/mdx/toc";
 import { MobileToc } from "@/app/_components/mdx/toc-mobile";
@@ -115,6 +116,7 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
 						}}
 					>
 						<GoBack />
+						<InPageAnchors />
 						<header className="mb-8">
 							<h1 className="post-title">{metadata.title}</h1>
 							<Meta {...(metadata as BlogMetadata)}>
