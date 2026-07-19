@@ -27,8 +27,10 @@ export default withNextra({
 	images: {
 		unoptimized: true, // Enable when deploying to github page
 	},
-	eslint: {
-		ignoreDuringBuilds: false,
-		dirs: ["utils", "types"],
+	turbopack: {
+		resolveAlias: {
+			// Path to your `mdx-components` file with extension
+			"next-mdx-import-source-file": "./mdx-components.tsx",
+		},
 	},
 });
