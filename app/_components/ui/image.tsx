@@ -2,7 +2,7 @@
 
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import Image from "next/image";
-import { getImageUrl } from "../../../utils/get-resources-url";
+import { getImageUrl } from "@/utils/get-resources-url";
 
 interface CloudeaImageProps {
 	className?: string;

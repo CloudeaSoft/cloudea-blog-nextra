@@ -1,5 +1,5 @@
 import { Link } from "next-view-transitions";
-import { getDistinctTags } from "../posts/get-posts";
+import { getDistinctTags } from "@/app/posts/get-posts";
 
 export default async function TagsPage() {
 	const tags = await getDistinctTags();

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getPosts } from "../posts/get-posts";
+import { getPosts } from "@/app/posts/get-posts";
 import cn from "clsx";
 import { Item } from "nextra/normalize-pages";
 

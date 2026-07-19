@@ -1,7 +1,7 @@
 import { Icon } from "@iconify-icon/react";
 import { Link } from "next-view-transitions";
 import type { FC } from "react";
-import { CloudeaImage } from "../ui/image";
+import { CloudeaImage } from "@/app/_components/ui/image";
 
 interface PostCardProps {
 	post: {

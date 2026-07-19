@@ -1,4 +1,4 @@
-import { GetHitokoto } from "../../../utils/hitokoto";
+import { GetHitokoto } from "@/utils/hitokoto";
 import { TypingEffect } from "./typing-effect";
 
 export const Hitokoto = async () => {

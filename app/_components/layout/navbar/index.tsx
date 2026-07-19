@@ -2,7 +2,7 @@ import type { PageMapItem } from "nextra";
 import type { FC } from "react";
 import { Stack } from "./stack";
 import { ClientNavbar, MobileNavbar } from "./index.client";
-import { getCategories, getPosts, getTags } from "../../../posts/get-posts";
+import { getCategories, getPosts, getTags } from "@/app/posts/get-posts";
 
 export const Navbar: FC<{ pageMap: PageMapItem[] }> = async ({ pageMap }) => {
 	const [tags, posts, categories] = await Promise.all([

@@ -19,7 +19,7 @@ import { FC, ReactNode, useEffect } from "react";
 import type { PageMapItem } from "nextra";
 import { Icon } from "@iconify-icon/react";
 import { useAtom } from "jotai";
-import { menuAtom } from "../../../../stores/menu";
+import { menuAtom } from "@/stores/menu";
 import Link from "next/link";
 
 const classes = {

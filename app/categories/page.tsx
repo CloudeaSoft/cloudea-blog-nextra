@@ -1,5 +1,5 @@
 import { Link } from "next-view-transitions";
-import { getDistinctCategories } from "../posts/get-posts";
+import { getDistinctCategories } from "@/app/posts/get-posts";
 
 export default async function CategoriesPage() {
 	const categories = await getDistinctCategories();
