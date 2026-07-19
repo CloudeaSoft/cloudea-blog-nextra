@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { FC } from "react";
-import { CloudeaImage } from "../image";
+import { CloudeaImage } from "../../ui/image";
 import { ClientFooter } from "./index.client";
 
 export const Footer: FC = () => {

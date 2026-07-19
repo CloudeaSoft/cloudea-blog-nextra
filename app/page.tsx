@@ -1,8 +1,8 @@
-import PostsPage from "./_components/post-list";
-import { Hitokoto } from "./_components/hitokoto";
-import { Github } from "./_components/navbar/github";
-import { Email } from "./_components/navbar/email";
-import { CloudeaImage } from "./_components/image";
+import PostsPage from "./_components/posts/post-list";
+import { Hitokoto } from "./_components/home/hitokoto";
+import { Github } from "./_components/layout/navbar/github";
+import { Email } from "./_components/layout/navbar/email";
+import { CloudeaImage } from "./_components/ui/image";
 import Link from "next/link";
 import { Icon } from "@iconify-icon/react";
 import cn from "clsx";

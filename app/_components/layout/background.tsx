@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { getImageUrl } from "../../utils/get-resources-url";
+import { getImageUrl } from "../../../utils/get-resources-url";
 import { useMounted } from "nextra/hooks";
 
 export const Background = () => {

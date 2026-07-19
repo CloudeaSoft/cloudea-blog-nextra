@@ -13,13 +13,13 @@ import {
 import { useMDXComponents as getNextraMDXComponents } from "nextra/mdx-components";
 import type { MDXComponents, UseMDXComponents } from "nextra/mdx-components";
 import type { ComponentProps, FC } from "react";
-import { Meta } from "./app/_components/meta";
-import { GoBack } from "./app/_components/go-back";
+import { Meta } from "./app/_components/mdx/meta";
+import { GoBack } from "./app/_components/mdx/go-back";
 import { isValidDate } from "./utils/is-valid-date";
-import { TOC } from "./app/_components/toc";
-import { MobileToc } from "./app/_components/toc-mobile";
+import { TOC } from "./app/_components/mdx/toc";
+import { MobileToc } from "./app/_components/mdx/toc-mobile";
 import cn from "clsx";
-import "./markdown.css";
+import "./app/_components/mdx/markdown.css";
 
 const createHeading = (
 	Tag: `h${2 | 3 | 4 | 5 | 6}`,

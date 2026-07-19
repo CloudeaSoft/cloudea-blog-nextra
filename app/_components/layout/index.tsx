@@ -5,7 +5,7 @@ import { Loading } from "./loading";
 
 import { Footer } from "./footer";
 import { Navbar } from "./navbar";
-import { LayoutProps } from "../../types/layout-props";
+import { LayoutProps } from "../../../types/layout-props";
 
 import "./theme.scss";
 import { Background } from "./background";

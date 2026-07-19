@@ -3,7 +3,7 @@
  * Scoped to `.markdown-body` (added to the article wrapper in
  * `mdx-components.tsx`) so it never leaks into other parts of the site.
  * Sizing and spacing follow GitHub's markdown rendering, while all colors
- * reference the theme tokens in `app/_components/theme.scss`, so everything
+ * reference the theme tokens in `app/_components/layout/theme.scss`, so everything
  * adapts automatically between light and dark mode.
  *
  * Note: some elements are replaced by Nextra React components and are styled
@@ -275,7 +275,7 @@
 /* -------------------------------------------------------------------------- */
 
 /* Rounded, softly bordered images centered in the reading column.
- * Uses the same elevation as post cards (see app/_components/post-list.css)
+ * Uses the same elevation as post cards (see app/_components/posts/post-list.css)
  * so images feel consistent with the rest of the site. */
 .markdown-body img {
 	display: block;

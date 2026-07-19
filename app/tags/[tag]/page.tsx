@@ -1,4 +1,4 @@
-import { PostCard } from "../../_components/post-card";
+import { PostCard } from "../../_components/posts/post-card";
 import { getPosts, getTags } from "../../posts/get-posts";
 
 export async function generateMetadata(props) {

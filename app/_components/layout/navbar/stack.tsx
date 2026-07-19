@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CloudeaImage } from "../image";
+import { CloudeaImage } from "../../ui/image";
 import { Noto_Sans } from "next/font/google";
 
 const notoSans = Noto_Sans({ weight: "500", subsets: ["latin"] });

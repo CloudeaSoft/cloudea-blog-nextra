@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import "./loading.scss";
-import { CloudeaImage } from "./image";
+import { CloudeaImage } from "../ui/image";
 import { M_PLUS_Rounded_1c } from "next/font/google";
 import cn from "clsx";
 
