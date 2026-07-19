@@ -4,7 +4,6 @@ import stylistic from "@stylistic/eslint-plugin";
 import tseslint from "typescript-eslint";
 import * as mdx from "eslint-plugin-mdx";
 import nextPlugin from "@next/eslint-plugin-next";
-import nextVitals from "eslint-config-next/core-web-vitals";
 
 const GLOBAL_IGNORES = [
 	"node_modules/**",
@@ -59,7 +58,6 @@ const typescriptRules = {
 
 export default defineConfig([
 	globalIgnores(GLOBAL_IGNORES),
-	...nextVitals,
 	{
 		files: ["**/*.{js,jsx,mjs,ts,tsx,mts}"],
 		extends: [
