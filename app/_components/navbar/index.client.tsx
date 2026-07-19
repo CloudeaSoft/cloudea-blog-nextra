@@ -62,7 +62,7 @@ const NavbarMenu: FC<{
 					// From https://headlessui.com/react/menu#adding-transitions
 					"origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0",
 					"border border-(--border-color)",
-					"z-60 rounded-md py-1 text-sm shadow-lg",
+					"z-[60] rounded-md py-1 text-sm shadow-lg",
 					"backdrop-blur-md bg-(--background-color-transparent-80)",
 					// headlessui adds max-height as style, use !important to override
 					"max-h-[min(calc(100vh-5rem),256px)]!",
