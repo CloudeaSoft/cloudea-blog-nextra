@@ -1,9 +1,17 @@
 import Link from "next/link";
 import type { FC } from "react";
 import { CloudeaImage } from "@/app/_components/ui/image";
+import { getPosts } from "@/app/posts/get-posts";
+import formatWords from "@/utils/format-words";
 import { ClientFooter } from "./index.client";
 
-export const Footer: FC = () => {
+export const Footer: FC = async () => {
+	const posts = await getPosts();
+	const totalWords = posts.reduce(
+		(sum, post) => sum + (post.frontMatter?.readingTime?.words ?? 0),
+		0,
+	);
+
 	return (
 		<footer
 			style={{
@@ -55,7 +63,7 @@ export const Footer: FC = () => {
 			<div className="text-center">
 				{`© 2022 - ${new Date().getFullYear()} Cloudea`}
 				<br />
-				12 posts in total 8.4k words in total
+				{`${posts.length} posts in total ${formatWords(totalWords)} words in total`}
 				<br />
 			</div>
 			<div className="text-right">
