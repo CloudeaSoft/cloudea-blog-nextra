@@ -54,24 +54,53 @@ export const PostCard: FC<PostCardProps> = ({ post }) => {
 					</p>
 				)}
 				<div
+					className="post-card-foot flex flex-col gap-3 md:flex-row md:items-center md:gap-4"
 					style={{
-						display: "flex",
-						justifyContent: "space-between",
-						alignItems: "center",
-						textAlign: "center",
 						lineHeight: 1,
 						fontSize: "0.9rem",
-						color: "var(--third-text-color)",
 					}}
 				>
-					<div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+					{(post.frontMatter.category ||
+						post.frontMatter.tags?.length) && (
+						<div className="flex items-center flex-wrap gap-x-4 gap-y-2 md:contents">
+							{post.frontMatter.category && (
+								<div className="flex items-center md:order-2">
+									<Icon
+										icon="line-md:folder"
+										width={20}
+										style={{ paddingRight: "0.4rem" }}
+									/>
+									<Link href={`/categories/${post.frontMatter.category}`}>
+										{post.frontMatter.category}
+									</Link>
+								</div>
+							)}
+							{post.frontMatter.tags?.length && (
+								<div className="flex items-center text-[0.95rem] md:order-3">
+									<Icon
+										icon="lucide:tag"
+										width={18}
+										style={{ paddingRight: "0.2rem" }}
+									/>
+									&nbsp;
+									<ul style={{ display: "flex", gap: "0.4rem" }}>
+										{post.frontMatter.tags?.map((tag, index) => (
+											<li key={tag}>
+												{index !== 0 && (
+													<span style={{ paddingRight: "0.4rem" }}>|</span>
+												)}
+												<Link href={`/tags/${tag}`}>{tag}</Link>
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
+						</div>
+					)}
+					<div className="flex items-center justify-between gap-4 md:contents">
 						{dateObj && (
 							<div
-								className="text-[0.95rem]"
-								style={{
-									display: "flex",
-									alignItems: "center",
-								}}
+								className="flex items-center text-[0.95rem] md:order-1"
 							>
 								<Icon
 									icon="line-md:calendar"
@@ -81,49 +110,18 @@ export const PostCard: FC<PostCardProps> = ({ post }) => {
 								{dateObj.toLocaleDateString("en-CA")}
 							</div>
 						)}
-						{post.frontMatter.category && (
-							<div className="flex items-center">
-								<Icon
-									icon="line-md:folder"
-									width={20}
-									style={{ paddingRight: "0.4rem" }}
-								/>
-								<Link href={`/categories/${post.frontMatter.category}`}>
-									{post.frontMatter.category}
-								</Link>
-							</div>
-						)}
-						{post.frontMatter.tags?.length && (
-							<div className="flex items-center text-[0.95rem]">
-								<Icon
-									icon="lucide:tag"
-									width={18}
-									style={{ paddingRight: "0.2rem" }}
-								/>
-								&nbsp;
-								<ul style={{ display: "flex", gap: "0.4rem" }}>
-									{post.frontMatter.tags?.map((tag, index) => (
-										<li key={tag}>
-											{index !== 0 && (
-												<span style={{ paddingRight: "0.4rem" }}>|</span>
-											)}
-											<Link href={`/tags/${tag}`}>{tag}</Link>
-										</li>
-									))}
-								</ul>
-							</div>
-						)}
+						<Link
+							href={post.route}
+							className="flex items-center justify-center md:order-4"
+							style={{ marginLeft: "auto", whiteSpace: "nowrap" }}
+						>
+							Read More
+							<Icon
+								icon="line-md:chevron-right"
+								width={22}
+							/>
+						</Link>
 					</div>
-					<Link
-						href={post.route}
-						className="x:ml-2 flex items-center justify-center"
-					>
-						Read More
-						<Icon
-							icon="line-md:chevron-right"
-							width={22}
-						/>
-					</Link>
 				</div>
 			</div>
 		</li>
