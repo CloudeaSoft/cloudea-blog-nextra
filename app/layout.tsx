@@ -10,7 +10,7 @@ import "./globals.css";
 export const metadata: Metadata = {
 	metadataBase: new URL("https://blog.cloudea.work"),
 	title: {
-		absolute: "",
+		absolute: "Cloudea's Blog",
 		template: "%s - Cloudea's Blog",
 	},
 	description: "",
