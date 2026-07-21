@@ -13,8 +13,8 @@ export function NavTitle({
 			<Icon
 				icon={icon}
 				className="navbar-link__icon"
-				width="1.15em"
-				height="1.15em"
+				width="1.2em"
+				height="1.2em"
 			/>
 			<span className="navbar-link__label">{children}</span>
 		</span>
