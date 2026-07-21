@@ -347,6 +347,18 @@ export const MobileNavbar = ({
 		};
 	}, [menu]);
 
+	// Close the drawer (and unlock body scroll) when the viewport reaches the
+	// `lg` breakpoint where the mobile nav is hidden via CSS.
+	useEffect(() => {
+		const media = window.matchMedia("(min-width: 1024px)");
+		const onChange = () => {
+			if (media.matches) setMenu(false);
+		};
+		onChange();
+		media.addEventListener("change", onChange);
+		return () => media.removeEventListener("change", onChange);
+	}, [setMenu]);
+
 	useEffect(() => {
 		if (menu) {
 			setMenu(false);
