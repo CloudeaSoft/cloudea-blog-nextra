@@ -116,10 +116,12 @@ const NavbarMenu: FC<{
 				)}
 				data-active={active || undefined}
 			>
-				{children}
+				<span className="navbar-link__item">
+					<span className="navbar-link__label">{children}</span>
+				</span>
 				<ArrowRightIcon
 					height="14"
-					className="*:origin-center *:transition-transform *:rotate-90"
+					className="navbar-link__caret *:origin-center *:transition-transform *:rotate-90"
 				/>
 			</MenuButton>
 			<MenuItems
@@ -214,7 +216,9 @@ export const ClientNavbar = ({
 								data-active={active || undefined}
 								aria-current={active ? "page" : undefined}
 							>
-								{page.title}
+								<span className="navbar-link__item">
+									<span className="navbar-link__label">{page.title}</span>
+								</span>
 							</Anchor>
 						</li>
 					);

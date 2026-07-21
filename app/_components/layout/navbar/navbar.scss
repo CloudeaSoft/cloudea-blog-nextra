@@ -106,6 +106,8 @@ body .navbar-link {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	align-self: stretch;
+	height: 100%;
 	font-size: 1.1rem;
 	line-height: 1;
 	color: var(--default-text-color);
@@ -116,14 +118,33 @@ body .navbar-link {
 	transition: color 0.2s ease;
 }
 
-body .navbar-link::after {
+/* Text + underline track. Horizontal padding makes the bar longer than the glyphs.
+ * Full-height so the underline can sit against the navbar bottom on scroll. */
+body .navbar-link__item {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	height: 100%;
+	padding-inline: 0.45em;
+}
+
+body .navbar-link__label {
+	display: inline-block;
+}
+
+body .navbar-link__caret {
+	flex-shrink: 0;
+}
+
+/* Underline stays on the item wrapper so only the label can bounce. */
+body .navbar-link__item::after {
 	content: "";
 	position: absolute;
-	left: 0.15em;
-	right: 0.15em;
+	left: 0;
+	right: 0;
 	bottom: var(--navbar-underline-inset);
-	height: 2px;
-	border-radius: 1px;
+	height: 3px;
+	border-radius: 999px;
 	background: var(--primary-color);
 	transform: scaleX(0);
 	transform-origin: center;
@@ -145,7 +166,7 @@ body .navbar-link[data-active="true"] {
 	font-weight: 560;
 }
 
-body .navbar-link[data-active="true"]::after {
+body .navbar-link[data-active="true"] .navbar-link__item::after {
 	transform: scaleX(1);
 	opacity: 1;
 }
@@ -169,11 +190,11 @@ body .navbar-link[data-active="true"]::after {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	body .navbar-link:hover {
+	body .navbar-link:hover .navbar-link__label {
 		animation: navbar-link-bounce 0.48s cubic-bezier(0.22, 1, 0.36, 1) 1;
 	}
 
-	body .navbar-link[data-active="true"]::after {
+	body .navbar-link[data-active="true"] .navbar-link__item::after {
 		animation: navbar-underline-settle 0.45s cubic-bezier(0.22, 1, 0.36, 1) 1;
 	}
 }
@@ -187,9 +208,4 @@ body .navbar-link[data-active="true"]::after {
 		transform: scaleX(1);
 		opacity: 1;
 	}
-}
-
-/* Keep bounce from fighting the underline transform (underline is on ::after). */
-body .navbar-link > * {
-	pointer-events: none;
 }
