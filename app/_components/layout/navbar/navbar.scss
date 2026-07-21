@@ -1,14 +1,24 @@
 /* PC navbar visual interactions: active underline, hover bounce, scroll compact.
- * `body …` prefixes beat the global `body *` color-only transition rule. */
+ * `body …` prefixes beat the global `body *` color-only transition rule.
+ *
+ * `--navbar-height` lives on `body` for sticky siblings (TOC). The variable
+ * itself jumps when compact toggles; keep the bar's `height` transition and
+ * the TOC's matching `top` transition on the same curve so they stay flush
+ * mid-animation. */
 
-body .navbar-header {
+body {
 	--navbar-height: 4rem;
-	height: var(--navbar-height);
-	transition: height 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+	--navbar-compact-ease: cubic-bezier(0.22, 1, 0.36, 1);
+	--navbar-compact-duration: 0.32s;
 }
 
-body .navbar-header[data-compact] {
+body:has(.navbar-header[data-compact]) {
 	--navbar-height: 3rem;
+}
+
+body .navbar-header {
+	height: var(--navbar-height);
+	transition: height var(--navbar-compact-duration) var(--navbar-compact-ease);
 }
 
 body .navbar-bar {
@@ -29,10 +39,25 @@ body .navbar-bar {
 	backdrop-filter: blur(10px);
 	border-bottom: 1px solid var(--border-color);
 	transition:
-		height 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+		height var(--navbar-compact-duration) var(--navbar-compact-ease),
 		background 0.32s ease,
 		backdrop-filter 0.32s ease,
 		box-shadow 0.32s ease;
+}
+
+/* Sticky TOCs must use concrete `top` lengths (not var()) so the value
+ * interpolates; `top: var(--navbar-height)` jumps and desyncs from the bar. */
+body .toc-sticky {
+	top: 4rem;
+	max-height: calc(100vh - 4rem);
+	transition:
+		top var(--navbar-compact-duration) var(--navbar-compact-ease),
+		max-height var(--navbar-compact-duration) var(--navbar-compact-ease);
+}
+
+body:has(.navbar-header[data-compact]) .toc-sticky {
+	top: 3rem;
+	max-height: calc(100vh - 3rem);
 }
 
 body .navbar-bar[data-compact] {

@@ -37,6 +37,7 @@ pnpm test:visual:update    # refresh baselines after intentional UI changes
 
 - Page screenshots: `e2e/visual.spec.ts` (+ `e2e/visual.spec.ts-snapshots/`)
 - Navbar compact / mobile drawer slide / hamburger icon: `e2e/navbar.spec.ts` (+ `e2e/navbar.spec.ts-snapshots/`)
+- TOC flush-under-navbar + empty TOC visibility: `e2e/toc.spec.ts`
 
 Commit updated snapshots when a visual or motion change is intentional; CI fails when screenshots or transition contracts drift.
 
