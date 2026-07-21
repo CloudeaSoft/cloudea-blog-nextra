@@ -243,9 +243,9 @@ body .navbar-link__title {
 body .navbar-link__icon {
 	flex: none;
 	display: block;
-	/* Match label size so center alignment looks even. */
-	width: 1em;
-	height: 1em;
+	/* Slightly under 1em so outline glyph ink matches uppercase cap height. */
+	width: 0.92em;
+	height: 0.92em;
 	line-height: 0;
 	opacity: 0.92;
 }
