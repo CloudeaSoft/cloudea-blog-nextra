@@ -245,8 +245,8 @@ body .navbar-link__icon {
 	margin-right: 0.18em;
 	line-height: 1;
 	opacity: 0.92;
-	/* Sit on the uppercase baseline; outline viewBoxes already pad the glyph. */
-	vertical-align: baseline;
+	/* Baseline plus a slight optical drop — MDI glyphs pad above the viewBox floor. */
+	vertical-align: -0.05em;
 }
 
 body .navbar-link__label {
