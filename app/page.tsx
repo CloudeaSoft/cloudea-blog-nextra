@@ -35,9 +35,10 @@ const Banner = async () => {
 			}}
 		>
 			<div className="flex flex-col gap-7.5 text-center text-[3rem] leading-[1.2] text-(--home-banner-text-color)">
-				<BannerBlurTrigger>Hi! Here is Cloudea.</BannerBlurTrigger>
+				<span>Hi! Here is Cloudea.</span>
 				<Hitokoto />
 			</div>
+			<BannerBlurTrigger />
 			<div
 				style={{
 					position: "absolute",

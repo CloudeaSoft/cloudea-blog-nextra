@@ -1,20 +1,18 @@
 "use client";
 
-import {
-	type ReactNode,
-	useEffect,
-	useRef,
-} from "react";
+import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { usePathname } from "next/navigation";
 import { backgroundBlurAtom } from "@/stores/background";
 
+/** Roughly when the home greeting has scrolled out of view. */
+const HOME_BLUR_SCROLL_Y = 420;
+
 /**
- * Observes the home greeting. When it leaves the viewport, signals the
- * global Background to blur; clears the signal on unmount / leave home.
+ * On the home page, blur the global background after a simple scroll
+ * threshold. Clears on unmount / leave home.
  */
-export function BannerBlurTrigger({ children }: { children: ReactNode }) {
-	const ref = useRef<HTMLSpanElement>(null);
+export function BannerBlurTrigger() {
 	const setBlurred = useSetAtom(backgroundBlurAtom);
 	const pathname = usePathname();
 
@@ -24,33 +22,17 @@ export function BannerBlurTrigger({ children }: { children: ReactNode }) {
 			return;
 		}
 
-		const target = ref.current;
-		if (!target) return;
+		const update = () => {
+			setBlurred(window.scrollY > HOME_BLUR_SCROLL_Y);
+		};
 
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				setBlurred(!entry.isIntersecting);
-			},
-			{
-				// Treat as gone once it fully exits below the fixed navbar (~4rem).
-				threshold: 0,
-				rootMargin: "-64px 0px 0px 0px",
-			},
-		);
-
-		observer.observe(target);
+		update();
+		window.addEventListener("scroll", update, { passive: true });
 		return () => {
-			observer.disconnect();
+			window.removeEventListener("scroll", update);
 			setBlurred(false);
 		};
 	}, [pathname, setBlurred]);
 
-	return (
-		<span
-			ref={ref}
-			className="home-banner-greeting"
-		>
-			{children}
-		</span>
-	);
+	return null;
 }
