@@ -116,7 +116,7 @@ const NavbarMenu: FC<{
 			<button
 				type="button"
 				className={cn(
-					"navbar-link items-center flex gap-1.5 focus:outline-none",
+					"navbar-link navbar-link--menu items-center flex focus:outline-none",
 					className,
 				)}
 				data-active={active || undefined}
@@ -127,10 +127,7 @@ const NavbarMenu: FC<{
 				<span className="navbar-link__item">
 					<span className="navbar-link__label">{children}</span>
 				</span>
-				<ArrowRightIcon
-					height="14"
-					className="navbar-link__caret"
-				/>
+				<ArrowRightIcon className="navbar-link__caret" />
 			</button>
 			<div className="navbar-menu__dropdown">
 				<ul

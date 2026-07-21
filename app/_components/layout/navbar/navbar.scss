@@ -224,13 +224,30 @@ body .navbar-link__label {
 	display: inline-block;
 }
 
-/* ArrowRight → rotated to ↓; hover rotates clockwise to ↑ (90deg → 270deg). */
+/* ArrowRight → rotated to ↓; hover rotates clockwise to ↑ (90deg → 270deg).
+ * Size tracks the link font via em so it stays proportional. */
 body .navbar-link__caret {
 	flex-shrink: 0;
 	display: inline-flex;
+	width: 0.85em;
+	height: 0.85em;
 	transform: rotate(90deg);
 	transform-origin: center;
 	transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body .navbar-link__caret svg {
+	width: 100%;
+	height: 100%;
+}
+
+body .navbar-link--menu {
+	gap: 0.15rem;
+}
+
+/* Keep underline longer than the label, but don't leave a wide gap before the caret. */
+body .navbar-link--menu .navbar-link__item {
+	padding-inline: 0.7em 0.2em;
 }
 
 body .navbar-menu:is(:hover, :focus-within) .navbar-link__caret {
