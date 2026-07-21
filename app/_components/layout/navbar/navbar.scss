@@ -153,8 +153,15 @@ body .navbar-links > li {
 	align-items: stretch;
 }
 
-/* Hover (not click) dropdown for PC menu nav items */
+/* Hover-open dropdown for PC menu nav items (Headless UI Menu). */
 body .navbar-menu {
+	position: relative;
+	display: flex;
+	align-items: stretch;
+	height: 100%;
+}
+
+body .navbar-menu__trigger {
 	position: relative;
 	display: flex;
 	align-items: stretch;
@@ -167,21 +174,9 @@ body .navbar-menu__dropdown {
 	left: 50%;
 	translate: -50% 0;
 	/* Small hover bridge — keep the panel close to the bar. */
-	padding-top: 0.2rem;
 	margin-top: -0.15rem;
-	opacity: 0;
-	visibility: hidden;
-	pointer-events: none;
-	transition:
-		opacity 0.18s ease,
-		visibility 0.18s ease;
-}
-
-body .navbar-menu__panel {
 	min-width: 8rem;
-	margin: 0;
-	padding: 0.35rem;
-	list-style: none;
+	padding: 0.55rem 0.35rem 0.35rem;
 	border: 1px solid var(--border-color);
 	border-radius: 0.85rem;
 	/* Match the navbar glass, warmed with a touch of brand crimson. */
@@ -194,9 +189,8 @@ body .navbar-menu__panel {
 	);
 	backdrop-filter: blur(14px);
 	box-shadow: var(--cloudea-box-shadow);
-	transform: scale(0.96);
 	transform-origin: top center;
-	transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+	outline: none;
 }
 
 body .navbar-menu__option {
@@ -214,19 +208,10 @@ body .navbar-menu__option {
 }
 
 body .navbar-menu__option:hover,
-body .navbar-menu__option:focus-visible {
+body .navbar-menu__option:focus-visible,
+body .navbar-menu__option[data-focus] {
 	color: var(--primary-color);
 	background: color-mix(in srgb, var(--primary-color) 10%, transparent);
-}
-
-body .navbar-menu:is(:hover, :focus-within) .navbar-menu__dropdown {
-	opacity: 1;
-	visibility: visible;
-	pointer-events: auto;
-}
-
-body .navbar-menu:is(:hover, :focus-within) .navbar-menu__panel {
-	transform: scale(1);
 }
 
 body .navbar-link {
@@ -306,7 +291,7 @@ body .navbar-link--menu .navbar-link__item {
 	padding-inline: 0.55em 0.15em;
 }
 
-body .navbar-menu:is(:hover, :focus-within) .navbar-link__caret {
+body .navbar-menu__trigger[data-open] .navbar-link__caret {
 	transform: rotate(270deg);
 }
 

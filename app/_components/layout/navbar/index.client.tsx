@@ -104,6 +104,7 @@ const NavbarMenu: FC<{
 	className?: string;
 	active?: boolean;
 }> = ({ menu, children, className, active }) => {
+	const buttonRef = useRef<HTMLButtonElement>(null);
 	const routes = Object.fromEntries(
 		(menu.children || []).map((route) => [route.name, route]),
 	);
@@ -112,43 +113,53 @@ const NavbarMenu: FC<{
 	);
 
 	return (
-		<div className="navbar-menu">
-			<button
-				type="button"
-				className={cn(
-					"navbar-link navbar-link--menu items-center flex focus:outline-none",
-					className,
-				)}
-				data-active={active || undefined}
-				aria-haspopup="menu"
-				// Keep open-on-hover: don't focus (and open via :focus-within) on mouse click.
-				onMouseDown={(event) => event.preventDefault()}
-			>
-				<span className="navbar-link__item">{children}</span>
-				<ArrowRightIcon className="navbar-link__caret" />
-			</button>
-			<div className="navbar-menu__dropdown">
-				<ul
-					className="navbar-menu__panel"
-					role="menu"
+		<Menu as="div" className="navbar-menu">
+			{({ open, close }) => (
+				<div
+					className="navbar-menu__trigger"
+					data-open={open || undefined}
+					onMouseEnter={() => {
+						if (!open) buttonRef.current?.click();
+					}}
+					onMouseLeave={close}
 				>
-					{items.map(([key, item]) => (
-						<li
-							key={key}
-							role="none"
-						>
-							<Anchor
+					<MenuButton
+						ref={buttonRef}
+						className={cn(
+							"navbar-link navbar-link--menu items-center flex focus:outline-none",
+							className,
+						)}
+						data-active={active || undefined}
+						// Keep open-on-hover: don't focus the button on mouse click.
+						onMouseDown={(event) => event.preventDefault()}
+					>
+						<span className="navbar-link__item">{children}</span>
+						<ArrowRightIcon className="navbar-link__caret" />
+					</MenuButton>
+					<MenuItems
+						transition
+						anchor={false}
+						modal={false}
+						className={cn(
+							"navbar-menu__dropdown",
+							"origin-top transition duration-200 ease-out",
+							"data-closed:scale-95 data-closed:opacity-0",
+						)}
+					>
+						{items.map(([key, item]) => (
+							<_MenuItem
+								key={key}
+								as={Anchor}
 								href={item.href || routes[key]?.route}
 								className="navbar-menu__option"
-								role="menuitem"
 							>
 								{item.title}
-							</Anchor>
-						</li>
-					))}
-				</ul>
-			</div>
-		</div>
+							</_MenuItem>
+						))}
+					</MenuItems>
+				</div>
+			)}
+		</Menu>
 	);
 };
 
