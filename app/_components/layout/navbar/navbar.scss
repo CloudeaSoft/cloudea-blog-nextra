@@ -219,13 +219,14 @@ body .navbar-menu__option:focus-visible {
 	background: color-mix(in srgb, var(--primary-color) 10%, transparent);
 }
 
-body .navbar-menu:is(:hover, :focus-within) .navbar-menu__dropdown {
+/* data-dismissed: stay closed after a menu link click until pointer leaves. */
+body .navbar-menu:is(:hover, :focus-within):not([data-dismissed]) .navbar-menu__dropdown {
 	opacity: 1;
 	visibility: visible;
 	pointer-events: auto;
 }
 
-body .navbar-menu:is(:hover, :focus-within) .navbar-menu__panel {
+body .navbar-menu:is(:hover, :focus-within):not([data-dismissed]) .navbar-menu__panel {
 	transform: scale(1);
 }
 
@@ -306,7 +307,7 @@ body .navbar-link--menu .navbar-link__item {
 	padding-inline: 0.55em 0.15em;
 }
 
-body .navbar-menu:is(:hover, :focus-within) .navbar-link__caret {
+body .navbar-menu:is(:hover, :focus-within):not([data-dismissed]) .navbar-link__caret {
 	transform: rotate(270deg);
 }
 

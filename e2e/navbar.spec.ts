@@ -162,6 +162,42 @@ test.describe("navbar: mobile drawer slide", () => {
 	});
 });
 
+test.describe("navbar: desktop menu dismiss", () => {
+	test.beforeEach(async ({ page }) => {
+		await prepare(page);
+	});
+
+	test("menu panel closes after clicking a link", async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== "desktop-chromium", "desktop only");
+
+		await gotoLight(page, "/");
+		await page.emulateMedia({ reducedMotion: "reduce" });
+
+		const aboutMenu = page.locator(".navbar-links .navbar-menu").filter({
+			hasText: "About",
+		});
+		const dropdown = aboutMenu.locator(".navbar-menu__dropdown");
+
+		await aboutMenu.hover();
+		await expect(dropdown).toBeVisible();
+
+		const friendsOption = aboutMenu.locator(".navbar-menu__option", {
+			hasText: "Friends",
+		});
+		await friendsOption.click();
+		await page.waitForURL("**/friends");
+
+		// Panel must collapse immediately after click (not stick via :focus-within).
+		await expect(aboutMenu).toHaveAttribute("data-dismissed", "true");
+		await expect(dropdown).toBeHidden();
+
+		// Leaving the menu re-arms hover; it must not stay stuck open.
+		await page.locator("body").hover({ position: { x: 8, y: 8 } });
+		await expect(aboutMenu).not.toHaveAttribute("data-dismissed");
+		await expect(dropdown).toBeHidden();
+	});
+});
+
 test.describe("navbar: mobile menu icon transition", () => {
 	test.beforeEach(async ({ page }) => {
 		await prepare(page);

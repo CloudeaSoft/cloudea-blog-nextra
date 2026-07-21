@@ -104,6 +104,7 @@ const NavbarMenu: FC<{
 	className?: string;
 	active?: boolean;
 }> = ({ menu, children, className, active }) => {
+	const [dismissed, setDismissed] = useState(false);
 	const routes = Object.fromEntries(
 		(menu.children || []).map((route) => [route.name, route]),
 	);
@@ -112,7 +113,12 @@ const NavbarMenu: FC<{
 	);
 
 	return (
-		<div className="navbar-menu">
+		<div
+			className="navbar-menu"
+			data-dismissed={dismissed || undefined}
+			// Re-arm hover open after the pointer leaves a dismissed menu.
+			onMouseLeave={() => setDismissed(false)}
+		>
 			<button
 				type="button"
 				className={cn(
@@ -141,6 +147,13 @@ const NavbarMenu: FC<{
 								href={item.href || routes[key]?.route}
 								className="navbar-menu__option"
 								role="menuitem"
+								onClick={(event) => {
+									// Clicking a link focuses it; :focus-within would otherwise keep
+									// the panel open after the pointer leaves. Dismiss immediately
+									// and clear focus so the float collapses on navigate.
+									setDismissed(true);
+									event.currentTarget.blur();
+								}}
 							>
 								{item.title}
 							</Anchor>
