@@ -25,6 +25,18 @@ Open http://localhost:3000.
 pnpm build   # static export into out/ (requires .env)
 ```
 
+## Visual regression tests
+
+Style changes are guarded by Playwright screenshot baselines (desktop + mobile).
+
+```bash
+pnpm build:visual          # build with stable hitokoto fixture
+pnpm test:visual           # compare against committed baselines
+pnpm test:visual:update    # refresh baselines after intentional UI changes
+```
+
+Baselines live under `e2e/visual.spec.ts-snapshots/`. Commit updated snapshots when a visual change is intentional; CI fails when screenshots drift.
+
 ## License
 
 [GPL-3.0-only](./LICENSE) © CloudeaSoft
