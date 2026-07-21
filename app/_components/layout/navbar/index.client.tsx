@@ -106,62 +106,54 @@ const NavbarMenu: FC<{
 	const routes = Object.fromEntries(
 		(menu.children || []).map((route) => [route.name, route]),
 	);
+	const items = Object.entries(
+		(menu.items as Record<string, { title: string; href?: string }>) || {},
+	);
+
 	return (
-		<Menu>
-			<MenuButton
+		<div className="navbar-menu">
+			<button
+				type="button"
 				className={cn(
 					classes.link,
 					"navbar-link items-center flex gap-1.5 focus:outline-none",
 					className,
 				)}
 				data-active={active || undefined}
+				aria-haspopup="menu"
+				// Keep open-on-hover: don't focus (and open via :focus-within) on mouse click.
+				onMouseDown={(event) => event.preventDefault()}
 			>
 				<span className="navbar-link__item">
 					<span className="navbar-link__label">{children}</span>
 				</span>
 				<ArrowRightIcon
 					height="14"
-					className="navbar-link__caret *:origin-center *:transition-transform *:rotate-90"
+					className="navbar-link__caret"
 				/>
-			</MenuButton>
-			<MenuItems
-				transition
-				className={cn(
-					"focus-visible:nextra-focus",
-					"focus:outline-none",
-					"nextra-scrollbar motion-reduce:transition-none",
-					// From https://headlessui.com/react/menu#adding-transitions
-					"origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0",
-					"border border-(--border-color)",
-					"z-[60] rounded-md py-1 text-sm shadow-lg",
-					"backdrop-blur-md bg-(--background-color-transparent-80)",
-					// headlessui adds max-height as style, use !important to override
-					"max-h-[min(calc(100vh-5rem),256px)]!",
-				)}
-				anchor={{ to: "bottom", gap: 10, padding: 16 }}
-				modal={false}
-			>
-				{Object.entries(
-					(menu.items as Record<string, { title: string; href?: string }>)
-					|| {},
-				).map(([key, item]) => (
-					<_MenuItem
-						key={key}
-						as={Anchor}
-						href={item.href || routes[key]?.route}
-						className={({ focus }) =>
-							cn(
-								"block py-1.5 transition-colors ps-3 pe-9",
-								focus
-									? "text-gray-900 dark:text-gray-100"
-									: "text-gray-600 dark:text-gray-400",
-							)}
-					>
-						{item.title}
-					</_MenuItem>
-				))}
-			</MenuItems>
-		</Menu>
+			</button>
+			<div className="navbar-menu__dropdown">
+				<ul
+					className="navbar-menu__panel"
+					role="menu"
+				>
+					{items.map(([key, item]) => (
+						<li
+							key={key}
+							role="none"
+						>
+							<Anchor
+								href={item.href || routes[key]?.route}
+								className="navbar-menu__option"
+								role="menuitem"
+							>
+								{item.title}
+							</Anchor>
+						</li>
+					))}
+				</ul>
+			</div>
+		</div>
 	);
 };
 
