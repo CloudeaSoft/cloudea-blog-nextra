@@ -7,6 +7,8 @@ A personal blog built with [Next.js](https://nextjs.org) and [Nextra](https://ne
 - Node.js 24
 - pnpm 11.15.0
 
+TypeScript 7 (`tsc`) runs side-by-side with the TypeScript 6 API (`tsc6`) so tooling like typescript-eslint keeps working. Use `pnpm typecheck` for TS 7 and `pnpm typecheck:tsc6` for the 6.x checker.
+
 ## Getting Started
 
 ```bash
