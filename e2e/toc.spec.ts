@@ -135,7 +135,7 @@ test.describe("toc: sticky flush under compact navbar", () => {
 		expect(result.topAnimated).toBeTruthy();
 		expect(result.maxAbsGap).toBeLessThanOrEqual(1);
 		expect(result.settled?.gap).toBeCloseTo(0, 0);
-		await expect(bar).toHaveAttribute("data-compact", "");
+		await expect(bar).toHaveAttribute("data-compact");
 	});
 
 	test("desktop TOC sits flush after compact settles", async ({ page }, testInfo) => {
@@ -146,7 +146,7 @@ test.describe("toc: sticky flush under compact navbar", () => {
 
 		await page.evaluate(() => window.scrollTo(0, 900));
 		const bar = page.locator("nav.navbar-bar").first();
-		await expect(bar).toHaveAttribute("data-compact", "");
+		await expect(bar).toHaveAttribute("data-compact", "true");
 		await page.waitForTimeout(50);
 
 		const gap = await page.evaluate(() => {
