@@ -80,9 +80,7 @@ const DEFAULT_COMPONENTS = getNextraMDXComponents({
 	tr: Table.Tr,
 });
 
-export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
-	T extends BlogMDXComponents,
->(
+export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <T extends BlogMDXComponents>(
 	comp?: T,
 ) => {
 	const { DateFormatter, ...components } = comp ?? {};

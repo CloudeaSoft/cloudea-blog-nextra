@@ -77,6 +77,8 @@ export default defineConfig([
 						"eslint.config.mjs",
 						"build/*.ts",
 						"postcss.config.mjs",
+						"playwright.config.ts",
+						"e2e/*.ts",
 					],
 					defaultProject: "tsconfig.json",
 				},
