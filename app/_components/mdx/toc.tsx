@@ -8,7 +8,7 @@ export const TOC: FC<{ toc: Heading[]; className?: string }> = ({ toc, className
 		<div
 			className={cn(
 				"w-52 rounded-2xl border-2 border-solid h-fit p-5",
-				"sticky top-[calc(30px+4rem)] self-start max-h-[calc(100vh-6rem)] overflow-y-auto",
+				"sticky top-[var(--navbar-height)] self-start max-h-[calc(100vh-var(--navbar-height))] overflow-y-auto",
 				className,
 			)}
 			style={{

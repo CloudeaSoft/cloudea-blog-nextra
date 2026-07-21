@@ -7,10 +7,10 @@ import { useState, type FC } from "react";
 import cn from "clsx";
 
 /**
- * Collapsible table of contents shown only on mobile (< lg), sticky just below
- * the fixed 4rem navbar. Mirrors the Nuxt blog pattern where the TOC is a
- * sticky bar at the top on small screens. The desktop sidebar TOC (`TOC`)
- * stays untouched.
+ * Collapsible table of contents shown only on mobile (< lg), sticky flush
+ * under the fixed navbar (`--navbar-height`, which shrinks when compact).
+ * Mirrors the Nuxt blog pattern where the TOC is a sticky bar at the top on
+ * small screens. The desktop sidebar TOC (`TOC`) stays untouched.
  *
  * Rendered as a sibling of the article (outside `.markdown-body`) so the
  * markdown post styles never apply to its list.
@@ -22,7 +22,7 @@ export const MobileToc: FC<{ toc?: Heading[] }> = ({ toc = [] }) => {
 
 	return (
 		<div
-			className="lg:hidden sticky top-16 z-20"
+			className="lg:hidden sticky top-[var(--navbar-height)] z-20"
 			style={{
 				backgroundColor: "var(--background-color-transparent-40)",
 				backdropFilter: "blur(16px)",
