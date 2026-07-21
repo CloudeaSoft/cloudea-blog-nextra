@@ -16,8 +16,10 @@
 		"postbuild": "pagefind --site .next/server/app --output-path out/_pagefind",
 		"export": "next build && next export",
 		"test:visual": "playwright test",
-		"test:visual:update": "playwright test --update-snapshots"
+		"test:visual:update": "playwright test --update-snapshots",
+		"typecheck": "tsc --noEmit"
 	},
+
 	"lint-staged": {
 		"*": "eslint --fix"
 	},
