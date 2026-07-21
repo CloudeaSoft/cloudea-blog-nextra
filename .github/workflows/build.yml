@@ -77,7 +77,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
 
-      - name: Build with Next.js
-        run: pnpm run build
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install chromium --with-deps
+
+      - name: Build with Next.js (visual fixture)
+        run: pnpm run build:visual
         env:
           PAGES_BASE_PATH: ${{ steps.setup_pages.outputs.base_path }}
+
+      - name: Visual regression tests
+        run: pnpm run test:visual
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14

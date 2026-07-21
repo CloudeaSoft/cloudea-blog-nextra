@@ -9,9 +9,11 @@ export const Hitokoto = async () => {
 
 	const text = hito.hitokoto;
 	return (
-		<TypingEffect
-			className="text-[1.25rem]"
-			text={text}
-		/>
+		<span data-testid="hitokoto">
+			<TypingEffect
+				className="text-[1.25rem]"
+				text={text}
+			/>
+		</span>
 	);
 };

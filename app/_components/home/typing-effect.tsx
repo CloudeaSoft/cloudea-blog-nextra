@@ -21,6 +21,15 @@ export const TypingEffect = ({
 	const [isComplete, setIsComplete] = useState(false);
 
 	useEffect(() => {
+		const prefersReducedMotion = window.matchMedia(
+			"(prefers-reduced-motion: reduce)",
+		).matches;
+		if (prefersReducedMotion) {
+			setDisplayText(text);
+			setIsComplete(true);
+			return;
+		}
+
 		if (displayText.length < text.length) {
 			const timer = setTimeout(() => {
 				setDisplayText(text.slice(0, displayText.length + 1));
