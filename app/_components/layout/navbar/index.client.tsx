@@ -124,9 +124,7 @@ const NavbarMenu: FC<{
 				// Keep open-on-hover: don't focus (and open via :focus-within) on mouse click.
 				onMouseDown={(event) => event.preventDefault()}
 			>
-				<span className="navbar-link__item">
-					<span className="navbar-link__label">{children}</span>
-				</span>
+				<span className="navbar-link__item">{children}</span>
 				<ArrowRightIcon className="navbar-link__caret" />
 			</button>
 			<div className="navbar-menu__dropdown">
@@ -205,9 +203,7 @@ export const ClientNavbar = ({
 								data-active={active || undefined}
 								aria-current={active ? "page" : undefined}
 							>
-								<span className="navbar-link__item">
-									<span className="navbar-link__label">{page.title}</span>
-								</span>
+								<span className="navbar-link__item">{page.title}</span>
 							</Anchor>
 						</li>
 					);
