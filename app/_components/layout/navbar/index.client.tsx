@@ -355,8 +355,13 @@ export const MobileNavbar = ({
 			if (media.matches) setMenu(false);
 		};
 		onChange();
-		media.addEventListener("change", onChange);
-		return () => media.removeEventListener("change", onChange);
+		// Safari < 14 / iOS < 14: MediaQueryList is not an EventTarget.
+		if (typeof media.addEventListener === "function") {
+			media.addEventListener("change", onChange);
+			return () => media.removeEventListener("change", onChange);
+		}
+		media.addListener(onChange);
+		return () => media.removeListener(onChange);
 	}, [setMenu]);
 
 	useEffect(() => {
