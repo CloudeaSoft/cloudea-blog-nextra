@@ -236,27 +236,22 @@ body .navbar-link__item {
 body .navbar-link__title {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.2em;
-	/* Shared track so icon + caps share one vertical center. */
-	height: 1.2em;
+	gap: 0.22em;
 	line-height: 1;
 }
 
 body .navbar-link__icon {
 	flex: none;
 	display: block;
-	width: 1.2em;
-	height: 1.2em;
+	/* Match label size so center alignment looks even. */
+	width: 1em;
+	height: 1em;
 	line-height: 0;
 	opacity: 0.92;
-	/* Keep flex centering; nudge glyph ink down (MDI pads the viewBox top-heavy). */
-	translate: 0 0.06em;
 }
 
 body .navbar-link__label {
-	display: inline-flex;
-	align-items: center;
-	height: 100%;
+	display: inline-block;
 	line-height: 1;
 }
 
