@@ -1,5 +1,6 @@
 import PostsPage from "@/app/_components/posts/post-list";
 import { Hitokoto } from "@/app/_components/home/hitokoto";
+import { BannerBlurTrigger } from "@/app/_components/home/banner-blur-trigger";
 import { Github } from "@/app/_components/layout/navbar/github";
 import { Email } from "@/app/_components/layout/navbar/email";
 import { CloudeaImage } from "@/app/_components/ui/image";
@@ -37,6 +38,7 @@ const Banner = async () => {
 				<span>Hi! Here is Cloudea.</span>
 				<Hitokoto />
 			</div>
+			<BannerBlurTrigger />
 			<div
 				style={{
 					position: "absolute",

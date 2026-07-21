@@ -1,8 +1,9 @@
 import type { PageMapItem } from "nextra";
 import type { FC } from "react";
 import { Stack } from "./stack";
-import { ClientNavbar, MobileNavbar } from "./index.client";
+import { ClientNavbar, MobileNavbar, NavbarShell } from "./index.client";
 import { getCategories, getPosts, getTags } from "@/app/posts/get-posts";
+import "./navbar.scss";
 
 export const Navbar: FC<{ pageMap: PageMapItem[] }> = async ({ pageMap }) => {
 	const [tags, posts, categories] = await Promise.all([
@@ -30,40 +31,17 @@ export const Navbar: FC<{ pageMap: PageMapItem[] }> = async ({ pageMap }) => {
 	];
 
 	return (
-		<header
-			style={{
-				height: "4rem",
-			}}
-		>
-			<nav
-				style={{
-					display: "flex",
+		<NavbarShell>
+			<div className="flex justify-between w-full max-w-300 z-1005 h-full items-center">
+				<Stack />
 
-					justifyContent: "center",
-					height: "4rem",
-					position: "fixed",
-					top: 0,
-					left: 0,
-					right: 0,
-					zIndex: 50,
+				<ClientNavbar pageMap={pageMap} />
+			</div>
 
-					background:
-						"linear-gradient(120deg, rgba(247, 135, 54, 0.208) 0%, rgba(54, 125, 247, 0.208) 100%)",
-					backdropFilter: "blur(10px)",
-					borderBottom: "1px solid var(--border-color)",
-				}}
-			>
-				<div className="flex justify-between w-full max-w-300 z-1005">
-					<Stack />
-
-					<ClientNavbar pageMap={pageMap} />
-				</div>
-
-				<MobileNavbar
-					links={sideLinks}
-					pageMap={pageMap}
-				/>
-			</nav>
-		</header>
+			<MobileNavbar
+				links={sideLinks}
+				pageMap={pageMap}
+			/>
+		</NavbarShell>
 	);
 };

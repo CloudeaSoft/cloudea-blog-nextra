@@ -1,8 +1,9 @@
-import { MetaRecord } from "nextra";
+import type { MetaRecord } from "nextra";
+import { NavTitle } from "@/app/_components/layout/navbar/nav-title";
 
 const meta: MetaRecord = {
 	index: {
-		title: "Home",
+		title: <NavTitle icon="mdi:home-outline">Home</NavTitle>,
 		type: "page",
 	},
 	// docs: {
@@ -13,12 +14,12 @@ const meta: MetaRecord = {
 	//   },
 	// },
 	archives: {
-		title: "Archives",
+		title: <NavTitle icon="mdi:archive-outline">Archives</NavTitle>,
 		type: "page",
 		href: "/posts",
 	},
 	about: {
-		title: "About",
+		title: <NavTitle icon="mdi:account-outline">About</NavTitle>,
 		type: "menu",
 		items: {
 			me: {

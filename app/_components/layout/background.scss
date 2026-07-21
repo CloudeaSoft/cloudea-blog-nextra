@@ -1,0 +1,17 @@
+/* Soft blur when the home greeting has scrolled out of view. */
+
+body .site-background-layer {
+	transition:
+		opacity 0.3s ease,
+		filter 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+		transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+	filter: blur(0);
+	transform: scale(1);
+	will-change: filter, transform;
+}
+
+body .site-background-layer[data-blurred] {
+	/* Scale up slightly so blur doesn't expose empty edges. */
+	filter: blur(14px);
+	transform: scale(1.06);
+}
