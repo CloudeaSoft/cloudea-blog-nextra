@@ -88,8 +88,8 @@ export default function FriendsPage() {
 																		<img
 																			src={friend.avatar}
 																			alt=""
-																			width={56}
-																			height={56}
+																			width={44}
+																			height={44}
 																			loading="lazy"
 																			referrerPolicy="no-referrer"
 																		/>
@@ -97,8 +97,8 @@ export default function FriendsPage() {
 																	: (
 																		<Icon
 																			icon="mdi:account-circle-outline"
-																			width={40}
-																			height={40}
+																			width={32}
+																			height={32}
 																		/>
 																	)}
 															</div>
@@ -114,8 +114,8 @@ export default function FriendsPage() {
 															</div>
 															<Icon
 																icon="line-md:external-link"
-																width={18}
-																height={18}
+																width={16}
+																height={16}
 																className="friend-card__external"
 																aria-hidden
 															/>
