@@ -55,7 +55,7 @@
 		"eslint-plugin-mdx": "^3.8.1",
 		"pagefind": "^1.5.2",
 		"serve": "^14.2.6",
-		"typescript": "5.9.3",
+		"typescript": "6.0.3",
 		"typescript-eslint": "^8.65.0",
 		"vitest": "^4.1.10"
 	}
