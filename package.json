@@ -4,6 +4,9 @@
 	"repository": "https://github.com/CloudeaSoft/cloudea-blog-nextra",
 	"author": "CloudeaSoft <cloudeasoft@qq.com>",
 	"license": "GPL-3.0-only",
+	"engines": {
+		"node": ">=24"
+	},
 	"packageManager": "pnpm@11.15.0",
 	"scripts": {
 		"dev": "next",
@@ -32,10 +35,10 @@
 		"next-view-transitions": "^0.3.5",
 		"nextra": "^4.6.1",
 		"nextra-theme-docs": "^4.6.1",
-		"postcss": "^8.5.19",
+		"postcss": "^8.5.20",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7",
-		"sass": "^1.101.0",
+		"sass": "^1.101.3",
 		"tailwindcss": "^4.3.3",
 		"yaml": "2.9.0"
 	},
@@ -45,15 +48,15 @@
 		"@next/eslint-plugin-next": "^16.2.10",
 		"@playwright/test": "^1.61.1",
 		"@stylistic/eslint-plugin": "^5.10.0",
-		"@types/node": "24.3.1",
-		"@types/react": "19.1.12",
+		"@types/node": "24.13.3",
+		"@types/react": "19.2.17",
 		"eslint": "^10.7.0",
 		"eslint-config-next": "^16.2.10",
 		"eslint-plugin-mdx": "^3.8.1",
 		"pagefind": "^1.5.2",
 		"serve": "^14.2.6",
-		"typescript": "5.9.3",
-		"typescript-eslint": "^8.64.0",
+		"typescript": "6.0.3",
+		"typescript-eslint": "^8.65.0",
 		"vitest": "^4.1.10"
 	}
 }

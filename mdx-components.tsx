@@ -13,6 +13,7 @@ import {
 import { useMDXComponents as getNextraMDXComponents } from "nextra/mdx-components";
 import type { MDXComponents, UseMDXComponents } from "nextra/mdx-components";
 import type { ComponentProps, FC } from "react";
+import type { MDXWrapper } from "nextra";
 import { Meta } from "@/app/_components/mdx/meta";
 import { GoBack } from "@/app/_components/mdx/go-back";
 import { InPageAnchors } from "@/app/_components/mdx/in-page-anchors";
@@ -87,8 +88,8 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
 	const { DateFormatter, ...components } = comp ?? {};
 	return {
 		...DEFAULT_COMPONENTS,
-		wrapper({ toc, children, metadata }) {
-			const date = metadata.date as string;
+		wrapper({ toc, children, metadata }: ComponentProps<MDXWrapper>) {
+			const date = (metadata as BlogMetadata).date;
 			if (date && !isValidDate(date)) {
 				throw new Error(
 					`Invalid date "${date}". Provide date in "YYYY/M/D", "YYYY/M/D H:m", "YYYY-MM-DD", "[YYYY-MM-DD]T[HH:mm]" or "[YYYY-MM-DD]T[HH:mm:ss.SSS]Z" format.`,

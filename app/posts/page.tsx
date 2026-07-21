@@ -5,10 +5,10 @@ import { Item } from "nextra/normalize-pages";
 
 export default async function PostPage() {
 	const posts = await getPosts();
-	const groupedByYear: Record<string, Record<string, Item[]>> = posts.reduce(
+	const groupedByYear = posts.reduce<Record<string, Record<string, Item[]>>>(
 		(acc, post) => {
 			const date = new Date(post.frontMatter.date);
-			const year = date.getFullYear();
+			const year = String(date.getFullYear());
 			const monthDay = `${date.getMonth() + 1}/${date.getDate()}`; // 格式: M/D
 
 			if (!acc[year]) acc[year] = {};

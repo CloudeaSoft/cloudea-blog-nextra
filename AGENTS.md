@@ -2,7 +2,7 @@
 
 ## Cursor Cloud specific instructions
 
-This repo is a single **Next.js 15 + Nextra 4** static blog (`cloudea-blog-nextra`). There is no backend, database, or automated test suite (a `vitest` dependency exists but there are no test files or `test` script). Standard scripts live in `package.json` (`dev`, `build`, `start`, `postbuild`). Toolchain: Node 22 + pnpm 11.15.0. The update script runs `pnpm install` on startup.
+This repo is a single **Next.js 15 + Nextra 4** static blog (`cloudea-blog-nextra`). There is no backend, database, or automated test suite (a `vitest` dependency exists but there are no test files or `test` script). Standard scripts live in `package.json` (`dev`, `build`, `start`, `postbuild`). Toolchain: Node 24 + pnpm 11.15.0. The update script runs `pnpm install` on startup.
 
 Non-obvious caveats:
 

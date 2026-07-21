@@ -1,7 +1,13 @@
 import { PostCard } from "@/app/_components/posts/post-card";
 import { getPosts, getTags } from "@/app/posts/get-posts";
 
-export async function generateMetadata(props) {
+type TagParams = { tag: string };
+
+type TagPageProps = {
+	params: Promise<TagParams>;
+};
+
+export async function generateMetadata(props: TagPageProps) {
 	const params = await props.params;
 	return {
 		title: `Posts Tagged with “${decodeURIComponent(params.tag)}”`,
@@ -9,14 +15,14 @@ export async function generateMetadata(props) {
 }
 
 // output: export
-export async function generateStaticParams(): Promise<{ tag }[]> {
+export async function generateStaticParams(): Promise<TagParams[]> {
 	const allTags = await getTags();
 	return [...new Set(allTags)].map((tag) => ({ tag }));
 }
 
-export default async function TagPage(props) {
-	const params = props.params;
-	const { title } = await generateMetadata({ params });
+export default async function TagPage(props: TagPageProps) {
+	const params = await props.params;
+	const { title } = await generateMetadata(props);
 	const posts = await getPosts();
 	return (
 		<>
