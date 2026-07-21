@@ -1,0 +1,140 @@
+.friends-header {
+	animation: friends-fade-up 0.45s ease-out both;
+}
+
+.friends-empty {
+	animation: friends-fade-up 0.45s ease-out 0.06s both;
+}
+
+.friends-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 1rem;
+}
+
+.friend-card {
+	display: flex;
+	align-items: center;
+	gap: 0.85rem;
+	padding: 1rem 1.1rem;
+	border-radius: 14px;
+	border: 1px solid var(--border-color);
+	background: var(--background-color-transparent-40);
+	box-shadow: var(--cloudea-box-shadow-flat);
+	color: inherit;
+	text-decoration: none;
+	transition:
+		transform 0.2s ease,
+		box-shadow 0.2s ease,
+		border-color 0.2s ease;
+	animation: friends-fade-up 0.45s ease-out both;
+}
+
+.friends-grid > li:nth-child(1) .friend-card {
+	animation-delay: 0.05s;
+}
+.friends-grid > li:nth-child(2) .friend-card {
+	animation-delay: 0.1s;
+}
+.friends-grid > li:nth-child(3) .friend-card {
+	animation-delay: 0.15s;
+}
+.friends-grid > li:nth-child(4) .friend-card {
+	animation-delay: 0.2s;
+}
+.friends-grid > li:nth-child(5) .friend-card {
+	animation-delay: 0.25s;
+}
+.friends-grid > li:nth-child(n + 6) .friend-card {
+	animation-delay: 0.3s;
+}
+
+.friend-card:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--cloudea-box-shadow-flat-hover);
+	border-color: color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
+}
+
+.friend-card__avatar {
+	flex-shrink: 0;
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--third-background-color);
+	color: var(--third-text-color);
+}
+
+.friend-card__avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.friend-card__body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	min-width: 0;
+	flex: 1;
+}
+
+.friend-card__name {
+	font-weight: 600;
+	font-size: 1.05rem;
+	color: var(--first-text-color);
+	line-height: 1.3;
+}
+
+.friend-card__desc {
+	font-size: 0.875rem;
+	color: var(--third-text-color);
+	line-height: 1.4;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.friend-card__external {
+	flex-shrink: 0;
+	color: var(--third-text-color);
+	opacity: 0.55;
+	transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.friend-card:hover .friend-card__external {
+	opacity: 1;
+	color: var(--primary-color);
+}
+
+.friends-exchange {
+	animation: friends-fade-up 0.45s ease-out 0.12s both;
+}
+
+@keyframes friends-fade-up {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.friends-header,
+	.friends-empty,
+	.friend-card,
+	.friends-exchange {
+		animation: none;
+	}
+
+	.friend-card:hover {
+		transform: none;
+	}
+}
