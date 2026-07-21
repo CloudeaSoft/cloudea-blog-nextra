@@ -26,7 +26,14 @@ const meta: MetaRecord = {
 				title: "Me",
 				href: "/about",
 			},
+			friends: {
+				title: "Friends",
+				href: "/friends",
+			},
 		},
+	},
+	friends: {
+		display: "hidden",
 	},
 };
 

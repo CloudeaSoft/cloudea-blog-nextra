@@ -1,0 +1,15 @@
+# Friend links (友链) — edit this file to update /friends
+#
+# - links_category: Category title shown on the page
+#   list:
+#     - name: Site name
+#       link: https://example.com
+#       description: Short blurb
+#       avatar: https://example.com/avatar.png   # optional
+
+- links_category: Hello Internet
+  list:
+    - name: EvanNotFound's Blog
+      link: https://ohevan.com
+      description: 用香港记者的速度更新文章
+      avatar: https://evan.beee.top/avatar.png

@@ -15,6 +15,7 @@ const ROUTES = [
 	{ name: "categories", path: "/categories" },
 	{ name: "tags", path: "/tags" },
 	{ name: "about", path: "/about" },
+	{ name: "friends", path: "/friends" },
 	{ name: "post-sample", path: "/posts/github-250908" },
 ] as const;
 
