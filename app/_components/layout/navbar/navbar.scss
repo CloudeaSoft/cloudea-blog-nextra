@@ -201,7 +201,7 @@ body .navbar-link {
 	justify-content: center;
 	align-self: stretch;
 	height: 100%;
-	font-size: 1.25rem;
+	font-size: 1.15rem;
 	font-weight: 500;
 	line-height: 1;
 	letter-spacing: 0.04em;
@@ -220,7 +220,7 @@ body .navbar-link__item {
 	display: inline-flex;
 	align-items: center;
 	height: 100%;
-	padding-inline: 0.45em 0.8em;
+	padding-inline: 0.55em 0.65em;
 }
 
 body .navbar-link__title {
@@ -235,8 +235,6 @@ body .navbar-link__icon {
 	align-items: center;
 	justify-content: center;
 	line-height: 1;
-	/* Pull the glyph a touch left so ink aligns with the underline start. */
-	margin-inline-start: -0.06em;
 	opacity: 0.92;
 }
 
@@ -267,7 +265,7 @@ body .navbar-link--menu {
 
 /* Keep underline longer than the label, but don't leave a wide gap before the caret. */
 body .navbar-link--menu .navbar-link__item {
-	padding-inline: 0.45em 0.15em;
+	padding-inline: 0.55em 0.15em;
 }
 
 body .navbar-menu:is(:hover, :focus-within) .navbar-link__caret {
