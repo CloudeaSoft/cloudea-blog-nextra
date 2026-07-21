@@ -4,7 +4,7 @@ A personal blog built with [Next.js](https://nextjs.org) and [Nextra](https://ne
 
 ## Prerequisites
 
-- Node.js 22
+- Node.js 24
 - pnpm 11.15.0
 
 ## Getting Started
