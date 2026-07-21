@@ -17,8 +17,6 @@ import cn from "clsx";
 export const MobileToc: FC<{ toc?: Heading[] }> = ({ toc = [] }) => {
 	const [open, setOpen] = useState(false);
 
-	if (!toc.length) return null;
-
 	return (
 		<div
 			className="toc-sticky lg:hidden sticky z-20"
@@ -66,20 +64,24 @@ export const MobileToc: FC<{ toc?: Heading[] }> = ({ toc = [] }) => {
 						className="max-h-[50vh] overflow-y-auto px-3 pb-3 flex flex-col text-sm"
 						style={{ color: "var(--second-text-color)" }}
 					>
-						{toc.map((heading) => (
-							<li key={heading.id}>
-								<Link
-									href={`#${heading.id}`}
-									onClick={() => setOpen(false)}
-									className="block truncate rounded-md py-1.5 opacity-80 hover:opacity-100"
-									style={{
-										paddingInlineStart: `${0.5 + Math.max(0, heading.depth - 2) * 0.85}rem`,
-									}}
-								>
-									{heading.value}
-								</Link>
-							</li>
-						))}
+						{toc.length
+							? toc.map((heading) => (
+								<li key={heading.id}>
+									<Link
+										href={`#${heading.id}`}
+										onClick={() => setOpen(false)}
+										className="block truncate rounded-md py-1.5 opacity-80 hover:opacity-100"
+										style={{
+											paddingInlineStart: `${0.5 + Math.max(0, heading.depth - 2) * 0.85}rem`,
+										}}
+									>
+										{heading.value}
+									</Link>
+								</li>
+							))
+							: (
+								<li className="px-2 py-1.5 opacity-60">No headings</li>
+							)}
 					</ul>
 				</div>
 			</div>
