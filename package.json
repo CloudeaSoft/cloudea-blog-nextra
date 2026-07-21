@@ -16,7 +16,9 @@
 		"postbuild": "pagefind --site .next/server/app --output-path out/_pagefind",
 		"export": "next build && next export",
 		"test:visual": "playwright test",
-		"test:visual:update": "playwright test --update-snapshots"
+		"test:visual:update": "playwright test --update-snapshots",
+		"typecheck": "tsc --noEmit",
+		"typecheck:tsc6": "tsc6 --noEmit"
 	},
 	"lint-staged": {
 		"*": "eslint --fix"
@@ -50,12 +52,13 @@
 		"@stylistic/eslint-plugin": "^5.10.0",
 		"@types/node": "24.13.3",
 		"@types/react": "19.2.17",
+		"@typescript/native": "npm:typescript@^7.0.2",
 		"eslint": "^10.7.0",
 		"eslint-config-next": "^16.2.10",
 		"eslint-plugin-mdx": "^3.8.1",
 		"pagefind": "^1.5.2",
 		"serve": "^14.2.6",
-		"typescript": "6.0.3",
+		"typescript": "npm:@typescript/typescript6@^6.0.2",
 		"typescript-eslint": "^8.65.0",
 		"vitest": "^4.1.10"
 	}
