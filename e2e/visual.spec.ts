@@ -85,11 +85,30 @@ test.describe("visual regression", () => {
 	test("home navbar compact after scroll", async ({ page }) => {
 		await gotoStable(page, "/");
 
-		// Scroll past the compact threshold used by the navbar.
+		// Scroll past the compact threshold used by the navbar (SCROLL_COMPACT_THRESHOLD = 36).
 		await page.evaluate(() => window.scrollTo(0, 80));
 		await page.waitForTimeout(200);
 
 		const navbar = page.locator("nav").first();
 		await expect(navbar).toHaveScreenshot("navbar-compact.png");
+	});
+
+	test("home background blur after scroll", async ({ page }) => {
+		await gotoStable(page, "/");
+
+		// BannerBlurTrigger enables blur when scrollY > 420.
+		await page.evaluate(() => window.scrollTo(0, 480));
+		await page.waitForTimeout(300);
+
+		await expect
+			.poll(async () =>
+				page.locator(".site-background-layer[data-blurred]").count(),
+			)
+			.toBeGreaterThan(0);
+
+		await expect(page).toHaveScreenshot("home-blurred.png", {
+			fullPage: false,
+			mask: [page.getByTestId("hitokoto")],
+		});
 	});
 });
