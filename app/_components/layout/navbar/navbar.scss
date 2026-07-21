@@ -7,15 +7,6 @@ body .navbar-header {
 	transition: height 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Hoist so sticky TOC / mobile TOC can track compact height. */
-body:has(.navbar-header) {
-	--navbar-height: 4rem;
-}
-
-body:has(.navbar-header[data-compact]) {
-	--navbar-height: 3rem;
-}
-
 body .navbar-header[data-compact] {
 	--navbar-height: 3rem;
 }

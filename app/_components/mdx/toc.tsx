@@ -6,12 +6,9 @@ import cn from "clsx";
 export const TOC: FC<{ toc: Heading[]; className?: string }> = ({ toc, className }) => {
 	return (
 		<div
-			data-testid="desktop-toc"
 			className={cn(
-				"w-52 shrink-0 rounded-2xl border-2 border-solid h-fit p-5",
-				// Sit just below the fixed navbar (tracks --navbar-height when compact).
-				"sticky top-[calc(30px+var(--navbar-height,4rem))] self-start",
-				"max-h-[calc(100vh-var(--navbar-height,4rem)-2rem)] overflow-y-auto",
+				"w-52 rounded-2xl border-2 border-solid h-fit p-5",
+				"sticky top-[calc(30px+4rem)] self-start max-h-[calc(100vh-6rem)] overflow-y-auto",
 				className,
 			)}
 			style={{
