@@ -77,6 +77,35 @@
 	border-color: color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
 }
 
+/* Override global `a:hover span` / `a:hover` brand color from theme.scss */
+.friend-card:hover,
+.friend-card:active,
+.friend-card:hover span,
+.friend-card:active span,
+.friend-card:hover i,
+.friend-card:active i,
+.friend-card:hover .friend-card__name,
+.friend-card:active .friend-card__name {
+	color: inherit;
+}
+
+.friend-card:hover .friend-card__name,
+.friend-card:active .friend-card__name {
+	color: var(--first-text-color);
+}
+
+.friend-card:hover .friend-card__desc,
+.friend-card:active .friend-card__desc {
+	color: var(--third-text-color);
+}
+
+.friend-card:hover .friend-card__external,
+.friend-card:active .friend-card__external,
+.friend-card:hover .friend-card__avatar,
+.friend-card:active .friend-card__avatar {
+	color: var(--third-text-color);
+}
+
 .friend-card__avatar {
 	flex-shrink: 0;
 	width: 56px;
@@ -125,12 +154,6 @@
 	flex-shrink: 0;
 	color: var(--third-text-color);
 	opacity: 0.55;
-	transition: opacity 0.2s ease, color 0.2s ease;
-}
-
-.friend-card:hover .friend-card__external {
-	opacity: 1;
-	color: var(--primary-color);
 }
 
 .friends-exchange {
