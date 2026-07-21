@@ -125,7 +125,7 @@ body .navbar-link__item {
 	display: inline-flex;
 	align-items: center;
 	height: 100%;
-	padding-inline: 0.45em;
+	padding-inline: 0.7em;
 }
 
 body .navbar-link__label {
@@ -144,7 +144,7 @@ body .navbar-link__item::after {
 	right: 0;
 	bottom: var(--navbar-underline-inset);
 	height: 3px;
-	border-radius: 999px;
+	border-radius: 9999px;
 	background: var(--primary-color);
 	transform: scaleX(0);
 	transform-origin: center;
