@@ -20,13 +20,7 @@ const meta: MetaRecord = {
 	},
 	about: {
 		title: <NavTitle icon="mdi:account-outline">About</NavTitle>,
-		type: "menu",
-		items: {
-			me: {
-				title: <NavTitle icon="mdi:emoticon-outline">Me</NavTitle>,
-				href: "/about",
-			},
-		},
+		type: "page",
 	},
 };
 
