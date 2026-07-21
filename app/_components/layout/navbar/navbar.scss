@@ -155,7 +155,7 @@ body .navbar-menu__dropdown {
 body .navbar-menu__panel {
 	min-width: 8rem;
 	margin: 0;
-	padding: 0.35rem 0;
+	padding: 0.35rem;
 	list-style: none;
 	border: 1px solid var(--border-color);
 	border-radius: 0.85rem;
@@ -176,7 +176,8 @@ body .navbar-menu__panel {
 
 body .navbar-menu__option {
 	display: block;
-	padding: 0.5rem 1.35rem 0.5rem 0.95rem;
+	padding: 0.5rem 0.85rem;
+	border-radius: 0.55rem;
 	font-size: 1.1rem;
 	font-weight: 500;
 	letter-spacing: 0.04em;
