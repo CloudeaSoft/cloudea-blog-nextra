@@ -22,7 +22,8 @@ export const MobileToc: FC<{ toc?: Heading[] }> = ({ toc = [] }) => {
 
 	return (
 		<div
-			className="lg:hidden sticky top-16 z-20"
+			data-testid="mobile-toc"
+			className="lg:hidden sticky top-[var(--navbar-height,4rem)] z-20"
 			style={{
 				backgroundColor: "var(--background-color-transparent-40)",
 				backdropFilter: "blur(16px)",

@@ -106,7 +106,10 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <
 					<article
 						className={cn(
 							"markdown-body lg:container px-8 py-8 max-lg:px-5 max-lg:py-6 prose max-md:prose-sm dark:prose-invert backdrop-blur-2xl rounded-2xl border-2 border-solid",
-							"max-lg:rounded-none max-lg:border-none! w-full min-h-full",
+							// flex-1 + min-w-0 so the sidebar TOC keeps its width instead of
+							// being pushed past the right edge of the viewport.
+							"min-w-0 flex-1 min-h-full",
+							"max-lg:rounded-none max-lg:border-none! max-lg:w-full",
 						)}
 						dir="ltr"
 						data-pagefind-body
