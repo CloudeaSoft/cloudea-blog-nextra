@@ -27,7 +27,7 @@ pnpm build   # static export into out/ (requires .env)
 
 ## Visual regression tests
 
-Style changes are guarded by Playwright screenshot baselines (desktop + mobile).
+Style and navbar motion changes are guarded by Playwright baselines (desktop + mobile).
 
 ```bash
 pnpm build:visual          # build with stable hitokoto fixture
@@ -35,7 +35,10 @@ pnpm test:visual           # compare against committed baselines
 pnpm test:visual:update    # refresh baselines after intentional UI changes
 ```
 
-Baselines live under `e2e/visual.spec.ts-snapshots/`. Commit updated snapshots when a visual change is intentional; CI fails when screenshots drift.
+- Page screenshots: `e2e/visual.spec.ts` (+ `e2e/visual.spec.ts-snapshots/`)
+- Navbar compact / mobile drawer slide / hamburger icon: `e2e/navbar.spec.ts` (+ `e2e/navbar.spec.ts-snapshots/`)
+
+Commit updated snapshots when a visual or motion change is intentional; CI fails when screenshots or transition contracts drift.
 
 ## License
 

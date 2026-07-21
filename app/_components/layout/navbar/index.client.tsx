@@ -225,10 +225,12 @@ export const ClientNavbar = ({
 
 			<Button
 				aria-label="Menu"
+				data-testid="mobile-menu-button"
 				className={cn("nextra-hamburger lg:hidden mr-5")}
 				onClick={toggleMenu}
 			>
 				<Icon
+					data-testid="mobile-menu-icon"
 					icon={
 						menu
 							? "line-md:menu-to-close-transition"
@@ -353,6 +355,8 @@ export const MobileNavbar = ({
 
 	return (
 		<div
+			data-testid="mobile-nav-drawer"
+			data-open={menu || undefined}
 			className={cn(
 				"fixed top-0 right-0 h-dvh w-full z-50 flex flex-col",
 				"bg-(--background-color)",
