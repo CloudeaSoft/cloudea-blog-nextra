@@ -72,7 +72,7 @@ body .navbar-brand__logo {
 }
 
 body .navbar-brand__title {
-	font-size: 1.55rem;
+	font-size: 1.45rem;
 	font-weight: 700;
 	letter-spacing: 0.01em;
 	color: var(--first-text-color);
@@ -83,7 +83,7 @@ body .navbar-brand__title {
 
 @media (min-width: 1024px) {
 	body .navbar-brand__title {
-		font-size: 2.25rem;
+		font-size: 1.85rem;
 	}
 }
 
@@ -97,13 +97,13 @@ body .navbar-bar[data-compact] .navbar-brand__logo {
 }
 
 body .navbar-bar[data-compact] .navbar-brand__title {
-	font-size: 1.35rem;
+	font-size: 1.3rem;
 	letter-spacing: 0;
 }
 
 @media (min-width: 1024px) {
 	body .navbar-bar[data-compact] .navbar-brand__title {
-		font-size: 1.85rem;
+		font-size: 1.55rem;
 	}
 }
 
@@ -168,7 +168,7 @@ body .navbar-menu__panel {
 body .navbar-menu__option {
 	display: block;
 	padding: 0.45rem 1.35rem 0.45rem 0.85rem;
-	font-size: 1.25rem;
+	font-size: 1.1rem;
 	font-weight: 500;
 	color: var(--third-text-color);
 	text-decoration: none;
@@ -199,7 +199,7 @@ body .navbar-link {
 	justify-content: center;
 	align-self: stretch;
 	height: 100%;
-	font-size: 1.5rem;
+	font-size: 1.25rem;
 	font-weight: 500;
 	line-height: 1;
 	color: var(--default-text-color);
