@@ -29,7 +29,7 @@ export const GetHitokoto = async (): Promise<Hitokoto | null> => {
 
 		throw new Error("Hitokoto is inavailable for unknown reason.");
 	} catch (ex) {
-		console.warn(ex.message);
+		console.warn(ex instanceof Error ? ex.message : ex);
 		return null;
 	}
 };

@@ -1,7 +1,13 @@
 import { PostCard } from "@/app/_components/posts/post-card";
 import { getCategories, getPosts } from "@/app/posts/get-posts";
 
-export async function generateMetadata(props) {
+type CategoryParams = { category: string };
+
+type CategoryPageProps = {
+	params: Promise<CategoryParams>;
+};
+
+export async function generateMetadata(props: CategoryPageProps) {
 	const params = await props.params;
 	return {
 		title: `Posts Categorized with “${decodeURIComponent(params.category)}”`,
@@ -9,14 +15,14 @@ export async function generateMetadata(props) {
 }
 
 // output: export
-export async function generateStaticParams(): Promise<{ category }[]> {
+export async function generateStaticParams(): Promise<CategoryParams[]> {
 	const allCategories = await getCategories();
 	return [...new Set(allCategories)].map((category) => ({ category }));
 }
 
-export default async function CategoryPage(props) {
-	const params = props.params;
-	const { title } = await generateMetadata({ params });
+export default async function CategoryPage(props: CategoryPageProps) {
+	const params = await props.params;
+	const { title } = await generateMetadata(props);
 	const posts = await getPosts();
 	return (
 		<>

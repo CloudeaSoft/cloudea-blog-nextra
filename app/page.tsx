@@ -7,6 +7,7 @@ import { CloudeaImage } from "@/app/_components/ui/image";
 import Link from "next/link";
 import { Icon } from "@iconify-icon/react";
 import cn from "clsx";
+import type { ReactNode } from "react";
 
 import "./page.css";
 import { getCategories, getPosts, getTags } from "@/app/posts/get-posts";
@@ -62,7 +63,7 @@ const Banner = async () => {
 	);
 };
 
-const Content = async ({ children }) => {
+const Content = async ({ children }: { children: ReactNode }) => {
 	const tags = await getTags();
 	const uniqueTagsCount = new Set(tags).size;
 	const posts = await getPosts();
