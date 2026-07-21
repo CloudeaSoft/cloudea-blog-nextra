@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Icon } from "@iconify-icon/react";
 import cn from "clsx";
-import { CloudeaImage } from "@/app/_components/ui/image";
-import { friends } from "./friends";
+import { getFriendCategories } from "./friends";
 
 import "./friends.css";
 
@@ -14,6 +13,9 @@ export const metadata: Metadata = {
 const EXCHANGE_EMAIL = "cloudeasoft@qq.com";
 
 export default function FriendsPage() {
+	const categories = getFriendCategories();
+	const hasLinks = categories.some((category) => category.list.length > 0);
+
 	return (
 		<div
 			data-pagefind-body
@@ -39,57 +41,86 @@ export default function FriendsPage() {
 						</p>
 					</header>
 
-					{friends.length === 0
+					{!hasLinks
 						? (
 							<p className="friends-empty text-(--third-text-color) text-center py-10 m-0">
 								暂无友链 · No friends listed yet
 							</p>
 						)
 						: (
-							<ul className="friends-grid list-none p-0 m-0">
-								{friends.map((friend) => (
-									<li key={friend.url}>
-										<a
-											href={friend.url}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="friend-card"
-										>
-											<span className="friend-card__avatar" aria-hidden>
-												{friend.avatar
-													? (
-														<CloudeaImage
-															src={friend.avatar}
-															alt=""
-															width={56}
-															height={56}
-														/>
-													)
-													: (
-														<Icon
-															icon="mdi:account-circle-outline"
-															width={40}
-															height={40}
-														/>
-													)}
-											</span>
-											<span className="friend-card__body">
-												<span className="friend-card__name">{friend.name}</span>
-												<span className="friend-card__desc">
-													{friend.description}
-												</span>
-											</span>
-											<Icon
-												icon="line-md:external-link"
-												width={18}
-												height={18}
-												className="friend-card__external"
-												aria-hidden
-											/>
-										</a>
-									</li>
+							<div className="friends-categories">
+								{categories.map((category) => (
+									<section
+										key={category.links_category}
+										className="friends-category"
+									>
+										<h2 className="friends-category__title">
+											{category.links_category}
+										</h2>
+										{category.list.length === 0
+											? (
+												<p className="friends-category__empty m-0 text-(--third-text-color)">
+													暂无
+												</p>
+											)
+											: (
+												<ul className="friends-grid list-none p-0 m-0">
+													{category.list.map((friend) => (
+														<li key={`${friend.name}-${friend.link}`}>
+															<a
+																href={friend.link}
+																target="_blank"
+																rel="noopener noreferrer"
+																className="friend-card"
+															>
+																<span
+																	className="friend-card__avatar"
+																	aria-hidden
+																>
+																	{friend.avatar
+																		? (
+																			<img
+																				src={friend.avatar}
+																				alt=""
+																				width={56}
+																				height={56}
+																				loading="lazy"
+																				referrerPolicy="no-referrer"
+																			/>
+																		)
+																		: (
+																			<Icon
+																				icon="mdi:account-circle-outline"
+																				width={40}
+																				height={40}
+																			/>
+																		)}
+																</span>
+																<span className="friend-card__body">
+																	<span className="friend-card__name">
+																		{friend.name}
+																	</span>
+																	{friend.description && (
+																		<span className="friend-card__desc">
+																			{friend.description}
+																		</span>
+																	)}
+																</span>
+																<Icon
+																	icon="line-md:external-link"
+																	width={18}
+																	height={18}
+																	className="friend-card__external"
+																	aria-hidden
+																/>
+															</a>
+														</li>
+													))}
+												</ul>
+											)}
+									</section>
 								))}
-							</ul>
+							</div>
 						)}
 
 					<section className="friends-exchange mt-10 pt-8 border-t border-solid border-(--border-color)">

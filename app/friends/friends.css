@@ -6,6 +6,28 @@
 	animation: friends-fade-up 0.45s ease-out 0.06s both;
 }
 
+.friends-categories {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+.friends-category {
+	animation: friends-fade-up 0.45s ease-out both;
+}
+
+.friends-category__title {
+	margin: 0 0 1rem;
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: var(--first-text-color);
+	letter-spacing: 0.01em;
+}
+
+.friends-category__empty {
+	font-size: 0.95rem;
+}
+
 .friends-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -129,6 +151,7 @@
 @media (prefers-reduced-motion: reduce) {
 	.friends-header,
 	.friends-empty,
+	.friends-category,
 	.friend-card,
 	.friends-exchange {
 		animation: none;
