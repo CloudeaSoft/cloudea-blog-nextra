@@ -1,11 +1,20 @@
 /* PC navbar visual interactions: active underline, hover bounce, scroll compact.
  * `body …` prefixes beat the global `body *` color-only transition rule.
  *
- * `--navbar-height` lives on `body` so sticky siblings (TOC) can sit flush
- * under the fixed bar as it expands/compacts. */
+ * `--navbar-height` is a registered, inheritable length on `body` so the fixed
+ * bar and sticky siblings (TOC) share one interpolated value while compacting.
+ * Animating the variable (not each consumer's height/top) keeps them flush
+ * mid-transition. */
+
+@property --navbar-height {
+	syntax: "<length>";
+	inherits: true;
+	initial-value: 4rem;
+}
 
 body {
 	--navbar-height: 4rem;
+	transition: --navbar-height 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 body:has(.navbar-header[data-compact]) {
@@ -14,7 +23,6 @@ body:has(.navbar-header[data-compact]) {
 
 body .navbar-header {
 	height: var(--navbar-height);
-	transition: height 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 body .navbar-bar {
@@ -35,7 +43,6 @@ body .navbar-bar {
 	backdrop-filter: blur(10px);
 	border-bottom: 1px solid var(--border-color);
 	transition:
-		height 0.32s cubic-bezier(0.22, 1, 0.36, 1),
 		background 0.32s ease,
 		backdrop-filter 0.32s ease,
 		box-shadow 0.32s ease;
