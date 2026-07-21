@@ -155,13 +155,20 @@ body .navbar-menu__dropdown {
 body .navbar-menu__panel {
 	min-width: 8rem;
 	margin: 0;
-	padding: 0.25rem 0;
+	padding: 0.35rem 0;
 	list-style: none;
 	border: 1px solid var(--border-color);
 	border-radius: 0.85rem;
-	background: var(--background-color-transparent-80);
-	backdrop-filter: blur(12px);
-	box-shadow: 0 10px 24px var(--shadow-color-2);
+	/* Match the navbar glass: warm→cool wash over frosted surface. */
+	background:
+		linear-gradient(
+			120deg,
+			rgba(247, 135, 54, 0.18) 0%,
+			rgba(54, 125, 247, 0.18) 100%
+		),
+		var(--background-color-transparent-80);
+	backdrop-filter: blur(14px);
+	box-shadow: var(--cloudea-box-shadow);
 	transform: scale(0.96);
 	transform-origin: top center;
 	transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
@@ -169,12 +176,12 @@ body .navbar-menu__panel {
 
 body .navbar-menu__option {
 	display: block;
-	padding: 0.45rem 1.35rem 0.45rem 0.85rem;
+	padding: 0.5rem 1.35rem 0.5rem 0.95rem;
 	font-size: 1.1rem;
 	font-weight: 500;
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
-	color: var(--third-text-color);
+	color: var(--default-text-color);
 	text-decoration: none;
 	white-space: nowrap;
 	transition: color 0.2s ease, background-color 0.2s ease;
@@ -182,8 +189,8 @@ body .navbar-menu__option {
 
 body .navbar-menu__option:hover,
 body .navbar-menu__option:focus-visible {
-	color: var(--first-text-color);
-	background: var(--background-color-transparent-40);
+	color: var(--primary-color);
+	background: color-mix(in srgb, var(--primary-color) 10%, transparent);
 }
 
 body .navbar-menu:is(:hover, :focus-within) .navbar-menu__dropdown {
