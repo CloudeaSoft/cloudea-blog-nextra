@@ -160,13 +160,12 @@ body .navbar-menu__panel {
 	border: 1px solid var(--border-color);
 	border-radius: 0.85rem;
 	/* Match the navbar glass: warm→cool wash over frosted surface. */
-	background:
-		linear-gradient(
-			120deg,
-			rgba(247, 135, 54, 0.18) 0%,
-			rgba(54, 125, 247, 0.18) 100%
-		),
-		var(--background-color-transparent-80);
+	background-color: var(--background-color-transparent-80);
+	background-image: linear-gradient(
+		120deg,
+		rgba(247, 135, 54, 0.18) 0%,
+		rgba(54, 125, 247, 0.18) 100%
+	);
 	backdrop-filter: blur(14px);
 	box-shadow: var(--cloudea-box-shadow);
 	transform: scale(0.96);
