@@ -14,13 +14,22 @@ import { Anchor, Button, Search } from "nextra/components";
 import { normalizePages } from "nextra/normalize-pages";
 import { ThemeSwitch } from "./theme-switch";
 import { GithubNav } from "./github";
-import { MenuItem } from "nextra/normalize-pages";
-import { FC, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
+import { MenuItem, PageItem } from "nextra/normalize-pages";
+import {
+	FC,
+	ReactNode,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
 import type { PageMapItem } from "nextra";
 import { Icon } from "@iconify-icon/react";
 import { useAtom } from "jotai";
 import { menuAtom } from "@/stores/menu";
 import Link from "next/link";
+
+const SCROLL_COMPACT_THRESHOLD = 36;
 
 const classes = {
 	link: cn(
@@ -30,11 +39,70 @@ const classes = {
 	),
 };
 
+function getNavHref(page: PageItem | MenuItem): string {
+	if ("href" in page && page.href) return page.href;
+	return page.route || "";
+}
+
+function isPathActive(href: string, pathname: string): boolean {
+	if (!href || href === "/") return pathname === "/";
+	return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function isNavItemActive(page: PageItem | MenuItem, pathname: string): boolean {
+	if (page.type === "menu") {
+		const menu = page as MenuItem;
+		const items = (menu.items
+			|| {}) as Record<string, { title: string; href?: string }>;
+		const childRoutes = Object.fromEntries(
+			(menu.children || []).map((route) => [route.name, route]),
+		);
+
+		const fromItems = Object.entries(items).some(([key, item]) => {
+			const href = item.href || childRoutes[key]?.route || "";
+			return isPathActive(href, pathname);
+		});
+		if (fromItems) return true;
+
+		return isPathActive(getNavHref(page), pathname);
+	}
+
+	return isPathActive(getNavHref(page), pathname);
+}
+
+export const NavbarShell: FC<{ children: ReactNode }> = ({ children }) => {
+	const [compact, setCompact] = useState(false);
+
+	useEffect(() => {
+		const update = () => {
+			setCompact(window.scrollY > SCROLL_COMPACT_THRESHOLD);
+		};
+		update();
+		window.addEventListener("scroll", update, { passive: true });
+		return () => window.removeEventListener("scroll", update);
+	}, []);
+
+	return (
+		<header
+			className="navbar-header"
+			data-compact={compact || undefined}
+		>
+			<nav
+				className="navbar-bar"
+				data-compact={compact || undefined}
+			>
+				{children}
+			</nav>
+		</header>
+	);
+};
+
 const NavbarMenu: FC<{
 	menu: MenuItem;
 	children: ReactNode;
 	className?: string;
-}> = ({ menu, children, className }) => {
+	active?: boolean;
+}> = ({ menu, children, className, active }) => {
 	const routes = Object.fromEntries(
 		(menu.children || []).map((route) => [route.name, route]),
 	);
@@ -43,9 +111,10 @@ const NavbarMenu: FC<{
 			<MenuButton
 				className={cn(
 					classes.link,
-					"items-center flex gap-1.5 cursor-pointer focus:outline-none text-[1.1rem]! text-(--default-text-color)! hover:text-(--primary-color)!",
+					"navbar-link items-center flex gap-1.5 focus:outline-none",
 					className,
 				)}
+				data-active={active || undefined}
 			>
 				{children}
 				<ArrowRightIcon
@@ -114,22 +183,23 @@ export const ClientNavbar = ({
 		<>
 			<ul
 				className={cn(
-					"flex p-5 pt-6 gap-6 items-center text-center",
+					"navbar-links",
 					className,
 					"max-lg:hidden",
 				)}
 			>
 				{topLevelNavbarItems.map((page) => {
-					const route = page.route || ("href" in page ? page.href! : "");
+					const href = getNavHref(page);
 					if ("display" in page && page.display === "hidden") return;
+					const active = isNavItemActive(page, pathname);
+
 					if (page.type === "menu") {
 						return (
-							<li key={route}>
+							<li key={href || page.name}>
 								<NavbarMenu
-									key={page.name}
 									menu={page as MenuItem}
+									active={active}
 								>
-									{" "}
 									{page.title}
 								</NavbarMenu>
 							</li>
@@ -137,10 +207,12 @@ export const ClientNavbar = ({
 					}
 
 					return (
-						<li key={route}>
+						<li key={href || page.name}>
 							<Anchor
-								href={route.toString()}
-								style={{ fontSize: "1.1rem" }}
+								href={href}
+								className="navbar-link"
+								data-active={active || undefined}
+								aria-current={active ? "page" : undefined}
 							>
 								{page.title}
 							</Anchor>
@@ -153,7 +225,7 @@ export const ClientNavbar = ({
 				<Search />
 			</div>
 
-			<ul className={cn("flex items-center gap-5 p-5", "max-lg:hidden!")}>
+			<ul className={cn("flex items-center gap-5 px-5", "max-lg:hidden!")}>
 				<li>
 					<ThemeSwitch />
 				</li>
@@ -310,20 +382,18 @@ export const MobileNavbar = ({
 						<Search className="lg:w-64 [&>input]:lg:w-64! [&_input]:md:w-full! [&_kbd]:max-lg:hidden" />
 					</li>
 					{topLevelNavbarItems.map((page) => {
-						const route = page.route || ("href" in page ? page.href! : "");
+						const href = getNavHref(page);
 						if ("display" in page && page.display === "hidden") return;
 						if (page.type === "menu") {
 							return (
 								<li
-									key={route}
+									key={href || page.name}
 									className="flex flex-col w-full my-1.5"
 								>
 									<MobileNavbarMenu
-										key={page.name}
 										menu={page as MenuItem}
 										className="py-1.5 px-2 flex flex-row items-center justify-between"
 									>
-										{" "}
 										{page.title}
 									</MobileNavbarMenu>
 								</li>
@@ -332,11 +402,11 @@ export const MobileNavbar = ({
 
 						return (
 							<li
-								key={route}
+								key={href || page.name}
 								className="flex flex-col w-full my-1.5"
 							>
 								<Anchor
-									href={route.toString()}
+									href={href}
 									style={{ fontSize: "1.1rem" }}
 									className="py-1.5 px-2 flex flex-row items-center justify-between"
 								>

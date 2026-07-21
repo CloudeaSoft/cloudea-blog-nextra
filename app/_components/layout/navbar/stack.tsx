@@ -10,28 +10,17 @@ const homeURL = new URL(url);
 export const Stack = () => {
 	return (
 		<Link
-			style={{
-				display: "flex",
-				alignItems: "center",
-				padding: "0 3rem",
-				gap: 20,
-			}}
+			className="navbar-brand"
 			href={homeURL.toString()}
 		>
 			<CloudeaImage
+				className="navbar-brand__logo"
 				src="favicon-96.ico"
 				alt="Cloudea's Blog"
 				width={50}
 				height={50}
 			/>
-			<h1
-				className={notoSans.className}
-				style={{
-					fontSize: "1.7rem",
-					fontWeight: "520",
-					color: "var(--first-text-color)",
-				}}
-			>
+			<h1 className={`${notoSans.className} navbar-brand__title`}>
 				Cloudea's Blog
 			</h1>
 		</Link>
