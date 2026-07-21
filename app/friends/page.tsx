@@ -66,54 +66,59 @@ export default function FriendsPage() {
 											: (
 												<ul className="friends-grid list-none p-0 m-0">
 													{category.list.map((friend) => (
-														<li key={`${friend.name}-${friend.link}`}>
+														<li
+															key={`${friend.name}-${friend.link}`}
+															className="friend-card"
+														>
+															{/* Stretched hit-target: keeps text out of global `a:hover` styles */}
 															<a
 																href={friend.link}
 																target="_blank"
 																rel="noopener noreferrer"
-																className="friend-card"
+																className="friend-card__hit"
 															>
-																<span
-																	className="friend-card__avatar"
-																	aria-hidden
-																>
-																	{friend.avatar
-																		? (
-																			<img
-																				src={friend.avatar}
-																				alt=""
-																				width={56}
-																				height={56}
-																				loading="lazy"
-																				referrerPolicy="no-referrer"
-																			/>
-																		)
-																		: (
-																			<Icon
-																				icon="mdi:account-circle-outline"
-																				width={40}
-																				height={40}
-																			/>
-																		)}
-																</span>
-																<span className="friend-card__body">
-																	<span className="friend-card__name">
-																		{friend.name}
-																	</span>
-																	{friend.description && (
-																		<span className="friend-card__desc">
-																			{friend.description}
-																		</span>
-																	)}
-																</span>
-																<Icon
-																	icon="line-md:external-link"
-																	width={18}
-																	height={18}
-																	className="friend-card__external"
-																	aria-hidden
-																/>
+																{friend.name}
 															</a>
+															<div
+																className="friend-card__avatar"
+																aria-hidden
+															>
+																{friend.avatar
+																	? (
+																		<img
+																			src={friend.avatar}
+																			alt=""
+																			width={56}
+																			height={56}
+																			loading="lazy"
+																			referrerPolicy="no-referrer"
+																		/>
+																	)
+																	: (
+																		<Icon
+																			icon="mdi:account-circle-outline"
+																			width={40}
+																			height={40}
+																		/>
+																	)}
+															</div>
+															<div className="friend-card__body">
+																<div className="friend-card__name">
+																	{friend.name}
+																</div>
+																{friend.description && (
+																	<div className="friend-card__desc">
+																		{friend.description}
+																	</div>
+																)}
+															</div>
+															<Icon
+																icon="line-md:external-link"
+																width={18}
+																height={18}
+																className="friend-card__external"
+																aria-hidden
+															/>
 														</li>
 													))}
 												</ul>

@@ -35,6 +35,7 @@
 }
 
 .friend-card {
+	position: relative;
 	display: flex;
 	align-items: center;
 	gap: 0.85rem;
@@ -43,8 +44,6 @@
 	border: 1px solid var(--border-color);
 	background: var(--background-color-transparent-40);
 	box-shadow: var(--cloudea-box-shadow-flat);
-	color: inherit;
-	text-decoration: none;
 	transition:
 		transform 0.2s ease,
 		box-shadow 0.2s ease,
@@ -52,22 +51,35 @@
 	animation: friends-fade-up 0.45s ease-out both;
 }
 
-.friends-grid > li:nth-child(1) .friend-card {
+/* Invisible stretched link — card chrome reacts to :hover on the li */
+.friend-card__hit {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	border-radius: inherit;
+	/* Visually hide label text while keeping it for a11y / screen readers */
+	overflow: hidden;
+	white-space: nowrap;
+	text-indent: 100%;
+	color: transparent !important;
+}
+
+.friends-grid > li:nth-child(1).friend-card {
 	animation-delay: 0.05s;
 }
-.friends-grid > li:nth-child(2) .friend-card {
+.friends-grid > li:nth-child(2).friend-card {
 	animation-delay: 0.1s;
 }
-.friends-grid > li:nth-child(3) .friend-card {
+.friends-grid > li:nth-child(3).friend-card {
 	animation-delay: 0.15s;
 }
-.friends-grid > li:nth-child(4) .friend-card {
+.friends-grid > li:nth-child(4).friend-card {
 	animation-delay: 0.2s;
 }
-.friends-grid > li:nth-child(5) .friend-card {
+.friends-grid > li:nth-child(5).friend-card {
 	animation-delay: 0.25s;
 }
-.friends-grid > li:nth-child(n + 6) .friend-card {
+.friends-grid > li:nth-child(n + 6).friend-card {
 	animation-delay: 0.3s;
 }
 
@@ -75,35 +87,6 @@
 	transform: translateY(-2px);
 	box-shadow: var(--cloudea-box-shadow-flat-hover);
 	border-color: color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
-}
-
-/* Override global `a:hover span` / `a:hover` brand color from theme.scss */
-.friend-card:hover,
-.friend-card:active,
-.friend-card:hover span,
-.friend-card:active span,
-.friend-card:hover i,
-.friend-card:active i,
-.friend-card:hover .friend-card__name,
-.friend-card:active .friend-card__name {
-	color: inherit;
-}
-
-.friend-card:hover .friend-card__name,
-.friend-card:active .friend-card__name {
-	color: var(--first-text-color);
-}
-
-.friend-card:hover .friend-card__desc,
-.friend-card:active .friend-card__desc {
-	color: var(--third-text-color);
-}
-
-.friend-card:hover .friend-card__external,
-.friend-card:active .friend-card__external,
-.friend-card:hover .friend-card__avatar,
-.friend-card:active .friend-card__avatar {
-	color: var(--third-text-color);
 }
 
 .friend-card__avatar {
