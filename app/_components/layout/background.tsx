@@ -4,6 +4,9 @@ import { useTheme } from "next-themes";
 import { getImageUrl } from "@/utils/get-resources-url";
 import { useMounted } from "nextra/hooks";
 import type { CSSProperties } from "react";
+import { useAtomValue } from "jotai";
+import { backgroundBlurAtom } from "@/stores/background";
+import "./background.scss";
 
 const layerStyle: CSSProperties = {
 	zIndex: -1,
@@ -13,12 +16,12 @@ const layerStyle: CSSProperties = {
 	width: "100%",
 	background: "center no-repeat",
 	backgroundSize: "cover",
-	transition: "opacity 0.3s ease",
 };
 
 export const Background = () => {
 	const { resolvedTheme } = useTheme();
 	const mounted = useMounted();
+	const blurred = useAtomValue(backgroundBlurAtom);
 
 	// Before mount we can't know the theme, so the dark layer stays visible
 	// (same default as before). Both layers stay mounted so theme changes
@@ -29,6 +32,8 @@ export const Background = () => {
 		<>
 			<div
 				aria-hidden
+				className="site-background-layer"
+				data-blurred={blurred || undefined}
 				style={{
 					...layerStyle,
 					backgroundImage: `url(${getImageUrl("wallhaven-wqery6-light.webp")})`,
@@ -37,6 +42,8 @@ export const Background = () => {
 			></div>
 			<div
 				aria-hidden
+				className="site-background-layer"
+				data-blurred={blurred || undefined}
 				style={{
 					...layerStyle,
 					backgroundImage: `url(${getImageUrl("wallhaven-wqery6-dark.webp")})`,

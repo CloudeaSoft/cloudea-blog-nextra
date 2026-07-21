@@ -1,5 +1,6 @@
 import PostsPage from "@/app/_components/posts/post-list";
 import { Hitokoto } from "@/app/_components/home/hitokoto";
+import { BannerBlurTrigger } from "@/app/_components/home/banner-blur-trigger";
 import { Github } from "@/app/_components/layout/navbar/github";
 import { Email } from "@/app/_components/layout/navbar/email";
 import { CloudeaImage } from "@/app/_components/ui/image";
@@ -34,7 +35,7 @@ const Banner = async () => {
 			}}
 		>
 			<div className="flex flex-col gap-7.5 text-center text-[3rem] leading-[1.2] text-(--home-banner-text-color)">
-				<span>Hi! Here is Cloudea.</span>
+				<BannerBlurTrigger>Hi! Here is Cloudea.</BannerBlurTrigger>
 				<Hitokoto />
 			</div>
 			<div
