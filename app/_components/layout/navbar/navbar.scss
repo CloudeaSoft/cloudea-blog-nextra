@@ -268,13 +268,10 @@ body .navbar-link__title {
 body .navbar-link__icon {
 	flex: none;
 	display: block;
-	/* Slightly under 1em so outline glyph ink matches uppercase cap height. */
-	width: 0.95em;
-	height: 0.95em;
+	width: 1em;
+	height: 1em;
 	line-height: 0;
 	opacity: 0.92;
-	/* Optical: outline glyphs sit high in the viewBox vs caps. */
-	translate: 0 0.04em;
 }
 
 body .navbar-link__label {
