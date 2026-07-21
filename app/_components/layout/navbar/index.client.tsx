@@ -116,7 +116,6 @@ const NavbarMenu: FC<{
 			<button
 				type="button"
 				className={cn(
-					classes.link,
 					"navbar-link items-center flex gap-1.5 focus:outline-none",
 					className,
 				)}
