@@ -28,6 +28,7 @@ import { Icon } from "@iconify-icon/react";
 import { useAtom } from "jotai";
 import { menuAtom } from "@/stores/menu";
 import Link from "next/link";
+import { navbarFont } from "./font";
 
 const SCROLL_COMPACT_THRESHOLD = 36;
 
@@ -84,7 +85,7 @@ export const NavbarShell: FC<{ children: ReactNode }> = ({ children }) => {
 
 	return (
 		<header
-			className="navbar-header"
+			className={cn("navbar-header", navbarFont.className)}
 			data-compact={compact || undefined}
 		>
 			<nav
