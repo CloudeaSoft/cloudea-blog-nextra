@@ -187,14 +187,13 @@ test.describe("navbar: desktop menu dismiss", () => {
 		await friendsOption.click();
 		await page.waitForURL("**/friends");
 
-		// Panel must collapse immediately after click (not stick via :focus-within).
-		await expect(aboutMenu).toHaveAttribute("data-dismissed", "true");
-		await expect(dropdown).toBeHidden();
+		// Headless UI Menu closes the panel on MenuItem activate.
+		await expect(dropdown).toHaveCount(0);
 
-		// Leaving the menu re-arms hover; it must not stay stuck open.
+		// Leaving and re-hovering must be able to open again.
 		await page.locator("body").hover({ position: { x: 8, y: 8 } });
-		await expect(aboutMenu).not.toHaveAttribute("data-dismissed");
-		await expect(dropdown).toBeHidden();
+		await aboutMenu.hover();
+		await expect(aboutMenu.locator(".navbar-menu__dropdown")).toBeVisible();
 	});
 });
 
