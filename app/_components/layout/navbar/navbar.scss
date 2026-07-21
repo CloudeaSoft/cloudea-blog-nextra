@@ -12,7 +12,7 @@ body .navbar-header[data-compact] {
 }
 
 body .navbar-bar {
-	--navbar-underline-inset: 0.45rem;
+	--navbar-underline-inset: 0.6rem;
 	display: flex;
 	justify-content: center;
 	height: var(--navbar-height);
@@ -236,23 +236,25 @@ body .navbar-link__item {
 body .navbar-link__title {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.18em;
+	gap: 0.22em;
+	line-height: 1;
 }
 
 body .navbar-link__icon {
-	flex-shrink: 0;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	/* Sized independently from the label — slightly larger than the text. */
-	width: 1.25rem;
-	height: 1.25rem;
-	line-height: 1;
+	flex: none;
+	display: block;
+	/* Slightly under 1em so outline glyph ink matches uppercase cap height. */
+	width: 0.95em;
+	height: 0.95em;
+	line-height: 0;
 	opacity: 0.92;
+	/* Optical: outline glyphs sit high in the viewBox vs caps. */
+	translate: 0 0.04em;
 }
 
 body .navbar-link__label {
 	display: inline-block;
+	line-height: 1;
 }
 
 /* ArrowRight → rotated to ↓; hover rotates clockwise to ↑ (90deg → 270deg).
@@ -260,6 +262,7 @@ body .navbar-link__label {
 body .navbar-link__caret {
 	flex-shrink: 0;
 	display: inline-flex;
+	align-self: center;
 	width: 0.85em;
 	height: 0.85em;
 	transform: rotate(90deg);
