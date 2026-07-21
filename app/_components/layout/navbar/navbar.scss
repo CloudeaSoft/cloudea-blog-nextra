@@ -141,7 +141,9 @@ body .navbar-menu__dropdown {
 	top: 100%;
 	left: 50%;
 	translate: -50% 0;
-	padding-top: 0.625rem;
+	/* Small hover bridge — keep the panel close to the bar. */
+	padding-top: 0.2rem;
+	margin-top: -0.15rem;
 	opacity: 0;
 	visibility: hidden;
 	pointer-events: none;
