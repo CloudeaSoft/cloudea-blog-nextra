@@ -323,6 +323,20 @@ body .mobile-nav-submenu[data-open] .mobile-nav-submenu__caret {
 	transform: rotate(90deg);
 }
 
+/* Mobile drawer: active route highlight (mirrors desktop primary-color cue). */
+body .mobile-nav-link[data-active="true"] {
+	/* Beat Tailwind `text-(--default-text-color)!` on the accordion trigger. */
+	color: var(--primary-color) !important;
+	font-weight: 500;
+}
+
+body .mobile-nav-submenu__option[data-active="true"] {
+	color: var(--primary-color);
+	font-weight: 500;
+	border-radius: 0.55rem;
+	background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
 	body .mobile-nav-submenu__caret {
 		transition: none;
