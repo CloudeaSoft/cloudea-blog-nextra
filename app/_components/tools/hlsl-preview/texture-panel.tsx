@@ -8,6 +8,8 @@ export type TextureItem = {
 	/** Identifier after `Textures.` — editable */
 	name: string;
 	fileName: string;
+	/** Persistable image payload for localStorage snapshots */
+	dataUrl?: string;
 };
 
 type TexturePanelProps = {

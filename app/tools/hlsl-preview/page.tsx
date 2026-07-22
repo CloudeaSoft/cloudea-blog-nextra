@@ -17,7 +17,7 @@ export default function HlslPreviewPage() {
 				"max-lg:pt-0 max-lg:mb-0",
 			)}
 		>
-			<div className={cn("max-w-300 relative w-[92%] h-full", "max-lg:w-full")}>
+			<div className={cn("max-w-380 relative w-[96%] h-full", "max-lg:w-full")}>
 				<div
 					className={cn(
 						"p-6 border border-solid rounded-[18px] border-(--border-color) shadow-(--cloudea-box-shadow) bg-(--background-color-transparent-80)",

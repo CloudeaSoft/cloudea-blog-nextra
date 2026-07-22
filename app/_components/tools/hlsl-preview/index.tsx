@@ -2,7 +2,7 @@
 
 import { Icon } from "@iconify-icon/react";
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PreviewCanvas, type PreviewCanvasHandle } from "./canvas";
 import { DEFAULT_CSHARP } from "./csharp/defaults";
 import { compileCsharp, type CsharpProgram } from "./csharp/runner";
@@ -11,10 +11,20 @@ import { DEFAULT_FRAGMENT_HLSL, DEFAULT_VERTEX_HLSL } from "./defaults";
 import { CodeEditor } from "./editor";
 import { ParamSliderPanel, type DemoParam } from "./param-slider-panel";
 import { parseParamAnnotations, paramsToRecord } from "./parse-params";
+import {
+	fileToDataUrl,
+	loadImageFromDataUrl,
+	loadSnapshot,
+	saveSnapshot,
+	WHITE_PIXEL_DATA_URL,
+	type SnapshotTexture,
+} from "./snapshot";
 import { TexturePanel, type TextureItem } from "./texture-panel";
 import { transpileHlslToGlsl } from "./transpile";
 
 import "./hlsl-preview.css";
+
+const AUTO_COMPILE_DEBOUNCE_MS = 650;
 
 function paramsFromSource(source: string): DemoParam[] {
 	return parseParamAnnotations(source).map((param) => ({
@@ -45,31 +55,13 @@ function mergeParsedParams(
 /** Names referenced by DEFAULT_CSHARP — also seeded in the Textures panel. */
 const DEFAULT_TEXTURE_NAMES = ["Ring"] as const;
 
-function makeDefaultTextureItems(): TextureItem[] {
+function makeDefaultTextureItems(): SnapshotTexture[] {
 	return DEFAULT_TEXTURE_NAMES.map((name) => ({
 		id: `default-${name}`,
 		name,
 		fileName: "(placeholder white)",
+		dataUrl: WHITE_PIXEL_DATA_URL,
 	}));
-}
-
-function createWhiteImage(): Promise<HTMLImageElement> {
-	return new Promise((resolve, reject) => {
-		const canvas = document.createElement("canvas");
-		canvas.width = 1;
-		canvas.height = 1;
-		const ctx = canvas.getContext("2d");
-		if (!ctx) {
-			reject(new Error("2D canvas unavailable"));
-			return;
-		}
-		ctx.fillStyle = "#ffffff";
-		ctx.fillRect(0, 0, 1, 1);
-		const image = new Image();
-		image.onload = () => resolve(image);
-		image.onerror = () => reject(new Error("Failed to create white placeholder"));
-		image.src = canvas.toDataURL("image/png");
-	});
 }
 
 function updateParam(list: DemoParam[], id: string, value: number): DemoParam[] {
@@ -83,6 +75,25 @@ function uniqueTextureName(base: string, existing: string[]): string {
 	return `${base}_${i}`;
 }
 
+function toSnapshotTextures(textures: TextureItem[]): SnapshotTexture[] {
+	return textures
+		.filter((item): item is SnapshotTexture => typeof item.dataUrl === "string")
+		.map((item) => ({
+			id: item.id,
+			name: item.name,
+			fileName: item.fileName,
+			dataUrl: item.dataUrl,
+		}));
+}
+
+function formatSavedAt(iso: string): string {
+	try {
+		return new Date(iso).toLocaleString();
+	} catch {
+		return iso;
+	}
+}
+
 export function HlslPreviewTool() {
 	const [csharpSource, setCsharpSource] = useState(DEFAULT_CSHARP);
 	const [vertexSource, setVertexSource] = useState(DEFAULT_VERTEX_HLSL);
@@ -93,25 +104,69 @@ export function HlslPreviewTool() {
 	const [textures, setTextures] = useState<TextureItem[]>(() => makeDefaultTextureItems());
 	const [error, setError] = useState<string | null>(null);
 	const [status, setStatus] = useState("Ready");
+	const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
 	const canvasRef = useRef<PreviewCanvasHandle>(null);
 	const assetsRef = useRef(new AssetStore());
 	const programRef = useRef<CsharpProgram | null>(null);
-	const defaultsSeededRef = useRef(false);
+	const bootedRef = useRef(false);
+	const canvasReadyRef = useRef(false);
+	const snapshotReadyRef = useRef(false);
+	const autoCompileEnabledRef = useRef(false);
 	const csParamsRef = useRef(csParams);
 	const vsParamsRef = useRef(vsParams);
 	const psParamsRef = useRef(psParams);
+	const csharpSourceRef = useRef(csharpSource);
+	const vertexSourceRef = useRef(vertexSource);
+	const fragmentSourceRef = useRef(fragmentSource);
+	const texturesRef = useRef(textures);
 	csParamsRef.current = csParams;
 	vsParamsRef.current = vsParams;
 	psParamsRef.current = psParams;
+	csharpSourceRef.current = csharpSource;
+	vertexSourceRef.current = vertexSource;
+	fragmentSourceRef.current = fragmentSource;
+	texturesRef.current = textures;
 
-	const seedDefaultTextures = useCallback(async (handle?: PreviewCanvasHandle | null) => {
+	const applyTexturesToGpu = useCallback(async (
+		items: TextureItem[],
+		handle?: PreviewCanvasHandle | null,
+	) => {
 		const target = handle ?? canvasRef.current;
-		const white = await createWhiteImage();
-		for (const name of DEFAULT_TEXTURE_NAMES) {
-			assetsRef.current.register(name);
-			target?.setTexture(name, white);
+		if (!target) return;
+		for (const name of assetsRef.current.list()) {
+			assetsRef.current.unregister(name);
+			target.removeTexture(name);
 		}
-		setTextures(makeDefaultTextureItems());
+		for (const item of items) {
+			if (!item.dataUrl) continue;
+			const image = await loadImageFromDataUrl(item.dataUrl);
+			assetsRef.current.register(item.name);
+			target.setTexture(item.name, image);
+		}
+	}, []);
+
+	const persistSnapshot = useCallback((opts?: { silent?: boolean }) => {
+		const result = saveSnapshot({
+			csharpSource: csharpSourceRef.current,
+			vertexSource: vertexSourceRef.current,
+			fragmentSource: fragmentSourceRef.current,
+			csParams: csParamsRef.current,
+			vsParams: vsParamsRef.current,
+			psParams: psParamsRef.current,
+			textures: toSnapshotTextures(texturesRef.current),
+		});
+		if (!result.ok) {
+			if (!opts?.silent) {
+				setError(`Save failed: ${result.error}`);
+				setStatus("Save failed");
+			}
+			return false;
+		}
+		setLastSavedAt(result.savedAt);
+		if (!opts?.silent) {
+			setStatus("Saved");
+		}
+		return true;
 	}, []);
 
 	const applyLiveParams = useCallback((
@@ -128,24 +183,24 @@ export function HlslPreviewTool() {
 		canvasRef.current?.setShaderParams(shaderRecord);
 	}, []);
 
-	const compile = useCallback(() => {
-		const vs = transpileHlslToGlsl(vertexSource, "vertex");
+	const compile = useCallback((opts?: { autoSave?: boolean }) => {
+		const vs = transpileHlslToGlsl(vertexSourceRef.current, "vertex");
 		if (!vs.ok) {
 			setError(vs.error);
 			setStatus("HLSL transpile failed");
-			return;
+			return false;
 		}
-		const fs = transpileHlslToGlsl(fragmentSource, "fragment");
+		const fs = transpileHlslToGlsl(fragmentSourceRef.current, "fragment");
 		if (!fs.ok) {
 			setError(fs.error);
 			setStatus("HLSL transpile failed");
-			return;
+			return false;
 		}
 
 		const nextVs = mergeParsedParams(vs.params, vsParamsRef.current);
 		const nextPs = mergeParsedParams(fs.params, psParamsRef.current);
 		const nextCs = mergeParsedParams(
-			parseParamAnnotations(csharpSource),
+			parseParamAnnotations(csharpSourceRef.current),
 			csParamsRef.current,
 		);
 		setVsParams(nextVs);
@@ -164,12 +219,12 @@ export function HlslPreviewTool() {
 		if (shaderError) {
 			setError(shaderError);
 			setStatus("Shader compile failed");
-			return;
+			return false;
 		}
 		canvasRef.current?.setShaderParams(shaderParams);
 
 		const compiled = compileCsharp(
-			csharpSource,
+			csharpSourceRef.current,
 			assetsRef.current,
 			paramsToRecord(nextCs),
 		);
@@ -178,36 +233,63 @@ export function HlslPreviewTool() {
 			setStatus("C# transpile failed");
 			canvasRef.current?.setProgram(null);
 			programRef.current = null;
-			return;
+			return false;
 		}
 
 		programRef.current = compiled.program;
 		canvasRef.current?.setProgram(compiled.program);
 		setError(null);
 		setStatus("Running");
-	}, [csharpSource, vertexSource, fragmentSource]);
+
+		if (opts?.autoSave !== false) {
+			// Keep refs in sync before snapshot (setState is async).
+			csParamsRef.current = nextCs;
+			vsParamsRef.current = nextVs;
+			psParamsRef.current = nextPs;
+			persistSnapshot({ silent: true });
+		}
+		return true;
+	}, [persistSnapshot]);
+
+	const tryBoot = useCallback(() => {
+		if (bootedRef.current) return;
+		if (!canvasReadyRef.current || !snapshotReadyRef.current) return;
+		bootedRef.current = true;
+		void applyTexturesToGpu(texturesRef.current, canvasRef.current).then(() => {
+			compile({ autoSave: false });
+			// Enable after boot so snapshot hydration does not immediately re-save.
+			autoCompileEnabledRef.current = true;
+		});
+	}, [applyTexturesToGpu, compile]);
 
 	const reset = () => {
+		const defaults = makeDefaultTextureItems();
 		setCsharpSource(DEFAULT_CSHARP);
 		setVertexSource(DEFAULT_VERTEX_HLSL);
 		setFragmentSource(DEFAULT_FRAGMENT_HLSL);
 		setCsParams(paramsFromSource(DEFAULT_CSHARP));
 		setVsParams(paramsFromSource(DEFAULT_VERTEX_HLSL));
 		setPsParams(paramsFromSource(DEFAULT_FRAGMENT_HLSL));
-		for (const item of textures) {
-			assetsRef.current.unregister(item.name);
-			canvasRef.current?.removeTexture(item.name);
-		}
-		void seedDefaultTextures().then(() => {
+		setTextures(defaults);
+		csharpSourceRef.current = DEFAULT_CSHARP;
+		vertexSourceRef.current = DEFAULT_VERTEX_HLSL;
+		fragmentSourceRef.current = DEFAULT_FRAGMENT_HLSL;
+		csParamsRef.current = paramsFromSource(DEFAULT_CSHARP);
+		vsParamsRef.current = paramsFromSource(DEFAULT_VERTEX_HLSL);
+		psParamsRef.current = paramsFromSource(DEFAULT_FRAGMENT_HLSL);
+		texturesRef.current = defaults;
+		void applyTexturesToGpu(defaults).then(() => {
 			setError(null);
-			compile();
+			compile({ autoSave: true });
 		});
 	};
 
 	const onCsParamChange = (id: string, value: number) => {
 		setCsParams((prev) => {
 			const next = updateParam(prev, id, value);
+			csParamsRef.current = next;
 			applyLiveParams(next, vsParamsRef.current, psParamsRef.current);
+			persistSnapshot({ silent: true });
 			return next;
 		});
 	};
@@ -215,7 +297,9 @@ export function HlslPreviewTool() {
 	const onVsParamChange = (id: string, value: number) => {
 		setVsParams((prev) => {
 			const next = updateParam(prev, id, value);
+			vsParamsRef.current = next;
 			applyLiveParams(csParamsRef.current, next, psParamsRef.current);
+			persistSnapshot({ silent: true });
 			return next;
 		});
 	};
@@ -223,19 +307,27 @@ export function HlslPreviewTool() {
 	const onPsParamChange = (id: string, value: number) => {
 		setPsParams((prev) => {
 			const next = updateParam(prev, id, value);
+			psParamsRef.current = next;
 			applyLiveParams(csParamsRef.current, vsParamsRef.current, next);
+			persistSnapshot({ silent: true });
 			return next;
 		});
 	};
 
 	const handleAddTexture = (name: string, file: File, image: HTMLImageElement) => {
-		const unique = uniqueTextureName(name, textures.map((t) => t.name));
-		assetsRef.current.register(unique);
-		canvasRef.current?.setTexture(unique, image);
-		setTextures((prev) => [
-			...prev,
-			{ id: crypto.randomUUID(), name: unique, fileName: file.name },
-		]);
+		void (async () => {
+			const unique = uniqueTextureName(name, texturesRef.current.map((t) => t.name));
+			const dataUrl = await fileToDataUrl(file);
+			assetsRef.current.register(unique);
+			canvasRef.current?.setTexture(unique, image);
+			const next: TextureItem[] = [
+				...texturesRef.current,
+				{ id: crypto.randomUUID(), name: unique, fileName: file.name, dataUrl },
+			];
+			texturesRef.current = next;
+			setTextures(next);
+			persistSnapshot({ silent: true });
+		})();
 	};
 
 	const handleRenameTexture = (id: string, nextName: string): string | null => {
@@ -243,25 +335,31 @@ export function HlslPreviewTool() {
 		if (!/^[_A-Za-z]\w*$/.test(nextName)) {
 			return "Name must be a valid identifier (letters/digits/_)";
 		}
-		const current = textures.find((item) => item.id === id);
+		const current = texturesRef.current.find((item) => item.id === id);
 		if (!current) return "Texture not found";
 		if (current.name === nextName) return null;
-		if (textures.some((item) => item.id !== id && item.name === nextName)) {
+		if (texturesRef.current.some((item) => item.id !== id && item.name === nextName)) {
 			return `Textures.${nextName} already exists`;
 		}
 		assetsRef.current.rename(current.name, nextName);
 		canvasRef.current?.renameTexture(current.name, nextName);
-		setTextures((prev) =>
-			prev.map((item) => (item.id === id ? { ...item, name: nextName } : item)));
+		const next = texturesRef.current.map((item) =>
+			(item.id === id ? { ...item, name: nextName } : item));
+		texturesRef.current = next;
+		setTextures(next);
+		persistSnapshot({ silent: true });
 		return null;
 	};
 
 	const handleRemoveTexture = (id: string) => {
-		const current = textures.find((item) => item.id === id);
+		const current = texturesRef.current.find((item) => item.id === id);
 		if (!current) return;
 		assetsRef.current.unregister(current.name);
 		canvasRef.current?.removeTexture(current.name);
-		setTextures((prev) => prev.filter((item) => item.id !== id));
+		const next = texturesRef.current.filter((item) => item.id !== id);
+		texturesRef.current = next;
+		setTextures(next);
+		persistSnapshot({ silent: true });
 	};
 
 	const handleFrameError = useCallback((message: string) => {
@@ -273,6 +371,58 @@ export function HlslPreviewTool() {
 		setError(`C# runtime: ${message}`);
 		setStatus("Runtime error");
 	}, []);
+
+	const handleSave = useCallback(() => {
+		persistSnapshot({ silent: false });
+	}, [persistSnapshot]);
+
+	// Restore localStorage after mount (avoids SSR/hydration mismatch).
+	useEffect(() => {
+		const snap = loadSnapshot();
+		if (snap) {
+			setCsharpSource(snap.csharpSource);
+			setVertexSource(snap.vertexSource);
+			setFragmentSource(snap.fragmentSource);
+			setCsParams(snap.csParams);
+			setVsParams(snap.vsParams);
+			setPsParams(snap.psParams);
+			setTextures(snap.textures);
+			setLastSavedAt(snap.savedAt);
+			csharpSourceRef.current = snap.csharpSource;
+			vertexSourceRef.current = snap.vertexSource;
+			fragmentSourceRef.current = snap.fragmentSource;
+			csParamsRef.current = snap.csParams;
+			vsParamsRef.current = snap.vsParams;
+			psParamsRef.current = snap.psParams;
+			texturesRef.current = snap.textures;
+		}
+		snapshotReadyRef.current = true;
+	}, []);
+
+	useEffect(() => {
+		tryBoot();
+	}, [tryBoot]);
+
+	// Debounced auto-compile: persist only when compile succeeds.
+	useEffect(() => {
+		if (!autoCompileEnabledRef.current) return;
+		const timer = window.setTimeout(() => {
+			compile({ autoSave: true });
+		}, AUTO_COMPILE_DEBOUNCE_MS);
+		return () => window.clearTimeout(timer);
+	}, [csharpSource, vertexSource, fragmentSource, compile]);
+
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (!(event.ctrlKey || event.metaKey)) return;
+			if (event.key.toLowerCase() !== "s") return;
+			event.preventDefault();
+			event.stopPropagation();
+			handleSave();
+		};
+		window.addEventListener("keydown", onKeyDown, true);
+		return () => window.removeEventListener("keydown", onKeyDown, true);
+	}, [handleSave]);
 
 	return (
 		<div className="hlsl-preview">
@@ -295,14 +445,15 @@ export function HlslPreviewTool() {
 						{" "}
 						<code>@param</code>
 						{" "}
-						sliders. Drag sliders for live tweaks; Compile rescans annotations.
+						sliders. Snapshots save to localStorage (Save / Ctrl+S; auto on
+						slider/texture changes and successful compile).
 					</p>
 				</div>
 				<div className="hlsl-preview__actions">
 					<button
 						type="button"
 						className="hlsl-preview__btn hlsl-preview__btn--primary"
-						onClick={compile}
+						onClick={() => compile({ autoSave: true })}
 					>
 						<Icon
 							icon="mdi:play"
@@ -310,6 +461,19 @@ export function HlslPreviewTool() {
 							height={18}
 						/>
 						Compile & Run
+					</button>
+					<button
+						type="button"
+						className="hlsl-preview__btn"
+						onClick={handleSave}
+						title="Save snapshot (Ctrl+S)"
+					>
+						<Icon
+							icon="mdi:content-save"
+							width={18}
+							height={18}
+						/>
+						Save
 					</button>
 					<button
 						type="button"
@@ -328,6 +492,7 @@ export function HlslPreviewTool() {
 						data-ok={error ? "false" : "true"}
 					>
 						{status}
+						{lastSavedAt ? ` · saved ${formatSavedAt(lastSavedAt)}` : ""}
 					</span>
 				</div>
 			</header>
@@ -338,14 +503,8 @@ export function HlslPreviewTool() {
 						ref={canvasRef}
 						className="hlsl-preview__canvas"
 						onReady={() => {
-							const boot = async () => {
-								if (!defaultsSeededRef.current) {
-									defaultsSeededRef.current = true;
-									await seedDefaultTextures(canvasRef.current);
-								}
-								compile();
-							};
-							void boot();
+							canvasReadyRef.current = true;
+							tryBoot();
 						}}
 						onFrameError={handleFrameError}
 					/>
@@ -361,7 +520,6 @@ export function HlslPreviewTool() {
 				/>
 			</div>
 
-			{/* 2×3 layout demo: editors row + sliders row */}
 			<div className="hlsl-preview__board">
 				<div className="hlsl-preview__board-row hlsl-preview__board-row--editors">
 					<CodeEditor
@@ -406,15 +564,17 @@ export function HlslPreviewTool() {
 				<summary>Dialect & builtins</summary>
 				<ul>
 					<li>
-						Layout locked for demo:
+						Snapshot: codes + sliders + textures in
 						{" "}
-						<code>C# | VS | PS</code>
+						<code>localStorage</code>
+						. Manual
 						{" "}
-						editors, then
+						<strong>Save</strong>
 						{" "}
-						<code>C# | VS | PS</code>
+						/
 						{" "}
-						slider columns.
+						<code>Ctrl+S</code>
+						; auto on slider/texture edits and successful compile.
 					</li>
 					<li>
 						Params:
@@ -422,17 +582,13 @@ export function HlslPreviewTool() {
 						<code>// @param name = def min=… max=… step=…</code>
 						{" "}
 						in each editor; Compile scans them into the matching slider column.
-						Dragging sliders updates live (no recompile).
 					</li>
 					<li>
-						Textures: import images, edit the
-						{" "}
-						<code>XXXX</code>
-						{" "}
-						in
+						Textures:
 						{" "}
 						<code>Textures.XXXX</code>
-						, copy into C# as
+						{" "}
+						—
 						{" "}
 						<code>GraphicsDevice.Textures[0] = Textures.XXXX;</code>
 						.

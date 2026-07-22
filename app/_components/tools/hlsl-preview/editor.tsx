@@ -41,6 +41,8 @@ export function CodeEditor({ value, onChange, label, language }: CodeEditorProps
 		if (model) {
 			monaco.editor.setModelLanguage(model, monacoLanguage);
 		}
+		// Page-level capture handler owns Save; keep Monaco from swallowing Ctrl/Cmd+S.
+		editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {});
 	};
 
 	return (
