@@ -18,6 +18,10 @@ const meta: MetaRecord = {
 		type: "page",
 		href: "/posts",
 	},
+	tools: {
+		title: <NavTitle icon="mdi:toolbox-outline">Tools</NavTitle>,
+		type: "page",
+	},
 	about: {
 		title: <NavTitle icon="mdi:account-outline">About</NavTitle>,
 		type: "menu",
