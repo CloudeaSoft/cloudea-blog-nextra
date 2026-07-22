@@ -34,6 +34,13 @@ function updateParam(list: DemoParam[], id: string, value: number): DemoParam[] 
 	return list.map((param) => (param.id === id ? { ...param, value } : param));
 }
 
+function uniqueTextureName(base: string, existing: string[]): string {
+	if (!existing.includes(base)) return base;
+	let i = 2;
+	while (existing.includes(`${base}_${i}`)) i++;
+	return `${base}_${i}`;
+}
+
 export function HlslPreviewTool() {
 	const [csharpSource, setCsharpSource] = useState(DEFAULT_CSHARP);
 	const [vertexSource, setVertexSource] = useState(DEFAULT_VERTEX_HLSL);
@@ -99,18 +106,39 @@ export function HlslPreviewTool() {
 	};
 
 	const handleAddTexture = (name: string, file: File, image: HTMLImageElement) => {
-		assetsRef.current.register(name);
-		canvasRef.current?.setTexture(name, image);
-		setTextures((prev) => {
-			const rest = prev.filter((item) => item.name !== name);
-			return [...rest, { name, fileName: file.name }];
-		});
+		const unique = uniqueTextureName(name, textures.map((t) => t.name));
+		assetsRef.current.register(unique);
+		canvasRef.current?.setTexture(unique, image);
+		setTextures((prev) => [
+			...prev,
+			{ id: crypto.randomUUID(), name: unique, fileName: file.name },
+		]);
 	};
 
-	const handleRemoveTexture = (name: string) => {
-		assetsRef.current.unregister(name);
-		canvasRef.current?.removeTexture(name);
-		setTextures((prev) => prev.filter((item) => item.name !== name));
+	const handleRenameTexture = (id: string, nextName: string): string | null => {
+		if (!nextName) return "Name cannot be empty";
+		if (!/^[_A-Za-z]\w*$/.test(nextName)) {
+			return "Name must be a valid identifier (letters/digits/_)";
+		}
+		const current = textures.find((item) => item.id === id);
+		if (!current) return "Texture not found";
+		if (current.name === nextName) return null;
+		if (textures.some((item) => item.id !== id && item.name === nextName)) {
+			return `Textures.${nextName} already exists`;
+		}
+		assetsRef.current.rename(current.name, nextName);
+		canvasRef.current?.renameTexture(current.name, nextName);
+		setTextures((prev) =>
+			prev.map((item) => (item.id === id ? { ...item, name: nextName } : item)));
+		return null;
+	};
+
+	const handleRemoveTexture = (id: string) => {
+		const current = textures.find((item) => item.id === id);
+		if (!current) return;
+		assetsRef.current.unregister(current.name);
+		canvasRef.current?.removeTexture(current.name);
+		setTextures((prev) => prev.filter((item) => item.id !== id));
 	};
 
 	const handleFrameError = useCallback((message: string) => {
@@ -197,6 +225,7 @@ export function HlslPreviewTool() {
 				<TexturePanel
 					textures={textures}
 					onAdd={handleAddTexture}
+					onRename={handleRenameTexture}
 					onRemove={handleRemoveTexture}
 				/>
 			</div>
@@ -258,6 +287,19 @@ export function HlslPreviewTool() {
 						<code>C# | VS | PS</code>
 						{" "}
 						slider columns.
+					</li>
+					<li>
+						Textures: import images, edit the
+						{" "}
+						<code>XXXX</code>
+						{" "}
+						in
+						{" "}
+						<code>Textures.XXXX</code>
+						, copy into C# as
+						{" "}
+						<code>GraphicsDevice.Textures[0] = Textures.XXXX;</code>
+						.
 					</li>
 					<li>
 						Slider wiring / `@param` scan comes next — values do not affect the

@@ -614,8 +614,9 @@ function preprocessCsharp(source: string): string {
 	);
 	out = out.replace(/\b(\w+)\s*=\s*\[\s*\]\s*;/g, "$1 = new VertexList();");
 
-	// ModAsset sugar
+	// ModAsset sugar + Textures.Name asset refs
 	out = out.replace(/\bCommons\.ModAsset\.(\w+)\.Value\b/g, "Assets.Get(\"$1\")");
+	out = out.replace(/\bTextures\.(\w+)\b/g, "Assets.Get(\"$1\")");
 
 	// Access modifiers + return types on methods
 	out = out.replace(

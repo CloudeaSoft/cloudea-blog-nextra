@@ -164,6 +164,12 @@ export class AssetStore {
 		this.names.delete(name);
 	}
 
+	rename(oldName: string, newName: string) {
+		if (oldName === newName) return;
+		this.names.delete(oldName);
+		this.names.add(newName);
+	}
+
 	list(): string[] {
 		return [...this.names];
 	}
@@ -249,6 +255,17 @@ export function createRuntime(assets: AssetStore) {
 		),
 	};
 
+	/** Uploaded assets: `Textures.MyName` → TextureRef */
+	const TexturesBag = new Proxy(
+		{},
+		{
+			get(_target, prop: string | symbol) {
+				if (typeof prop !== "string") return undefined;
+				return assets.Get(prop);
+			},
+		},
+	);
+
 	return {
 		Vector2,
 		Vector3,
@@ -261,6 +278,7 @@ export function createRuntime(assets: AssetStore) {
 		PrimitiveType,
 		Main,
 		Commons,
+		Textures: TexturesBag,
 		Assets: assets,
 		graphicsDevice,
 		__add(a: unknown, b: unknown) {

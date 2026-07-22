@@ -18,7 +18,7 @@ void DrawRing(Vector2 drawCenter, float timeValue, float wink)
         bars.Add(drawCenter + new Vector2(0, 120).RotatedBy(rotValue), drawColor, new Vector3(i / 50f, frameHeightOut, 0));
         bars.Add(drawCenter + new Vector2(0, 96).RotatedBy(rotValue), drawColor, new Vector3(i / 50f, frameHeightIn, 0));
     }
-    Main.graphics.GraphicsDevice.Textures[0] = Commons.ModAsset.RingSoft.Value;
+    Main.graphics.GraphicsDevice.Textures[0] = Textures.RingSoft;
     Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, bars.ToArray(), 0, bars.Count - 2);
 
     // Outer colorful ring
@@ -31,7 +31,7 @@ void DrawRing(Vector2 drawCenter, float timeValue, float wink)
         bars.Add(drawCenter + new Vector2(0, 118).RotatedBy(rotValue), drawColor, new Vector3(i / 50f, frameHeightOut, 0));
         bars.Add(drawCenter + new Vector2(0, 98).RotatedBy(rotValue), drawColor, new Vector3(i / 50f, frameHeightIn, 0));
     }
-    Main.graphics.GraphicsDevice.Textures[0] = Commons.ModAsset.RingColor.Value;
+    Main.graphics.GraphicsDevice.Textures[0] = Textures.RingColor;
     Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, bars.ToArray(), 0, bars.Count - 2);
 
     // Inner ring
@@ -44,7 +44,7 @@ void DrawRing(Vector2 drawCenter, float timeValue, float wink)
         bars.Add(drawCenter + new Vector2(0, 72).RotatedBy(rotValue), drawColor, new Vector3(i / 25f, 0.2f, 0));
         bars.Add(drawCenter + new Vector2(0, 52).RotatedBy(rotValue), drawColor, new Vector3(i / 25f, 0.5f, 0));
     }
-    Main.graphics.GraphicsDevice.Textures[0] = Commons.ModAsset.RingInner.Value;
+    Main.graphics.GraphicsDevice.Textures[0] = Textures.RingInner;
     Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, bars.ToArray(), 0, bars.Count - 2);
 }
 `;

@@ -18,6 +18,7 @@ export type PreviewCanvasHandle = {
 	compileShaders: (source: ShaderProgramSource) => string | null;
 	setProgram: (program: CsharpProgram | null) => void;
 	setTexture: (name: string, image: HTMLImageElement | ImageBitmap | null) => void;
+	renameTexture: (oldName: string, newName: string) => void;
 	removeTexture: (name: string) => void;
 };
 
@@ -307,6 +308,18 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+			},
+			renameTexture(oldName, newName) {
+				if (oldName === newName) return;
+				const texture = texturesRef.current.get(oldName);
+				if (!texture) return;
+				texturesRef.current.delete(oldName);
+				const existing = texturesRef.current.get(newName);
+				if (existing && existing !== texture) {
+					const gl = glRef.current;
+					if (gl) gl.deleteTexture(existing);
+				}
+				texturesRef.current.set(newName, texture);
 			},
 			removeTexture(name) {
 				const gl = glRef.current;

@@ -1,9 +1,11 @@
 "use client";
 
 import { Icon } from "@iconify-icon/react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 export type TextureItem = {
+	id: string;
+	/** Identifier after `Textures.` — editable */
 	name: string;
 	fileName: string;
 };
@@ -11,15 +13,28 @@ export type TextureItem = {
 type TexturePanelProps = {
 	textures: TextureItem[];
 	onAdd: (name: string, file: File, image: HTMLImageElement) => void;
-	onRemove: (name: string) => void;
+	onRename: (id: string, nextName: string) => string | null;
+	onRemove: (id: string) => void;
 };
 
 function assetNameFromFile(fileName: string): string {
-	return fileName.replace(/\.[^.]+$/, "").replace(/[^\w.-]+/g, "_");
+	const base = fileName.replace(/\.[^.]+$/, "").replace(/[^\w]+/g, "_");
+	return base.replace(/^(\d)/, "_$1") || "Texture";
 }
 
-export function TexturePanel({ textures, onAdd, onRemove }: TexturePanelProps) {
+function textureRef(name: string): string {
+	return `Textures.${name}`;
+}
+
+export function TexturePanel({
+	textures,
+	onAdd,
+	onRename,
+	onRemove,
+}: TexturePanelProps) {
 	const inputRef = useRef<HTMLInputElement>(null);
+	const [copiedId, setCopiedId] = useState<string | null>(null);
+	const [renameError, setRenameError] = useState<string | null>(null);
 
 	const handleFiles = async (files: FileList | null) => {
 		if (!files) return;
@@ -35,6 +50,23 @@ export function TexturePanel({ textures, onAdd, onRemove }: TexturePanelProps) {
 			}
 		}
 		if (inputRef.current) inputRef.current.value = "";
+	};
+
+	const handleCopy = async (name: string, id: string) => {
+		const text = textureRef(name);
+		try {
+			await navigator.clipboard.writeText(text);
+			setCopiedId(id);
+			window.setTimeout(() => setCopiedId((cur) => (cur === id ? null : cur)), 1200);
+		} catch {
+			setRenameError("Copy failed — clipboard unavailable");
+		}
+	};
+
+	const handleNameChange = (id: string, raw: string) => {
+		const cleaned = raw.replace(/[^\w]/g, "");
+		const err = onRename(id, cleaned);
+		setRenameError(err);
 	};
 
 	return (
@@ -63,11 +95,18 @@ export function TexturePanel({ textures, onAdd, onRemove }: TexturePanelProps) {
 				/>
 			</div>
 			<p className="hlsl-textures__hint">
-				File name (without extension) becomes
+				Use
 				{" "}
-				<code>Commons.ModAsset.Name.Value</code>
-				. Missing textures fall back to white.
+				<code>Textures.Name</code>
+				{" "}
+				in C# (e.g.
+				{" "}
+				<code>GraphicsDevice.Textures[0] = Textures.RingSoft;</code>
+				). Missing textures fall back to white.
 			</p>
+			{renameError && (
+				<p className="hlsl-textures__error">{renameError}</p>
+			)}
 			{textures.length === 0
 				? (
 					<p className="hlsl-textures__empty">No textures imported yet.</p>
@@ -76,23 +115,46 @@ export function TexturePanel({ textures, onAdd, onRemove }: TexturePanelProps) {
 					<ul className="hlsl-textures__list">
 						{textures.map((item) => (
 							<li
-								key={item.name}
+								key={item.id}
 								className="hlsl-textures__item"
 							>
-								<code>{item.name}</code>
-								<span className="hlsl-textures__file">{item.fileName}</span>
-								<button
-									type="button"
-									className="hlsl-textures__remove"
-									aria-label={`Remove ${item.name}`}
-									onClick={() => onRemove(item.name)}
-								>
-									<Icon
-										icon="mdi:close"
-										width={16}
-										height={16}
+								<div className="hlsl-textures__name-row">
+									<span className="hlsl-textures__prefix">Textures.</span>
+									<input
+										className="hlsl-textures__name-input"
+										value={item.name}
+										spellCheck={false}
+										aria-label={`Texture name for ${item.fileName}`}
+										onChange={(event) =>
+											handleNameChange(item.id, event.target.value)}
 									/>
-								</button>
+									<button
+										type="button"
+										className="hlsl-textures__icon-btn"
+										aria-label={`Copy Textures.${item.name}`}
+										title="Copy Textures.Name"
+										onClick={() => void handleCopy(item.name, item.id)}
+									>
+										<Icon
+											icon={copiedId === item.id ? "mdi:check" : "mdi:content-copy"}
+											width={16}
+											height={16}
+										/>
+									</button>
+									<button
+										type="button"
+										className="hlsl-textures__icon-btn hlsl-textures__icon-btn--danger"
+										aria-label={`Remove Textures.${item.name}`}
+										onClick={() => onRemove(item.id)}
+									>
+										<Icon
+											icon="mdi:close"
+											width={16}
+											height={16}
+										/>
+									</button>
+								</div>
+								<span className="hlsl-textures__file">{item.fileName}</span>
 							</li>
 						))}
 					</ul>
