@@ -3,7 +3,12 @@
 import Editor, { loader, type OnMount } from "@monaco-editor/react";
 import { useTheme } from "next-themes";
 import { useMounted } from "nextra/hooks";
-import { registerCsharpLanguage, CSHARP_GEOM_LANGUAGE_ID } from "./register-csharp";
+import {
+	CSHARP_GEOM_LANGUAGE_ID,
+	GEOM_THEME_DARK,
+	GEOM_THEME_LIGHT,
+	registerCsharpLanguage,
+} from "./register-csharp";
 import { registerHlslLanguage } from "./register-hlsl";
 
 if (typeof window !== "undefined") {
@@ -24,12 +29,14 @@ type CodeEditorProps = {
 export function CodeEditor({ value, onChange, label, language }: CodeEditorProps) {
 	const { resolvedTheme } = useTheme();
 	const mounted = useMounted();
-	const theme = mounted && resolvedTheme === "dark" ? "vs-dark" : "light";
+	const theme
+		= mounted && resolvedTheme === "dark" ? GEOM_THEME_DARK : GEOM_THEME_LIGHT;
 	const monacoLanguage = language === "csharp" ? CSHARP_GEOM_LANGUAGE_ID : "hlsl";
 
 	const handleMount: OnMount = (editor, monaco) => {
 		registerCsharpLanguage(monaco);
 		registerHlslLanguage(monaco);
+		monaco.editor.setTheme(theme);
 		const model = editor.getModel();
 		if (model) {
 			monaco.editor.setModelLanguage(model, monacoLanguage);

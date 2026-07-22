@@ -10,7 +10,6 @@ export function registerHlslLanguage(monaco: Monaco): void {
 	monaco.languages.register({ id: "hlsl" });
 	monaco.languages.setMonarchTokensProvider("hlsl", {
 		defaultToken: "",
-		tokenPostfix: ".hlsl",
 		keywords: [
 			"break",
 			"case",

@@ -5,11 +5,55 @@ let registered = false;
 /** Monaco language id used by the geometry C# editor (avoids clobbering built-in csharp). */
 export const CSHARP_GEOM_LANGUAGE_ID = "csharp-geom";
 
+export const GEOM_THEME_LIGHT = "cloudea-geom-light";
+export const GEOM_THEME_DARK = "cloudea-geom-dark";
+
+function defineGeomThemes(monaco: Monaco): void {
+	monaco.editor.defineTheme(GEOM_THEME_LIGHT, {
+		base: "vs",
+		inherit: true,
+		rules: [
+			{ token: "keyword", foreground: "AF00DB" },
+			{ token: "type", foreground: "267F99", fontStyle: "bold" },
+			{ token: "predefined", foreground: "795E26" },
+			{ token: "number", foreground: "098658" },
+			{ token: "number.float", foreground: "098658" },
+			{ token: "number.hex", foreground: "098658" },
+			{ token: "string", foreground: "A31515" },
+			{ token: "string.escape", foreground: "A31515" },
+			{ token: "comment", foreground: "008000" },
+			{ token: "delimiter", foreground: "6B6B6B" },
+			{ token: "operator", foreground: "000000" },
+		],
+		colors: {},
+	});
+
+	monaco.editor.defineTheme(GEOM_THEME_DARK, {
+		base: "vs-dark",
+		inherit: true,
+		rules: [
+			{ token: "keyword", foreground: "C586C0" },
+			{ token: "type", foreground: "4EC9B0", fontStyle: "bold" },
+			{ token: "predefined", foreground: "DCDCAA" },
+			{ token: "number", foreground: "B5CEA8" },
+			{ token: "number.float", foreground: "B5CEA8" },
+			{ token: "number.hex", foreground: "B5CEA8" },
+			{ token: "string", foreground: "CE9178" },
+			{ token: "string.escape", foreground: "CE9178" },
+			{ token: "comment", foreground: "6A9955" },
+			{ token: "delimiter", foreground: "D4D4D4" },
+			{ token: "operator", foreground: "D4D4D4" },
+		],
+		colors: {},
+	});
+}
+
 /**
  * Richer C# highlighting for the geometry host:
  * built-in C# keywords + Terraria-like API types/members.
  */
 export function registerCsharpLanguage(monaco: Monaco): void {
+	defineGeomThemes(monaco);
 	if (registered) return;
 	registered = true;
 
@@ -46,7 +90,7 @@ export function registerCsharpLanguage(monaco: Monaco): void {
 
 	monaco.languages.setMonarchTokensProvider(CSHARP_GEOM_LANGUAGE_ID, {
 		defaultToken: "",
-		tokenPostfix: ".cs",
+		// No tokenPostfix — keep tokens as keyword/type/predefined for reliable theme matching
 		keywords: [
 			"abstract",
 			"as",
@@ -109,30 +153,11 @@ export function registerCsharpLanguage(monaco: Monaco): void {
 			"virtual",
 			"volatile",
 			"while",
-			"add",
-			"alias",
-			"ascending",
 			"async",
 			"await",
-			"by",
-			"descending",
 			"dynamic",
-			"equals",
-			"from",
-			"get",
-			"global",
-			"group",
-			"into",
-			"join",
-			"let",
 			"nameof",
-			"on",
-			"orderby",
 			"partial",
-			"remove",
-			"select",
-			"set",
-			"value",
 			"var",
 			"when",
 			"where",
@@ -140,9 +165,6 @@ export function registerCsharpLanguage(monaco: Monaco): void {
 			"record",
 			"init",
 			"with",
-			"nint",
-			"nuint",
-			"file",
 			"required",
 			"scoped",
 		],
@@ -163,7 +185,6 @@ export function registerCsharpLanguage(monaco: Monaco): void {
 			"ulong",
 			"ushort",
 			"void",
-			// Geometry host / XNA-like API
 			"Vector2",
 			"Vector3",
 			"Vector4",
@@ -214,6 +235,7 @@ export function registerCsharpLanguage(monaco: Monaco): void {
 			"iTime",
 			"iResolution",
 			"iMouse",
+			"graphics",
 		],
 		operators: [
 			"=",
@@ -254,9 +276,34 @@ export function registerCsharpLanguage(monaco: Monaco): void {
 		escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
 		tokenizer: {
 			root: [
-				// identifiers & keywords
+				// member access: .Name
 				[
-					/[a-zA-Z_]\w*/,
+					/(\.)([A-Za-z_]\w*)/,
+					[
+						"delimiter",
+						{
+							cases: {
+								"@typeKeywords": "type",
+								"@builtins": "predefined",
+								"@default": "predefined",
+							},
+						},
+					],
+				],
+				// function-like identifiers before (
+				[
+					/[A-Za-z_]\w*(?=\s*[<(])/,
+					{
+						cases: {
+							"@keywords": "keyword",
+							"@typeKeywords": "type",
+							"@builtins": "predefined",
+							"@default": "predefined",
+						},
+					},
+				],
+				[
+					/[A-Za-z_]\w*/,
 					{
 						cases: {
 							"@keywords": "keyword",
@@ -278,13 +325,12 @@ export function registerCsharpLanguage(monaco: Monaco): void {
 						},
 					},
 				],
-				// numbers with C# suffixes
 				[/\d*\.\d+([eE][-+]?\d+)?[fFdDmM]?/, "number.float"],
 				[/\d+[eE][-+]?\d+[fFdDmM]?/, "number.float"],
 				[/\d+[fFdDmM]/, "number.float"],
 				[/0[xX][0-9a-fA-F_]+[uUlL]*/, "number.hex"],
 				[/\d+[uUlL]*/, "number"],
-				[/[;,.]/, "delimiter"],
+				[/[;,]/, "delimiter"],
 				[/"([^"\\]|\\.)*$/, "string.invalid"],
 				[/"/, "string", "@string"],
 				[/'[^\\']'/, "string"],
