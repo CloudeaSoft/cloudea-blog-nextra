@@ -312,7 +312,7 @@ const MobileNavbarMenu: FC<{
 
 	return (
 		<div
-			className="w-full"
+			className="mobile-nav-submenu w-full"
 			data-testid="mobile-nav-submenu"
 			data-open={open || undefined}
 		>
@@ -329,12 +329,7 @@ const MobileNavbarMenu: FC<{
 				{children}
 				<ArrowRightIcon
 					height="14"
-					className={cn(
-						"*:origin-center *:transition-transform",
-						open
-							? "*:rotate-90"
-							: "*:rotate-0",
-					)}
+					className="mobile-nav-submenu__caret"
 				/>
 			</button>
 			{open
