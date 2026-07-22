@@ -17,8 +17,6 @@ import "./hlsl-preview.css";
 
 const DEMO_CS_PARAMS: DemoParam[] = [
 	{ id: "wink", label: "wink", value: 1, min: 0, max: 1, step: 0.01 },
-	{ id: "radius", label: "radius", value: 120, min: 40, max: 200, step: 1 },
-	{ id: "spin", label: "spin", value: 0.1, min: -1, max: 1, step: 0.01 },
 ];
 
 const DEMO_VS_PARAMS: DemoParam[] = [
@@ -27,7 +25,6 @@ const DEMO_VS_PARAMS: DemoParam[] = [
 
 const DEMO_PS_PARAMS: DemoParam[] = [
 	{ id: "intensity", label: "intensity", value: 1, min: 0, max: 2, step: 0.01 },
-	{ id: "tint", label: "tint", value: 0.5, min: 0, max: 1, step: 0.01 },
 ];
 
 /** Names referenced by DEFAULT_CSHARP — also seeded in the Textures panel. */
