@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { scrollPage } from "./helpers";
 
 /**
  * Visual regression suite — screenshot baselines for layout/style changes.
@@ -58,7 +59,18 @@ async function gotoStable(page: Page, path: string) {
 		}
 	});
 
-	// Brief settle for layout after theme + fonts.
+	// Splash stays mounted and only fades out after `window.load`.
+	await page.waitForFunction(() => {
+		const splash = document.querySelector(".loader-bg");
+		if (!splash) return true;
+		const style = getComputedStyle(splash);
+		return (
+			splash.classList.contains("fade-out")
+			&& (style.visibility === "hidden" || style.opacity === "0")
+		);
+	}, { timeout: 10_000 });
+
+	// Brief settle for layout after theme + fonts + splash.
 	await page.waitForTimeout(150);
 }
 
@@ -87,7 +99,7 @@ test.describe("visual regression", () => {
 		await gotoStable(page, "/");
 
 		// BannerBlurTrigger enables blur when scrollY > 420.
-		await page.evaluate(() => window.scrollTo(0, 480));
+		await scrollPage(page, 480);
 		await page.waitForTimeout(300);
 
 		await expect

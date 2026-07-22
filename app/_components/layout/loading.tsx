@@ -37,41 +37,23 @@ export const Loading = () => {
 	}, []);
 
 	return (
-		<>
-			<div
-				className={cn("loader-bg", { "fade-out": !isLoading })}
-				style={{
-					position: "fixed",
-					background: "white",
-					zIndex: 9999,
-					width: 100 + "%",
-					height: 100 + "%",
-				}}
+		<div className={cn("loader-bg", { "fade-out": !isLoading })}>
+			<p
+				id="loading"
+				className={mPlusRounded1c.className}
 			>
-				<p
-					id="loading"
-					className={mPlusRounded1c.className}
-				>
-					<span>
-						その歌声は
-						<span style={{ display: "inline-block", marginRight: "-0.3rem" }}>
-							、
-						</span>
-						春風と共に
-					</span>
-					──
-				</p>
-				<div className="loading-bg">
-					<CloudeaImage
-						className="sakura-1"
-						src="loading-bg.gif"
-						alt="sakura"
-						width={240}
-						height={240}
-						priority={true}
-					/>
-				</div>
+				その歌声は、春風と共に──
+			</p>
+			<div className="loading-bg">
+				<CloudeaImage
+					className="sakura-1"
+					src="loading-bg.gif"
+					alt="sakura"
+					width={240}
+					height={240}
+					priority={true}
+				/>
 			</div>
-		</>
+		</div>
 	);
 };

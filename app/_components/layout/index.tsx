@@ -20,7 +20,10 @@ export const Layout: FC<LayoutProps> = ({ children, ...themeConfig }) => {
 			{...nextThemes}
 		>
 			<Loading />
-			<div className="flex flex-col min-h-dvh">
+			<div
+				className="app-scroll flex flex-col min-h-full"
+				data-scroll-root
+			>
 				<Navbar pageMap={pageMap} />
 
 				<main className="flex-1 w-full">

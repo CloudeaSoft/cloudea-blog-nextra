@@ -3,12 +3,36 @@
 
 @variant dark (&:where(.dark *));
 
+html,
+body {
+	height: 100%;
+	overflow: hidden;
+}
+
 body {
 	font-family:
 		"SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial",
 		sans-serif;
 	margin: 0;
 	padding: 0;
+}
+
+/*
+ * Page scroll lives on this element (not the document). On mobile Chrome,
+ * document scrolling retracts the UA chrome and resizes the visual viewport;
+ * scrolling an inner port keeps the address bar expanded much more reliably.
+ *
+ * `container-type: size` lets the home banner size with `cqh` so the first
+ * screen fills this port exactly (no posts peeking under the fold).
+ */
+.app-scroll {
+	container-type: size;
+	container-name: app-scroll;
+	height: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
+	overscroll-behavior-y: none;
+	-webkit-overflow-scrolling: touch;
 }
 
 iconify-icon {

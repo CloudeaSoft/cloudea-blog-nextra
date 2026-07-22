@@ -1,4 +1,5 @@
 /* PC navbar visual interactions: active underline, hover bounce, scroll compact.
+ * Compact applies on all viewports (scrollport is `.app-scroll`).
  * `body …` prefixes beat the global `body *` color-only transition rule.
  *
  * `--navbar-height` lives on `body` for sticky siblings (TOC). The variable
@@ -18,6 +19,7 @@ body:has(.navbar-header[data-compact]) {
 
 body .navbar-header {
 	height: var(--navbar-height);
+	flex-shrink: 0;
 	transition: height var(--navbar-compact-duration) var(--navbar-compact-ease);
 }
 

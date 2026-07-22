@@ -29,6 +29,7 @@ import { useAtom } from "jotai";
 import { menuAtom } from "@/stores/menu";
 import Link from "next/link";
 import { navbarFont } from "./font";
+import { getScrollY, onScrollY } from "@/utils/scroll-root";
 
 const SCROLL_COMPACT_THRESHOLD = 36;
 
@@ -76,11 +77,10 @@ export const NavbarShell: FC<{ children: ReactNode }> = ({ children }) => {
 
 	useEffect(() => {
 		const update = () => {
-			setCompact(window.scrollY > SCROLL_COMPACT_THRESHOLD);
+			setCompact(getScrollY() > SCROLL_COMPACT_THRESHOLD);
 		};
 		update();
-		window.addEventListener("scroll", update, { passive: true });
-		return () => window.removeEventListener("scroll", update);
+		return onScrollY(update, { passive: true });
 	}, []);
 
 	return (
@@ -372,23 +372,25 @@ export const MobileNavbar = ({
 		route: pathname,
 	});
 
-	// Lock background scroll while the mobile drawer is open. useLayoutEffect
-	// avoids a flash of a scrollable body during the open transition, and only
+	// Lock the app scrollport while the mobile drawer is open. useLayoutEffect
+	// avoids a flash of a scrollable page during the open transition, and only
 	// runs on the client so SSR markup is unaffected.
 	const prevOverflow = useRef<string | null>(null);
 	useLayoutEffect(() => {
 		if (typeof document === "undefined") return;
-		const { body } = document;
+		const root =
+			document.querySelector<HTMLElement>("[data-scroll-root]")
+			|| document.body;
 		if (menu) {
-			prevOverflow.current = body.style.overflow;
-			body.style.overflow = "hidden";
+			prevOverflow.current = root.style.overflow;
+			root.style.overflow = "hidden";
 		} else if (prevOverflow.current !== null) {
-			body.style.overflow = prevOverflow.current;
+			root.style.overflow = prevOverflow.current;
 			prevOverflow.current = null;
 		}
 		return () => {
 			if (prevOverflow.current !== null) {
-				body.style.overflow = prevOverflow.current;
+				root.style.overflow = prevOverflow.current;
 				prevOverflow.current = null;
 			}
 		};

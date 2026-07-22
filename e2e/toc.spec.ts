@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { scrollPage } from "./helpers";
 
 /**
  * TOC coverage for the sticky sidebar / mobile bar:
@@ -65,7 +66,7 @@ test.describe("toc: sticky flush under compact navbar", () => {
 		await expect(toc.getByRole("heading", { name: "Table of Contents" })).toBeVisible();
 
 		// Stick the TOC, then settle expanded so the next compact toggle animates.
-		await page.evaluate(() => window.scrollTo(0, 900));
+		await scrollPage(page, 900);
 		await page.waitForTimeout(400);
 		await page.evaluate(() => {
 			document.querySelector(".navbar-header")?.removeAttribute("data-compact");
@@ -144,7 +145,7 @@ test.describe("toc: sticky flush under compact navbar", () => {
 		await gotoLight(page, POST_WITH_HEADINGS);
 		await page.emulateMedia({ reducedMotion: "reduce" });
 
-		await page.evaluate(() => window.scrollTo(0, 900));
+		await scrollPage(page, 900);
 		const bar = page.locator("nav.navbar-bar").first();
 		await expect(bar).toHaveAttribute("data-compact", "true");
 		await page.waitForTimeout(50);

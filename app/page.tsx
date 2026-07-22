@@ -27,7 +27,10 @@ const Banner = async () => {
 	return (
 		<div
 			style={{
-				height: "calc(100dvh - 4rem)",
+				// Fill the app scrollport under the navbar so the first screen
+				// is exactly one viewport — no posts peeking below the fold.
+				// `cqh` tracks `.app-scroll` (see globals.css), not `svh`/`dvh`.
+				height: "calc(100cqh - var(--navbar-height, 4rem))",
 				position: "relative",
 				display: "flex",
 				width: "100%",
