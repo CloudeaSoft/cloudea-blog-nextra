@@ -98,6 +98,24 @@ export const NavbarShell: FC<{ children: ReactNode }> = ({ children }) => {
 	);
 };
 
+/** Open Headless UI Menu via mouse pointerdown (not click).
+ *
+ * MenuButton toggles on pointerdown for mouse, and ignores click once its
+ * internal pointerType has been set to "mouse". After a real click, the old
+ * hover path (`button.click()`) therefore stopped opening the panel.
+ */
+function openMenuButton(button: HTMLButtonElement | null) {
+	if (!button || button.getAttribute("aria-expanded") === "true") return;
+	button.dispatchEvent(
+		new PointerEvent("pointerdown", {
+			bubbles: true,
+			cancelable: true,
+			pointerType: "mouse",
+			button: 0,
+		}),
+	);
+}
+
 const NavbarMenu: FC<{
 	menu: MenuItem;
 	children: ReactNode;
@@ -119,7 +137,7 @@ const NavbarMenu: FC<{
 					className="navbar-menu__trigger"
 					data-open={open || undefined}
 					onMouseEnter={() => {
-						if (!open) buttonRef.current?.click();
+						if (!open) openMenuButton(buttonRef.current);
 					}}
 					onMouseLeave={close}
 				>
@@ -132,6 +150,19 @@ const NavbarMenu: FC<{
 						data-active={active || undefined}
 						// Keep open-on-hover: don't focus the button on mouse click.
 						onMouseDown={(event) => event.preventDefault()}
+						// While open from hover, a mouse click would toggle closed and
+						// leave the pointer over a closed menu (no new mouseenter).
+						// Swallow that toggle; mouse leave still dismisses.
+						onPointerDownCapture={(event) => {
+							if (
+								open
+								&& event.pointerType === "mouse"
+								&& event.button === 0
+							) {
+								event.preventDefault();
+								event.stopPropagation();
+							}
+						}}
 					>
 						<span className="navbar-link__item">{children}</span>
 						<ArrowRightIcon className="navbar-link__caret" />
