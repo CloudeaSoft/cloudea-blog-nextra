@@ -219,8 +219,10 @@ test.describe("friends: navigation", () => {
 		);
 
 		const drawer = page.getByTestId("mobile-nav-drawer");
-		await drawer.getByRole("button", { name: /About/i }).click();
-		const friendsLink = drawer.getByRole("menuitem", { name: "Friends" });
+		const aboutSubmenu = drawer.getByTestId("mobile-nav-submenu");
+		// Accordion starts expanded — Friends is reachable without an extra tap.
+		await expect(aboutSubmenu).toHaveAttribute("data-open", "true");
+		const friendsLink = drawer.getByRole("link", { name: "Friends" });
 		await expect(friendsLink).toBeVisible();
 		await friendsLink.click();
 

@@ -98,6 +98,45 @@ export const NavbarShell: FC<{ children: ReactNode }> = ({ children }) => {
 	);
 };
 
+type NavMenuEntry = {
+	key: string;
+	title: string;
+	href: string;
+};
+
+/** Shared data only — desktop/mobile keep separate interaction models. */
+function getNavMenuEntries(menu: MenuItem): NavMenuEntry[] {
+	const routes = Object.fromEntries(
+		(menu.children || []).map((route) => [route.name, route]),
+	);
+	return Object.entries(
+		(menu.items as Record<string, { title: string; href?: string }>) || {},
+	).map(([key, item]) => ({
+		key,
+		title: item.title,
+		href: item.href || routes[key]?.route || "",
+	}));
+}
+
+/** Open Headless UI Menu via mouse pointerdown (not click).
+ *
+ * MenuButton toggles on pointerdown for mouse, and ignores click once its
+ * internal pointerType has been set to "mouse". After a real click, the old
+ * hover path (`button.click()`) therefore stopped opening the panel.
+ */
+function openMenuButton(button: HTMLButtonElement | null) {
+	if (!button || button.getAttribute("aria-expanded") === "true") return;
+	button.dispatchEvent(
+		new PointerEvent("pointerdown", {
+			bubbles: true,
+			cancelable: true,
+			pointerType: "mouse",
+			button: 0,
+		}),
+	);
+}
+
+/** Desktop: hover to open, leave to close. Not reused on mobile. */
 const NavbarMenu: FC<{
 	menu: MenuItem;
 	children: ReactNode;
@@ -105,12 +144,7 @@ const NavbarMenu: FC<{
 	active?: boolean;
 }> = ({ menu, children, className, active }) => {
 	const buttonRef = useRef<HTMLButtonElement>(null);
-	const routes = Object.fromEntries(
-		(menu.children || []).map((route) => [route.name, route]),
-	);
-	const items = Object.entries(
-		(menu.items as Record<string, { title: string; href?: string }>) || {},
-	);
+	const items = getNavMenuEntries(menu);
 
 	return (
 		<Menu as="div" className="navbar-menu">
@@ -119,7 +153,7 @@ const NavbarMenu: FC<{
 					className="navbar-menu__trigger"
 					data-open={open || undefined}
 					onMouseEnter={() => {
-						if (!open) buttonRef.current?.click();
+						if (!open) openMenuButton(buttonRef.current);
 					}}
 					onMouseLeave={close}
 				>
@@ -132,6 +166,19 @@ const NavbarMenu: FC<{
 						data-active={active || undefined}
 						// Keep open-on-hover: don't focus the button on mouse click.
 						onMouseDown={(event) => event.preventDefault()}
+						// While open from hover, a mouse click would toggle closed and
+						// leave the pointer over a closed menu (no new mouseenter).
+						// Swallow that toggle; mouse leave still dismisses.
+						onPointerDownCapture={(event) => {
+							if (
+								open
+								&& event.pointerType === "mouse"
+								&& event.button === 0
+							) {
+								event.preventDefault();
+								event.stopPropagation();
+							}
+						}}
 					>
 						<span className="navbar-link__item">{children}</span>
 						<ArrowRightIcon className="navbar-link__caret" />
@@ -146,11 +193,11 @@ const NavbarMenu: FC<{
 							"data-closed:scale-95 data-closed:opacity-0",
 						)}
 					>
-						{items.map(([key, item]) => (
+						{items.map((item) => (
 							<_MenuItem
-								key={key}
+								key={item.key}
 								as={Anchor}
-								href={item.href || routes[key]?.route}
+								href={item.href}
 								className="navbar-menu__option"
 							>
 								{item.title}
@@ -254,65 +301,54 @@ export const ClientNavbar = ({
 	);
 };
 
+/** Mobile drawer: accordion — default expanded, click toggles. Not hover. */
 const MobileNavbarMenu: FC<{
 	menu: MenuItem;
 	children: ReactNode;
 	className?: string;
 }> = ({ menu, children, className }) => {
-	const routes = Object.fromEntries(
-		(menu.children || []).map((route) => [route.name, route]),
-	);
+	const [open, setOpen] = useState(true);
+	const items = getNavMenuEntries(menu);
+
 	return (
-		<Menu>
-			<MenuButton
+		<div
+			className="mobile-nav-submenu w-full"
+			data-testid="mobile-nav-submenu"
+			data-open={open || undefined}
+		>
+			<button
+				type="button"
+				aria-expanded={open}
 				className={cn(
 					classes.link,
-					"items-center flex gap-1.5 cursor-pointer focus:outline-none text-[1.1rem]! text-(--default-text-color)! hover:text-(--primary-color)!",
+					"w-full items-center justify-between flex cursor-pointer focus:outline-none text-[1.1rem]! text-(--default-text-color)! hover:text-(--primary-color)!",
 					className,
 				)}
+				onClick={() => setOpen((prev) => !prev)}
 			>
 				{children}
 				<ArrowRightIcon
 					height="14"
-					className="*:origin-center *:transition-transform *:rotate-90"
+					className="mobile-nav-submenu__caret"
 				/>
-			</MenuButton>
-			<MenuItems
-				transition
-				className={cn(
-					"focus-visible:nextra-focus",
-					"focus:outline-none",
-					"nextra-scrollbar motion-reduce:transition-none",
-					// From https://headlessui.com/react/menu#adding-transitions
-					"origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0",
-					"z-30 rounded-md py-1 text-[1.1rem]!",
-					// headlessui adds max-height as style, use !important to override
-					"max-h-[min(calc(100vh-5rem),256px)]!",
-				)}
-				anchor={false}
-				modal={false}
-			>
-				{Object.entries(
-					(menu.items as Record<string, { title: string; href?: string }>)
-					|| {},
-				).map(([key, item]) => (
-					<_MenuItem
-						key={key}
-						as={Anchor}
-						href={item.href || routes[key]?.route}
-						className={({ focus }) =>
-							cn(
-								"block py-1.5 transition-colors ps-3 pe-9",
-								focus
-									? "text-gray-900 dark:text-gray-100"
-									: "text-gray-600 dark:text-gray-400",
-							)}
-					>
-						{item.title}
-					</_MenuItem>
-				))}
-			</MenuItems>
-		</Menu>
+			</button>
+			{open
+				? (
+					<ul className="flex flex-col py-1 text-[1.1rem]!">
+						{items.map((item) => (
+							<li key={item.key}>
+								<Anchor
+									href={item.href}
+									className="block py-1.5 transition-colors ps-3 pe-9 text-gray-600 dark:text-gray-400"
+								>
+									{item.title}
+								</Anchor>
+							</li>
+						))}
+					</ul>
+				)
+				: null}
+		</div>
 	);
 };
 
@@ -411,7 +447,9 @@ export const MobileNavbar = ({
 									key={href || page.name}
 									className="flex flex-col w-full my-1.5"
 								>
+									{/* Remount when the drawer opens so nested menus reset to expanded. */}
 									<MobileNavbarMenu
+										key={menu ? "drawer-open" : "drawer-closed"}
 										menu={page as MenuItem}
 										className="py-1.5 px-2 flex flex-row items-center justify-between"
 									>

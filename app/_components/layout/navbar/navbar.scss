@@ -295,6 +295,25 @@ body .navbar-menu__trigger[data-open] .navbar-link__caret {
 	transform: rotate(270deg);
 }
 
+/* Mobile drawer accordion caret — use transform (not Tailwind rotate) so
+ * transition-property: transform actually animates the turn. */
+body .mobile-nav-submenu__caret {
+	flex-shrink: 0;
+	transform: rotate(0deg);
+	transform-origin: center;
+	transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body .mobile-nav-submenu[data-open] .mobile-nav-submenu__caret {
+	transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body .mobile-nav-submenu__caret {
+		transition: none;
+	}
+}
+
 /* Underline stays on the item wrapper so only the label can bounce. */
 body .navbar-link__item::after {
 	content: "";

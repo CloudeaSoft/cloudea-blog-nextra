@@ -195,6 +195,60 @@ test.describe("navbar: desktop menu dismiss", () => {
 		await aboutMenu.hover();
 		await expect(aboutMenu.locator(".navbar-menu__dropdown")).toBeVisible();
 	});
+
+	test("hover still opens after clicking the menu button", async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== "desktop-chromium", "desktop only");
+
+		await gotoLight(page, "/");
+		await page.emulateMedia({ reducedMotion: "reduce" });
+
+		const aboutMenu = page.locator(".navbar-links .navbar-menu").filter({
+			hasText: "About",
+		});
+		const dropdown = aboutMenu.locator(".navbar-menu__dropdown");
+		const trigger = aboutMenu.locator(".navbar-link--menu");
+
+		await aboutMenu.hover();
+		await expect(dropdown).toBeVisible();
+
+		// Real mouse click used to stick Headless UI's pointerType at "mouse",
+		// after which programmatic click()-to-open from mouseenter stopped working.
+		await trigger.click();
+		await page.locator("body").hover({ position: { x: 8, y: 8 } });
+		await expect(dropdown).toHaveCount(0);
+
+		await aboutMenu.hover();
+		await expect(aboutMenu.locator(".navbar-menu__dropdown")).toBeVisible();
+	});
+});
+
+test.describe("navbar: mobile nested menu", () => {
+	test.beforeEach(async ({ page }) => {
+		await prepare(page);
+	});
+
+	test("About submenu starts expanded and toggles on click", async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== "mobile-chromium", "mobile only");
+
+		await gotoLight(page, "/");
+		await page.getByTestId("mobile-menu-button").click();
+
+		const drawer = page.getByTestId("mobile-nav-drawer");
+		const submenu = drawer.getByTestId("mobile-nav-submenu");
+		const aboutButton = submenu.getByRole("button", { name: /About/i });
+		const friendsLink = submenu.getByRole("link", { name: "Friends" });
+
+		await expect(submenu).toHaveAttribute("data-open", "true");
+		await expect(friendsLink).toBeVisible();
+
+		await aboutButton.click();
+		await expect(submenu).not.toHaveAttribute("data-open", "true");
+		await expect(friendsLink).toHaveCount(0);
+
+		await aboutButton.click();
+		await expect(submenu).toHaveAttribute("data-open", "true");
+		await expect(friendsLink).toBeVisible();
+	});
 });
 
 test.describe("navbar: mobile menu icon transition", () => {
