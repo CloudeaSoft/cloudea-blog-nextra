@@ -106,7 +106,7 @@ test.describe("navbar: scroll compact", () => {
 		await expect(bar).toHaveScreenshot("navbar-compact.png");
 	});
 
-	test("mobile stays expanded after scroll", async ({ page }, testInfo) => {
+	test("mobile expands then compactifies on scroll", async ({ page }, testInfo) => {
 		test.skip(testInfo.project.name !== "mobile-chromium", "mobile only");
 
 		await gotoLight(page, "/");
@@ -116,8 +116,9 @@ test.describe("navbar: scroll compact", () => {
 		await expect(bar).not.toHaveAttribute("data-compact");
 
 		await scrollPage(page, 80);
-		await page.waitForTimeout(100);
-		await expect(bar).not.toHaveAttribute("data-compact");
+		await expect(bar).toHaveAttribute("data-compact", "true");
+		await page.waitForTimeout(350);
+		await expect(bar).toHaveScreenshot("mobile-navbar-compact.png");
 	});
 });
 

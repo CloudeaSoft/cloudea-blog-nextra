@@ -1,7 +1,5 @@
 /* PC navbar visual interactions: active underline, hover bounce, scroll compact.
- * Compact is applied only on desktop (`min-width: 1024px`) via NavbarShell —
- * mobile keeps a fixed bar height so UA chrome + site shrink don't fight the
- * fixed cover background.
+ * Compact applies on all viewports (scrollport is `.app-scroll`).
  * `body …` prefixes beat the global `body *` color-only transition rule.
  *
  * `--navbar-height` lives on `body` for sticky siblings (TOC). The variable
@@ -21,6 +19,7 @@ body:has(.navbar-header[data-compact]) {
 
 body .navbar-header {
 	height: var(--navbar-height);
+	flex-shrink: 0;
 	transition: height var(--navbar-compact-duration) var(--navbar-compact-ease);
 }
 
