@@ -2,32 +2,32 @@
  * Compact applies on all viewports (scrollport is `.app-scroll`).
  * `body …` prefixes beat the global `body *` color-only transition rule.
  *
- * `--navbar-height` lives on `body` for sticky siblings (TOC). The variable
- * itself jumps when compact toggles; keep the bar's `height` transition and
- * the TOC's matching `top` transition on the same curve so they stay flush
- * mid-animation. */
+ * Layout spacer (`.navbar-header`) and `--navbar-height` stay at 4rem so
+ * scroll-compact only reshapes the fixed glass bar. Shrinking the in-flow
+ * spacer used to reflow the scrollport when expanding at the top — one bounce
+ * every time you scrolled back up. TOC `top` still tracks the visual bar. */
 
 body {
 	--navbar-height: 4rem;
+	--navbar-bar-height: 4rem;
 	--navbar-compact-ease: cubic-bezier(0.22, 1, 0.36, 1);
 	--navbar-compact-duration: 0.32s;
 }
 
 body:has(.navbar-header[data-compact]) {
-	--navbar-height: 3rem;
+	--navbar-bar-height: 3rem;
 }
 
 body .navbar-header {
 	height: var(--navbar-height);
 	flex-shrink: 0;
-	transition: height var(--navbar-compact-duration) var(--navbar-compact-ease);
 }
 
 body .navbar-bar {
 	--navbar-underline-inset: 0.6rem;
 	display: flex;
 	justify-content: center;
-	height: var(--navbar-height);
+	height: var(--navbar-bar-height);
 	position: fixed;
 	top: 0;
 	left: 0;

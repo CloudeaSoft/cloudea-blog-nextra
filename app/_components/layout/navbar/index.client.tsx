@@ -31,7 +31,11 @@ import Link from "next/link";
 import { navbarFont } from "./font";
 import { getScrollY, onScrollY } from "@/utils/scroll-root";
 
-const SCROLL_COMPACT_THRESHOLD = 36;
+/** Enter compact past this offset; leave only near the top (hysteresis).
+ * A single threshold let expand↔compact flicker when layout/scroll anchoring
+ * nudged `scrollTop` around the edge — felt like a bounce on return-to-top. */
+const SCROLL_COMPACT_ENTER = 36;
+const SCROLL_COMPACT_EXIT = 8;
 
 const classes = {
 	link: cn(
@@ -77,7 +81,11 @@ export const NavbarShell: FC<{ children: ReactNode }> = ({ children }) => {
 
 	useEffect(() => {
 		const update = () => {
-			setCompact(getScrollY() > SCROLL_COMPACT_THRESHOLD);
+			const y = getScrollY();
+			setCompact((prev) => {
+				if (prev) return y > SCROLL_COMPACT_EXIT;
+				return y > SCROLL_COMPACT_ENTER;
+			});
 		};
 		update();
 		return onScrollY(update, { passive: true });
