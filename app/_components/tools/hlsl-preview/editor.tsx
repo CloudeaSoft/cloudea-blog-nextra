@@ -3,6 +3,7 @@
 import Editor, { loader, type OnMount } from "@monaco-editor/react";
 import { useTheme } from "next-themes";
 import { useMounted } from "nextra/hooks";
+import { registerCsharpLanguage, CSHARP_GEOM_LANGUAGE_ID } from "./register-csharp";
 import { registerHlslLanguage } from "./register-hlsl";
 
 if (typeof window !== "undefined") {
@@ -24,10 +25,14 @@ export function CodeEditor({ value, onChange, label, language }: CodeEditorProps
 	const { resolvedTheme } = useTheme();
 	const mounted = useMounted();
 	const theme = mounted && resolvedTheme === "dark" ? "vs-dark" : "light";
+	const monacoLanguage = language === "csharp" ? CSHARP_GEOM_LANGUAGE_ID : "hlsl";
 
-	const handleMount: OnMount = (_editor, monaco) => {
-		if (language === "hlsl") {
-			registerHlslLanguage(monaco);
+	const handleMount: OnMount = (editor, monaco) => {
+		registerCsharpLanguage(monaco);
+		registerHlslLanguage(monaco);
+		const model = editor.getModel();
+		if (model) {
+			monaco.editor.setModelLanguage(model, monacoLanguage);
 		}
 	};
 
@@ -37,10 +42,14 @@ export function CodeEditor({ value, onChange, label, language }: CodeEditorProps
 			<div className="hlsl-editor__frame">
 				<Editor
 					height="100%"
-					language={language === "csharp" ? "csharp" : "hlsl"}
+					language={monacoLanguage}
 					theme={theme}
 					value={value}
 					onChange={(next) => onChange(next ?? "")}
+					beforeMount={(monaco) => {
+						registerCsharpLanguage(monaco);
+						registerHlslLanguage(monaco);
+					}}
 					onMount={handleMount}
 					options={{
 						fontSize: 13,
