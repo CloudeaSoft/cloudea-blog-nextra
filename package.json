@@ -17,8 +17,6 @@
 		"export": "next build && next export",
 		"lint": "eslint .",
 		"test": "vitest run",
-		"test:unit": "vitest run",
-		"test:watch": "vitest",
 		"test:visual": "playwright test",
 		"test:visual:update": "playwright test --update-snapshots=changed",
 		"typecheck": "tsc --noEmit"
