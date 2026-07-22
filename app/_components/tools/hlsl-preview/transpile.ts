@@ -35,7 +35,6 @@ const INTRINSIC_REPLACEMENTS: Array<[RegExp, string]> = [
 	[/\btex2Dlod\s*\(/g, "textureLod("],
 ];
 
-/** Strip HLSL semantics like `: SV_POSITION`, `: TEXCOORD0`. */
 function stripSemantics(source: string): string {
 	return source.replace(
 		/\s*:\s*(SV_[A-Za-z0-9_]+|POSITION|NORMAL|TANGENT|BINORMAL|COLOR[0-9]*|TEXCOORD[0-9]*|PSIZE|FOG|DEPTH|BLENDWEIGHT|BLENDINDICES)\b/gi,
@@ -43,7 +42,6 @@ function stripSemantics(source: string): string {
 	);
 }
 
-/** `saturate(x)` → `clamp(x, 0.0, 1.0)` with balanced parentheses. */
 function replaceSaturate(source: string): string {
 	const token = "saturate";
 	let result = "";
@@ -85,7 +83,6 @@ function replaceSaturate(source: string): string {
 	return result;
 }
 
-/** Naive `mul(a, b)` → `(a * b)` with balanced args. */
 function replaceMul(source: string): string {
 	const token = "mul";
 	let result = "";
@@ -152,37 +149,42 @@ function applyReplacements(source: string): string {
 const VERTEX_PREAMBLE = `#version 300 es
 precision highp float;
 
-in vec3 aPosition;
-in vec2 aUv;
-out vec2 vUv;
+in vec2 aPosition;
+in vec4 aColor;
+in vec3 aTexCoord;
+out vec4 vColor;
+out vec3 vTexCoord;
 
 uniform float iTime;
 uniform vec2 iResolution;
 uniform vec4 iMouse;
+uniform sampler2D iChannel0;
 
 `;
 
 const FRAGMENT_PREAMBLE = `#version 300 es
 precision highp float;
 
-in vec2 vUv;
+in vec4 vColor;
+in vec3 vTexCoord;
 out vec4 fragColor;
 
 uniform float iTime;
 uniform vec2 iResolution;
 uniform vec4 iMouse;
+uniform sampler2D iChannel0;
 
 `;
 
 const VERTEX_MAIN = `
 void main() {
-  gl_Position = vert(aPosition, aUv, vUv);
+  gl_Position = vert(aPosition, aColor, aTexCoord, vColor, vTexCoord);
 }
 `;
 
 const FRAGMENT_MAIN = `
 void main() {
-  fragColor = frag(vUv, gl_FragCoord.xy);
+  fragColor = frag(vColor, vTexCoord);
 }
 `;
 
@@ -196,12 +198,10 @@ function ensureEntryPoint(source: string, stage: ShaderStage): string | null {
 }
 
 /**
- * Transpile a constrained HLSL subset to GLSL ES 3.00.
+ * Transpile a constrained HLSL subset to GLSL ES 3.00 for custom meshes.
  *
- * Vertex must define: `float4 vert(float3 position, float2 uv, out float2 vUv)`
- * Fragment must define: `float4 frag(float2 vUv, float2 fragCoord)`
- *
- * Built-in uniforms: `iTime`, `iResolution`, `iMouse`.
+ * Vertex: `float4 vert(float2 position, float4 color, float3 texCoord, out float4 vColor, out float3 vTexCoord)`
+ * Fragment: `float4 frag(float4 vColor, float3 vTexCoord)`
  */
 export function transpileHlslToGlsl(
 	source: string,

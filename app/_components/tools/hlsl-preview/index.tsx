@@ -4,67 +4,98 @@ import { Icon } from "@iconify-icon/react";
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { PreviewCanvas, type PreviewCanvasHandle } from "./canvas";
+import { DEFAULT_CSHARP } from "./csharp/defaults";
+import { compileCsharp, type CsharpProgram } from "./csharp/runner";
+import { AssetStore } from "./csharp/runtime";
 import { DEFAULT_FRAGMENT_HLSL, DEFAULT_VERTEX_HLSL } from "./defaults";
-import { HlslEditor } from "./editor";
+import { CodeEditor } from "./editor";
+import { TexturePanel, type TextureItem } from "./texture-panel";
 import { transpileHlslToGlsl } from "./transpile";
 
 import "./hlsl-preview.css";
 
 export function HlslPreviewTool() {
+	const [csharpSource, setCsharpSource] = useState(DEFAULT_CSHARP);
 	const [vertexSource, setVertexSource] = useState(DEFAULT_VERTEX_HLSL);
 	const [fragmentSource, setFragmentSource] = useState(DEFAULT_FRAGMENT_HLSL);
+	const [textures, setTextures] = useState<TextureItem[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [status, setStatus] = useState("Ready");
 	const canvasRef = useRef<PreviewCanvasHandle>(null);
+	const assetsRef = useRef(new AssetStore());
+	const programRef = useRef<CsharpProgram | null>(null);
 
 	const compile = useCallback(() => {
 		const vs = transpileHlslToGlsl(vertexSource, "vertex");
 		if (!vs.ok) {
 			setError(vs.error);
-			setStatus("Transpile failed");
+			setStatus("HLSL transpile failed");
 			return;
 		}
 		const fs = transpileHlslToGlsl(fragmentSource, "fragment");
 		if (!fs.ok) {
 			setError(fs.error);
-			setStatus("Transpile failed");
+			setStatus("HLSL transpile failed");
 			return;
 		}
 
-		const compileError = canvasRef.current?.compile({
+		const shaderError = canvasRef.current?.compileShaders({
 			vertex: vs.glsl,
 			fragment: fs.glsl,
 		});
-		if (compileError) {
-			setError(compileError);
-			setStatus("Compile failed");
+		if (shaderError) {
+			setError(shaderError);
+			setStatus("Shader compile failed");
 			return;
 		}
 
+		const compiled = compileCsharp(csharpSource, assetsRef.current);
+		if (!compiled.ok) {
+			setError(compiled.error);
+			setStatus("C# transpile failed");
+			canvasRef.current?.setProgram(null);
+			programRef.current = null;
+			return;
+		}
+
+		programRef.current = compiled.program;
+		canvasRef.current?.setProgram(compiled.program);
 		setError(null);
 		setStatus("Running");
-	}, [vertexSource, fragmentSource]);
+	}, [csharpSource, vertexSource, fragmentSource]);
 
 	const reset = () => {
+		setCsharpSource(DEFAULT_CSHARP);
 		setVertexSource(DEFAULT_VERTEX_HLSL);
 		setFragmentSource(DEFAULT_FRAGMENT_HLSL);
 		setError(null);
-		window.setTimeout(() => {
-			const vs = transpileHlslToGlsl(DEFAULT_VERTEX_HLSL, "vertex");
-			const fs = transpileHlslToGlsl(DEFAULT_FRAGMENT_HLSL, "fragment");
-			if (!vs.ok || !fs.ok) return;
-			const compileError = canvasRef.current?.compile({
-				vertex: vs.glsl,
-				fragment: fs.glsl,
-			});
-			if (compileError) {
-				setError(compileError);
-				setStatus("Compile failed");
-				return;
-			}
-			setStatus("Running");
-		}, 0);
+		window.setTimeout(() => compile(), 0);
 	};
+
+	const handleAddTexture = (name: string, file: File, image: HTMLImageElement) => {
+		assetsRef.current.register(name);
+		canvasRef.current?.setTexture(name, image);
+		setTextures((prev) => {
+			const rest = prev.filter((item) => item.name !== name);
+			return [...rest, { name, fileName: file.name }];
+		});
+	};
+
+	const handleRemoveTexture = (name: string) => {
+		assetsRef.current.unregister(name);
+		canvasRef.current?.removeTexture(name);
+		setTextures((prev) => prev.filter((item) => item.name !== name));
+	};
+
+	const handleFrameError = useCallback((message: string) => {
+		if (!message) {
+			setError(null);
+			setStatus("Running");
+			return;
+		}
+		setError(`C# runtime: ${message}`);
+		setStatus("Runtime error");
+	}, []);
 
 	return (
 		<div className="hlsl-preview">
@@ -83,8 +114,10 @@ export function HlslPreviewTool() {
 					</Link>
 					<h1 className="hlsl-preview__title">HLSL Preview</h1>
 					<p className="hlsl-preview__desc">
-						Dual HLSL editors (vertex + fragment), subset transpile to GLSL ES
-						3.00, live WebGL2 preview. Not a full DXC / Unity ShaderLab runtime.
+						C# geometry (Terraria-like
+						{" "}
+						<code>DrawUserPrimitives</code>
+						) + HLSL vert/frag subset + local textures → WebGL2.
 					</p>
 				</div>
 				<div className="hlsl-preview__actions">
@@ -123,26 +156,44 @@ export function HlslPreviewTool() {
 
 			<div className="hlsl-preview__workspace">
 				<div className="hlsl-preview__editors">
-					<HlslEditor
-						label="Vertex — float4 vert(float3 position, float2 uv, out float2 vUv)"
-						value={vertexSource}
-						onChange={setVertexSource}
+					<CodeEditor
+						language="csharp"
+						label="C# geometry — void Draw(float time) / DrawUserPrimitives"
+						value={csharpSource}
+						onChange={setCsharpSource}
 					/>
-					<HlslEditor
-						label="Fragment — float4 frag(float2 vUv, float2 fragCoord)"
-						value={fragmentSource}
-						onChange={setFragmentSource}
-					/>
+					<div className="hlsl-preview__hlsl-pair">
+						<CodeEditor
+							language="hlsl"
+							label="HLSL vertex — vert(position, color, texCoord, out vColor, out vTexCoord)"
+							value={vertexSource}
+							onChange={setVertexSource}
+						/>
+						<CodeEditor
+							language="hlsl"
+							label="HLSL fragment — frag(vColor, vTexCoord)"
+							value={fragmentSource}
+							onChange={setFragmentSource}
+						/>
+					</div>
 				</div>
-				<div className="hlsl-preview__stage">
-					<PreviewCanvas
-						ref={canvasRef}
-						className="hlsl-preview__canvas"
-						onReady={compile}
+				<div className="hlsl-preview__side">
+					<div className="hlsl-preview__stage">
+						<PreviewCanvas
+							ref={canvasRef}
+							className="hlsl-preview__canvas"
+							onReady={compile}
+							onFrameError={handleFrameError}
+						/>
+						{error && (
+							<pre className="hlsl-preview__error">{error}</pre>
+						)}
+					</div>
+					<TexturePanel
+						textures={textures}
+						onAdd={handleAddTexture}
+						onRemove={handleRemoveTexture}
 					/>
-					{error && (
-						<pre className="hlsl-preview__error">{error}</pre>
-					)}
 				</div>
 			</div>
 
@@ -150,77 +201,71 @@ export function HlslPreviewTool() {
 				<summary>Dialect & builtins</summary>
 				<ul>
 					<li>
-						Entry points must be named
+						C# entry:
 						{" "}
-						<code>vert</code>
+						<code>Draw(time)</code>
+						. Helpers like
 						{" "}
-						and
+						<code>DrawRing</code>
 						{" "}
-						<code>frag</code>
-						{" "}
-						with the signatures shown above the editors.
+						are supported. Subset only — not a full C# / CLR runtime.
 					</li>
 					<li>
-						Types:
+						Geometry API:
 						{" "}
-						<code>float2/3/4</code>
-						, matrices,
-						{" "}
-						<code>int</code>
+						<code>Vector2</code>
 						,
 						{" "}
-						<code>uint</code>
+						<code>Color</code>
 						,
 						{" "}
-						<code>half</code>
+						<code>Vertex2D</code>
+						,
+						{" "}
+						<code>List&lt;Vertex2D&gt;</code>
+						,
+						{" "}
+						<code>PrimitiveType.TriangleStrip</code>
+						,
+						{" "}
+						<code>DrawUserPrimitives</code>
 						.
 					</li>
 					<li>
-						Intrinsics:
+						Textures:
 						{" "}
-						<code>lerp</code>
-						,
+						<code>Commons.ModAsset.Name.Value</code>
 						{" "}
-						<code>saturate</code>
-						,
+						maps to an imported image named
 						{" "}
-						<code>frac</code>
-						,
+						<code>Name</code>
+						. Bound as
 						{" "}
-						<code>mul</code>
-						,
+						<code>iChannel0</code>
 						{" "}
-						<code>tex2D</code>
-						,
-						{" "}
-						<code>ddx</code>
-						/
-						<code>ddy</code>
-						, …
+						in HLSL (
+						<code>tex2D(iChannel0, uv)</code>
+						).
 					</li>
 					<li>
-						Uniforms:
-						{" "}
-						<code>iTime</code>
-						{" "}
-						(s),
-						{" "}
-						<code>iResolution</code>
-						{" "}
-						(px),
-						{" "}
-						<code>iMouse</code>
-						{" "}
-						(xy + down).
-					</li>
-					<li>
-						Mesh: fullscreen quad; attributes
+						HLSL mesh attributes: pixel-space
 						{" "}
 						<code>position</code>
+						,
 						{" "}
-						(clip xy) and
+						<code>color</code>
+						,
 						{" "}
-						<code>uv</code>
+						<code>texCoord</code>
+						. Uniforms:
+						{" "}
+						<code>iTime</code>
+						,
+						{" "}
+						<code>iResolution</code>
+						,
+						{" "}
+						<code>iMouse</code>
 						.
 					</li>
 				</ul>

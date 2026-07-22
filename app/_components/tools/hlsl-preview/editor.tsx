@@ -13,19 +13,22 @@ if (typeof window !== "undefined") {
 	});
 }
 
-type HlslEditorProps = {
+type CodeEditorProps = {
 	value: string;
 	onChange: (value: string) => void;
 	label: string;
+	language: "hlsl" | "csharp";
 };
 
-export function HlslEditor({ value, onChange, label }: HlslEditorProps) {
+export function CodeEditor({ value, onChange, label, language }: CodeEditorProps) {
 	const { resolvedTheme } = useTheme();
 	const mounted = useMounted();
 	const theme = mounted && resolvedTheme === "dark" ? "vs-dark" : "light";
 
 	const handleMount: OnMount = (_editor, monaco) => {
-		registerHlslLanguage(monaco);
+		if (language === "hlsl") {
+			registerHlslLanguage(monaco);
+		}
 	};
 
 	return (
@@ -34,7 +37,7 @@ export function HlslEditor({ value, onChange, label }: HlslEditorProps) {
 			<div className="hlsl-editor__frame">
 				<Editor
 					height="100%"
-					language="hlsl"
+					language={language === "csharp" ? "csharp" : "hlsl"}
 					theme={theme}
 					value={value}
 					onChange={(next) => onChange(next ?? "")}
@@ -57,3 +60,6 @@ export function HlslEditor({ value, onChange, label }: HlslEditorProps) {
 		</div>
 	);
 }
+
+/** @deprecated use CodeEditor */
+export const HlslEditor = CodeEditor;

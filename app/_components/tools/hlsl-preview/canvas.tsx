@@ -6,6 +6,8 @@ import {
 	useImperativeHandle,
 	useRef,
 } from "react";
+import type { CsharpProgram } from "./csharp/runner";
+import { VERTEX_FLOATS, Vector2, type DrawCommand } from "./csharp/runtime";
 
 export type ShaderProgramSource = {
 	vertex: string;
@@ -13,23 +15,17 @@ export type ShaderProgramSource = {
 };
 
 export type PreviewCanvasHandle = {
-	compile: (source: ShaderProgramSource) => string | null;
+	compileShaders: (source: ShaderProgramSource) => string | null;
+	setProgram: (program: CsharpProgram | null) => void;
+	setTexture: (name: string, image: HTMLImageElement | ImageBitmap | null) => void;
+	removeTexture: (name: string) => void;
 };
 
 type PreviewCanvasProps = {
 	className?: string;
 	onReady?: () => void;
+	onFrameError?: (message: string) => void;
 };
-
-const QUAD_VERTS = new Float32Array([
-	// position xyz, uv
-	-1, -1, 0, 0, 0,
-	1, -1, 0, 1, 0,
-	-1, 1, 0, 0, 1,
-	-1, 1, 0, 0, 1,
-	1, -1, 0, 1, 0,
-	1, 1, 0, 1, 1,
-]);
 
 function createShader(
 	gl: WebGL2RenderingContext,
@@ -48,22 +44,52 @@ function createShader(
 	return { shader, log };
 }
 
+function createWhiteTexture(gl: WebGL2RenderingContext): WebGLTexture {
+	const texture = gl.createTexture()!;
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	gl.texImage2D(
+		gl.TEXTURE_2D,
+		0,
+		gl.RGBA,
+		1,
+		1,
+		0,
+		gl.RGBA,
+		gl.UNSIGNED_BYTE,
+		new Uint8Array([255, 255, 255, 255]),
+	);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+	return texture;
+}
+
 export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>(
-	function PreviewCanvas({ className, onReady }, ref) {
+	function PreviewCanvas({ className, onReady, onFrameError }, ref) {
 		const canvasRef = useRef<HTMLCanvasElement>(null);
 		const glRef = useRef<WebGL2RenderingContext | null>(null);
 		const programRef = useRef<WebGLProgram | null>(null);
 		const vaoRef = useRef<WebGLVertexArrayObject | null>(null);
+		const bufferRef = useRef<WebGLBuffer | null>(null);
+		const whiteTexRef = useRef<WebGLTexture | null>(null);
+		const texturesRef = useRef(new Map<string, WebGLTexture>());
+		const csharpRef = useRef<CsharpProgram | null>(null);
 		const onReadyRef = useRef(onReady);
+		const onFrameErrorRef = useRef(onFrameError);
 		onReadyRef.current = onReady;
+		onFrameErrorRef.current = onFrameError;
+
 		const uniformsRef = useRef<{
 			iTime: WebGLUniformLocation | null;
 			iResolution: WebGLUniformLocation | null;
 			iMouse: WebGLUniformLocation | null;
-		}>({ iTime: null, iResolution: null, iMouse: null });
+			iChannel0: WebGLUniformLocation | null;
+		}>({ iTime: null, iResolution: null, iMouse: null, iChannel0: null });
 		const mouseRef = useRef({ x: 0, y: 0, down: 0 });
 		const startRef = useRef(performance.now());
 		const rafRef = useRef(0);
+		const lastErrorRef = useRef<string | null>(null);
 
 		useEffect(() => {
 			const canvas = canvasRef.current;
@@ -72,31 +98,38 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 			const gl = canvas.getContext("webgl2", {
 				antialias: true,
 				alpha: false,
+				premultipliedAlpha: false,
 			});
 			if (!gl) {
 				onReadyRef.current?.();
 				return;
 			}
 			glRef.current = gl;
+			gl.enable(gl.BLEND);
+			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
 			const buffer = gl.createBuffer();
 			const vao = gl.createVertexArray();
+			bufferRef.current = buffer;
 			vaoRef.current = vao;
+			whiteTexRef.current = createWhiteTexture(gl);
+
 			gl.bindVertexArray(vao);
 			gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-			gl.bufferData(gl.ARRAY_BUFFER, QUAD_VERTS, gl.STATIC_DRAW);
-
-			const stride = 5 * 4;
+			const stride = VERTEX_FLOATS * 4;
 			gl.enableVertexAttribArray(0);
-			gl.vertexAttribPointer(0, 3, gl.FLOAT, false, stride, 0);
+			gl.vertexAttribPointer(0, 2, gl.FLOAT, false, stride, 0);
 			gl.enableVertexAttribArray(1);
-			gl.vertexAttribPointer(1, 2, gl.FLOAT, false, stride, 3 * 4);
+			gl.vertexAttribPointer(1, 4, gl.FLOAT, false, stride, 2 * 4);
+			gl.enableVertexAttribArray(2);
+			gl.vertexAttribPointer(2, 3, gl.FLOAT, false, stride, 6 * 4);
 			gl.bindVertexArray(null);
 
 			const onMove = (event: PointerEvent) => {
 				const rect = canvas.getBoundingClientRect();
-				mouseRef.current.x = event.clientX - rect.left;
-				mouseRef.current.y = rect.height - (event.clientY - rect.top);
+				const dpr = Math.min(window.devicePixelRatio || 1, 2);
+				mouseRef.current.x = (event.clientX - rect.left) * dpr;
+				mouseRef.current.y = (rect.height - (event.clientY - rect.top)) * dpr;
 			};
 			const onDown = (event: PointerEvent) => {
 				mouseRef.current.down = 1;
@@ -120,11 +153,40 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 				}
 			};
 
+			const drawCommands = (commands: DrawCommand[]) => {
+				const program = programRef.current;
+				if (!program || !buffer || !vao) return;
+				gl.useProgram(program);
+				gl.bindVertexArray(vao);
+				for (const command of commands) {
+					gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+					gl.bufferData(gl.ARRAY_BUFFER, command.data, gl.DYNAMIC_DRAW);
+
+					const tex
+						= (command.textureName
+							? texturesRef.current.get(command.textureName)
+							: null)
+						?? whiteTexRef.current;
+					gl.activeTexture(gl.TEXTURE0);
+					gl.bindTexture(gl.TEXTURE_2D, tex);
+					gl.uniform1i(uniformsRef.current.iChannel0, 0);
+
+					const mode
+						= command.mode === "triangle-strip" ? gl.TRIANGLE_STRIP : gl.TRIANGLES;
+					gl.drawArrays(mode, 0, command.vertexCount);
+				}
+				gl.bindVertexArray(null);
+			};
+
 			const frame = () => {
 				resize();
+				gl.viewport(0, 0, canvas.width, canvas.height);
+				gl.clearColor(0.06, 0.07, 0.09, 1);
+				gl.clear(gl.COLOR_BUFFER_BIT);
+
 				const program = programRef.current;
-				if (program) {
-					gl.viewport(0, 0, canvas.width, canvas.height);
+				const csharp = csharpRef.current;
+				if (program && csharp) {
 					gl.useProgram(program);
 					const t = (performance.now() - startRef.current) / 1000;
 					gl.uniform1f(uniformsRef.current.iTime, t);
@@ -135,19 +197,31 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 					);
 					gl.uniform4f(
 						uniformsRef.current.iMouse,
-						mouseRef.current.x * (window.devicePixelRatio || 1),
-						mouseRef.current.y * (window.devicePixelRatio || 1),
+						mouseRef.current.x,
+						mouseRef.current.y,
 						mouseRef.current.down,
 						0,
 					);
-					gl.bindVertexArray(vao);
-					gl.drawArrays(gl.TRIANGLES, 0, 6);
-					gl.bindVertexArray(null);
-				} else {
-					gl.viewport(0, 0, canvas.width, canvas.height);
-					gl.clearColor(0.08, 0.09, 0.11, 1);
-					gl.clear(gl.COLOR_BUFFER_BIT);
+					try {
+						const commands = csharp.runFrame({
+							iTime: t,
+							iResolution: new Vector2(canvas.width, canvas.height),
+							iMouse: { ...mouseRef.current },
+						});
+						drawCommands(commands);
+						if (lastErrorRef.current) {
+							lastErrorRef.current = null;
+							onFrameErrorRef.current?.("");
+						}
+					} catch (error) {
+						const message = error instanceof Error ? error.message : String(error);
+						if (lastErrorRef.current !== message) {
+							lastErrorRef.current = message;
+							onFrameErrorRef.current?.(message);
+						}
+					}
 				}
+
 				rafRef.current = requestAnimationFrame(frame);
 			};
 			rafRef.current = requestAnimationFrame(frame);
@@ -161,20 +235,21 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 				if (programRef.current) gl.deleteProgram(programRef.current);
 				if (vao) gl.deleteVertexArray(vao);
 				if (buffer) gl.deleteBuffer(buffer);
+				if (whiteTexRef.current) gl.deleteTexture(whiteTexRef.current);
+				for (const tex of texturesRef.current.values()) gl.deleteTexture(tex);
+				texturesRef.current.clear();
 				glRef.current = null;
 				programRef.current = null;
 			};
 		}, []);
 
 		useImperativeHandle(ref, () => ({
-			compile(source: ShaderProgramSource) {
+			compileShaders(source: ShaderProgramSource) {
 				const gl = glRef.current;
 				if (!gl) return "WebGL2 is not available in this browser";
 
 				const vs = createShader(gl, gl.VERTEX_SHADER, source.vertex);
-				if (!vs.shader) {
-					return `Vertex compile error:\n${vs.log}`;
-				}
+				if (!vs.shader) return `Vertex compile error:\n${vs.log}`;
 				const fs = createShader(gl, gl.FRAGMENT_SHADER, source.fragment);
 				if (!fs.shader) {
 					gl.deleteShader(vs.shader);
@@ -190,7 +265,8 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 				gl.attachShader(program, vs.shader);
 				gl.attachShader(program, fs.shader);
 				gl.bindAttribLocation(program, 0, "aPosition");
-				gl.bindAttribLocation(program, 1, "aUv");
+				gl.bindAttribLocation(program, 1, "aColor");
+				gl.bindAttribLocation(program, 2, "aTexCoord");
 				gl.linkProgram(program);
 				gl.deleteShader(vs.shader);
 				gl.deleteShader(fs.shader);
@@ -207,9 +283,36 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 					iTime: gl.getUniformLocation(program, "iTime"),
 					iResolution: gl.getUniformLocation(program, "iResolution"),
 					iMouse: gl.getUniformLocation(program, "iMouse"),
+					iChannel0: gl.getUniformLocation(program, "iChannel0"),
 				};
 				startRef.current = performance.now();
 				return null;
+			},
+			setProgram(program) {
+				csharpRef.current = program;
+				startRef.current = performance.now();
+			},
+			setTexture(name, image) {
+				const gl = glRef.current;
+				if (!gl || !image) return;
+				let texture = texturesRef.current.get(name);
+				if (!texture) {
+					texture = gl.createTexture()!;
+					texturesRef.current.set(name, texture);
+				}
+				gl.bindTexture(gl.TEXTURE_2D, texture);
+				gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+			},
+			removeTexture(name) {
+				const gl = glRef.current;
+				const texture = texturesRef.current.get(name);
+				if (gl && texture) gl.deleteTexture(texture);
+				texturesRef.current.delete(name);
 			},
 		}));
 
