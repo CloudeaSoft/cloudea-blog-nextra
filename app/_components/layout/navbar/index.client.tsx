@@ -321,7 +321,7 @@ const MobileNavbarMenu: FC<{
 				aria-expanded={open}
 				className={cn(
 					classes.link,
-					"items-center flex gap-1.5 cursor-pointer focus:outline-none text-[1.1rem]! text-(--default-text-color)! hover:text-(--primary-color)!",
+					"w-full items-center justify-between flex cursor-pointer focus:outline-none text-[1.1rem]! text-(--default-text-color)! hover:text-(--primary-color)!",
 					className,
 				)}
 				onClick={() => setOpen((prev) => !prev)}
