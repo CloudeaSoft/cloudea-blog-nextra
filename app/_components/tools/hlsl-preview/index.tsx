@@ -9,15 +9,38 @@ import { compileCsharp, type CsharpProgram } from "./csharp/runner";
 import { AssetStore } from "./csharp/runtime";
 import { DEFAULT_FRAGMENT_HLSL, DEFAULT_VERTEX_HLSL } from "./defaults";
 import { CodeEditor } from "./editor";
+import { ParamSliderPanel, type DemoParam } from "./param-slider-panel";
 import { TexturePanel, type TextureItem } from "./texture-panel";
 import { transpileHlslToGlsl } from "./transpile";
 
 import "./hlsl-preview.css";
 
+const DEMO_CS_PARAMS: DemoParam[] = [
+	{ id: "wink", label: "wink", value: 1, min: 0, max: 1, step: 0.01 },
+	{ id: "radius", label: "radius", value: 120, min: 40, max: 200, step: 1 },
+	{ id: "spin", label: "spin", value: 0.1, min: -1, max: 1, step: 0.01 },
+];
+
+const DEMO_VS_PARAMS: DemoParam[] = [
+	{ id: "scale", label: "scale", value: 1, min: 0.5, max: 2, step: 0.01 },
+];
+
+const DEMO_PS_PARAMS: DemoParam[] = [
+	{ id: "intensity", label: "intensity", value: 1, min: 0, max: 2, step: 0.01 },
+	{ id: "tint", label: "tint", value: 0.5, min: 0, max: 1, step: 0.01 },
+];
+
+function updateParam(list: DemoParam[], id: string, value: number): DemoParam[] {
+	return list.map((param) => (param.id === id ? { ...param, value } : param));
+}
+
 export function HlslPreviewTool() {
 	const [csharpSource, setCsharpSource] = useState(DEFAULT_CSHARP);
 	const [vertexSource, setVertexSource] = useState(DEFAULT_VERTEX_HLSL);
 	const [fragmentSource, setFragmentSource] = useState(DEFAULT_FRAGMENT_HLSL);
+	const [csParams, setCsParams] = useState(DEMO_CS_PARAMS);
+	const [vsParams, setVsParams] = useState(DEMO_VS_PARAMS);
+	const [psParams, setPsParams] = useState(DEMO_PS_PARAMS);
 	const [textures, setTextures] = useState<TextureItem[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [status, setStatus] = useState("Ready");
@@ -68,6 +91,9 @@ export function HlslPreviewTool() {
 		setCsharpSource(DEFAULT_CSHARP);
 		setVertexSource(DEFAULT_VERTEX_HLSL);
 		setFragmentSource(DEFAULT_FRAGMENT_HLSL);
+		setCsParams(DEMO_CS_PARAMS);
+		setVsParams(DEMO_VS_PARAMS);
+		setPsParams(DEMO_PS_PARAMS);
 		setError(null);
 		window.setTimeout(() => compile(), 0);
 	};
@@ -114,10 +140,12 @@ export function HlslPreviewTool() {
 					</Link>
 					<h1 className="hlsl-preview__title">HLSL Preview</h1>
 					<p className="hlsl-preview__desc">
-						C# geometry (Terraria-like
+						Layout demo:
 						{" "}
-						<code>DrawUserPrimitives</code>
-						) + HLSL vert/frag subset + local textures → WebGL2.
+						<strong>C# / VS / PS</strong>
+						{" "}
+						editors on top, matching slider columns below. Sliders are
+						placeholders (not wired to runtime yet).
 					</p>
 				</div>
 				<div className="hlsl-preview__actions">
@@ -154,45 +182,65 @@ export function HlslPreviewTool() {
 				</div>
 			</header>
 
-			<div className="hlsl-preview__workspace">
-				<div className="hlsl-preview__editors">
+			<div className="hlsl-preview__preview-row">
+				<div className="hlsl-preview__stage">
+					<PreviewCanvas
+						ref={canvasRef}
+						className="hlsl-preview__canvas"
+						onReady={compile}
+						onFrameError={handleFrameError}
+					/>
+					{error && (
+						<pre className="hlsl-preview__error">{error}</pre>
+					)}
+				</div>
+				<TexturePanel
+					textures={textures}
+					onAdd={handleAddTexture}
+					onRemove={handleRemoveTexture}
+				/>
+			</div>
+
+			{/* 2×3 layout demo: editors row + sliders row */}
+			<div className="hlsl-preview__board">
+				<div className="hlsl-preview__board-row hlsl-preview__board-row--editors">
 					<CodeEditor
 						language="csharp"
-						label="C# geometry — void Draw(float time) / DrawUserPrimitives"
+						label="C# — geometry / Draw(time)"
 						value={csharpSource}
 						onChange={setCsharpSource}
 					/>
-					<div className="hlsl-preview__hlsl-pair">
-						<CodeEditor
-							language="hlsl"
-							label="HLSL vertex — vert(position, color, texCoord, out vColor, out vTexCoord)"
-							value={vertexSource}
-							onChange={setVertexSource}
-						/>
-						<CodeEditor
-							language="hlsl"
-							label="HLSL fragment — frag(vColor, vTexCoord)"
-							value={fragmentSource}
-							onChange={setFragmentSource}
-						/>
-					</div>
+					<CodeEditor
+						language="hlsl"
+						label="VS — vertex shader"
+						value={vertexSource}
+						onChange={setVertexSource}
+					/>
+					<CodeEditor
+						language="hlsl"
+						label="PS — pixel / fragment shader"
+						value={fragmentSource}
+						onChange={setFragmentSource}
+					/>
 				</div>
-				<div className="hlsl-preview__side">
-					<div className="hlsl-preview__stage">
-						<PreviewCanvas
-							ref={canvasRef}
-							className="hlsl-preview__canvas"
-							onReady={compile}
-							onFrameError={handleFrameError}
-						/>
-						{error && (
-							<pre className="hlsl-preview__error">{error}</pre>
-						)}
-					</div>
-					<TexturePanel
-						textures={textures}
-						onAdd={handleAddTexture}
-						onRemove={handleRemoveTexture}
+				<div className="hlsl-preview__board-row hlsl-preview__board-row--params">
+					<ParamSliderPanel
+						title="C# params"
+						hint="demo"
+						params={csParams}
+						onChange={(id, value) => setCsParams((p) => updateParam(p, id, value))}
+					/>
+					<ParamSliderPanel
+						title="VS params"
+						hint="demo"
+						params={vsParams}
+						onChange={(id, value) => setVsParams((p) => updateParam(p, id, value))}
+					/>
+					<ParamSliderPanel
+						title="PS params"
+						hint="demo"
+						params={psParams}
+						onChange={(id, value) => setPsParams((p) => updateParam(p, id, value))}
 					/>
 				</div>
 			</div>
@@ -201,72 +249,19 @@ export function HlslPreviewTool() {
 				<summary>Dialect & builtins</summary>
 				<ul>
 					<li>
-						C# entry:
+						Layout locked for demo:
 						{" "}
-						<code>Draw(time)</code>
-						. Helpers like
+						<code>C# | VS | PS</code>
 						{" "}
-						<code>DrawRing</code>
+						editors, then
 						{" "}
-						are supported. Subset only — not a full C# / CLR runtime.
+						<code>C# | VS | PS</code>
+						{" "}
+						slider columns.
 					</li>
 					<li>
-						Geometry API:
-						{" "}
-						<code>Vector2</code>
-						,
-						{" "}
-						<code>Color</code>
-						,
-						{" "}
-						<code>Vertex2D</code>
-						,
-						{" "}
-						<code>List&lt;Vertex2D&gt;</code>
-						,
-						{" "}
-						<code>PrimitiveType.TriangleStrip</code>
-						,
-						{" "}
-						<code>DrawUserPrimitives</code>
-						.
-					</li>
-					<li>
-						Textures:
-						{" "}
-						<code>Commons.ModAsset.Name.Value</code>
-						{" "}
-						maps to an imported image named
-						{" "}
-						<code>Name</code>
-						. Bound as
-						{" "}
-						<code>iChannel0</code>
-						{" "}
-						in HLSL (
-						<code>tex2D(iChannel0, uv)</code>
-						).
-					</li>
-					<li>
-						HLSL mesh attributes: pixel-space
-						{" "}
-						<code>position</code>
-						,
-						{" "}
-						<code>color</code>
-						,
-						{" "}
-						<code>texCoord</code>
-						. Uniforms:
-						{" "}
-						<code>iTime</code>
-						,
-						{" "}
-						<code>iResolution</code>
-						,
-						{" "}
-						<code>iMouse</code>
-						.
+						Slider wiring / `@param` scan comes next — values do not affect the
+						preview yet.
 					</li>
 				</ul>
 			</details>
