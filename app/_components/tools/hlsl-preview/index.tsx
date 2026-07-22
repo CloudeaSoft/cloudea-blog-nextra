@@ -133,15 +133,25 @@ export function HlslPreviewTool() {
 	) => {
 		const target = handle ?? canvasRef.current;
 		if (!target) return;
+		// Decode first so we never clear the previous GPU textures before
+		// replacements are ready (avoids a visible flash / broken bind).
+		const decoded: Array<{ name: string; image: HTMLImageElement }> = [];
+		for (const item of items) {
+			if (!item.dataUrl) continue;
+			try {
+				const image = await loadImageFromDataUrl(item.dataUrl);
+				decoded.push({ name: item.name, image });
+			} catch {
+				// Skip undecodable entries; keep previous GPU texture if any.
+			}
+		}
 		for (const name of assetsRef.current.list()) {
 			assetsRef.current.unregister(name);
 			target.removeTexture(name);
 		}
-		for (const item of items) {
-			if (!item.dataUrl) continue;
-			const image = await loadImageFromDataUrl(item.dataUrl);
-			assetsRef.current.register(item.name);
-			target.setTexture(item.name, image);
+		for (const entry of decoded) {
+			assetsRef.current.register(entry.name);
+			target.setTexture(entry.name, entry.image);
 		}
 	}, []);
 

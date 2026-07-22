@@ -326,7 +326,27 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 				}
 				gl.bindTexture(gl.TEXTURE_2D, texture);
 				gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+				try {
+					gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+					const err = gl.getError();
+					if (err !== gl.NO_ERROR) {
+						throw new Error(`texImage2D error ${err}`);
+					}
+				} catch {
+					// Fall back to a solid white texel if the bitmap is WebGL-incompatible
+					// (e.g. grayscale+alpha PNG placeholders).
+					gl.texImage2D(
+						gl.TEXTURE_2D,
+						0,
+						gl.RGBA,
+						1,
+						1,
+						0,
+						gl.RGBA,
+						gl.UNSIGNED_BYTE,
+						new Uint8Array([255, 255, 255, 255]),
+					);
+				}
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);

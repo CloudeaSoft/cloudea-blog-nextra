@@ -41,7 +41,14 @@ export function loadSnapshot(): PreviewSnapshot | null {
 		const raw = window.localStorage.getItem(SNAPSHOT_STORAGE_KEY);
 		if (!raw) return null;
 		const parsed: unknown = JSON.parse(raw);
-		return isPreviewSnapshot(parsed) ? parsed : null;
+		if (!isPreviewSnapshot(parsed)) return null;
+		return {
+			...parsed,
+			textures: parsed.textures.map((texture) => ({
+				...texture,
+				dataUrl: sanitizeTextureDataUrl(texture.dataUrl),
+			})),
+		};
 	} catch {
 		return null;
 	}
@@ -91,6 +98,14 @@ export function loadImageFromDataUrl(dataUrl: string): Promise<HTMLImageElement>
 	});
 }
 
-/** 1×1 white PNG data URL for default placeholders. */
+/** 1×1 opaque white PNG (RGBA color type 6 — WebGL-safe). */
 export const WHITE_PIXEL_DATA_URL
+	= "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR42mP4DwQACfsD/Wj6HMwAAAAASUVORK5CYII=";
+
+/** Legacy grayscale+alpha placeholder that WebGL rejects (`texImage2D: bad image data`). */
+const LEGACY_WHITE_PIXEL_DATA_URL
 	= "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5W6YQAAAAASUVORK5CYII=";
+
+export function sanitizeTextureDataUrl(dataUrl: string): string {
+	return dataUrl === LEGACY_WHITE_PIXEL_DATA_URL ? WHITE_PIXEL_DATA_URL : dataUrl;
+}
