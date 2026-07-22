@@ -38,7 +38,7 @@ const Banner = async () => {
 				alignItems: "center",
 			}}
 		>
-			<div className="flex flex-col gap-7.5 text-center text-[3rem] leading-[1.2] text-(--home-banner-text-color)">
+			<div className="flex w-full flex-col items-center gap-7.5 text-center text-[3rem] leading-[1.2] text-(--home-banner-text-color)">
 				<span>Hi! Here is Cloudea.</span>
 				<Hitokoto />
 			</div>
