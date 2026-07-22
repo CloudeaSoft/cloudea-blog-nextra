@@ -1,0 +1,219 @@
+.hlsl-preview {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.hlsl-preview__header {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 1rem 1.5rem;
+	animation: hlsl-fade-up 0.4s ease-out both;
+}
+
+.hlsl-preview__back {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	margin-bottom: 0.65rem;
+	color: var(--third-text-color);
+	text-decoration: none;
+	font-size: 0.9rem;
+}
+
+.hlsl-preview__back:hover {
+	color: var(--primary-color);
+}
+
+.hlsl-preview__title {
+	margin: 0;
+	font-size: 1.75rem;
+	font-weight: 600;
+	color: var(--first-text-color);
+}
+
+.hlsl-preview__desc {
+	margin: 0.55rem 0 0;
+	max-width: 42rem;
+	line-height: 1.55;
+	color: var(--third-text-color);
+}
+
+.hlsl-preview__actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem;
+	align-self: flex-start;
+}
+
+.hlsl-preview__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.45rem 0.85rem;
+	border-radius: 10px;
+	border: 1px solid var(--border-color);
+	background: var(--background-color-transparent-40);
+	color: var(--first-text-color);
+	font-size: 0.9rem;
+	cursor: pointer;
+	transition:
+		border-color 0.15s ease,
+		background 0.15s ease;
+}
+
+.hlsl-preview__btn:hover {
+	border-color: color-mix(in srgb, var(--primary-color) 40%, var(--border-color));
+}
+
+.hlsl-preview__btn--primary {
+	background: color-mix(in srgb, var(--primary-color) 88%, black);
+	border-color: transparent;
+	color: #fff;
+}
+
+.hlsl-preview__btn--primary:hover {
+	background: var(--primary-color);
+	border-color: transparent;
+}
+
+.hlsl-preview__status {
+	font-size: 0.85rem;
+	color: var(--third-text-color);
+}
+
+.hlsl-preview__status[data-ok="false"] {
+	color: #c23b3b;
+}
+
+.hlsl-preview__workspace {
+	display: grid;
+	grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+	gap: 0.85rem;
+	min-height: min(70vh, 720px);
+	animation: hlsl-fade-up 0.45s ease-out 0.05s both;
+}
+
+.hlsl-preview__editors {
+	display: grid;
+	grid-template-rows: 1fr 1fr;
+	gap: 0.75rem;
+	min-height: 0;
+}
+
+.hlsl-editor {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	overflow: hidden;
+	background: var(--background-color-transparent-40);
+}
+
+.hlsl-editor__label {
+	padding: 0.45rem 0.75rem;
+	font-size: 0.78rem;
+	line-height: 1.35;
+	color: var(--third-text-color);
+	border-bottom: 1px solid var(--border-color);
+	background: var(--background-color-transparent-15);
+}
+
+.hlsl-editor__frame {
+	flex: 1;
+	min-height: 180px;
+}
+
+.hlsl-editor__loading {
+	display: grid;
+	place-items: center;
+	height: 100%;
+	color: var(--third-text-color);
+	font-size: 0.9rem;
+}
+
+.hlsl-preview__stage {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-height: 280px;
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	overflow: hidden;
+	background: #111318;
+}
+
+.hlsl-preview__canvas {
+	flex: 1;
+	width: 100%;
+	min-height: 280px;
+	display: block;
+}
+
+.hlsl-preview__error {
+	margin: 0;
+	padding: 0.75rem 0.9rem;
+	max-height: 40%;
+	overflow: auto;
+	font-size: 0.78rem;
+	line-height: 1.45;
+	white-space: pre-wrap;
+	color: #ffb4b4;
+	background: rgba(80, 16, 16, 0.92);
+	border-top: 1px solid rgba(255, 120, 120, 0.35);
+}
+
+.hlsl-preview__dialect {
+	padding: 0.85rem 1rem;
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	background: var(--background-color-transparent-40);
+	color: var(--second-text-color, var(--third-text-color));
+	animation: hlsl-fade-up 0.45s ease-out 0.1s both;
+}
+
+.hlsl-preview__dialect summary {
+	cursor: pointer;
+	font-weight: 600;
+	color: var(--first-text-color);
+}
+
+.hlsl-preview__dialect ul {
+	margin: 0.75rem 0 0;
+	padding-left: 1.2rem;
+	line-height: 1.55;
+}
+
+.hlsl-preview__dialect code {
+	font-size: 0.85em;
+}
+
+@keyframes hlsl-fade-up {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (max-width: 1024px) {
+	.hlsl-preview__workspace {
+		grid-template-columns: 1fr;
+		min-height: 0;
+	}
+
+	.hlsl-preview__editors {
+		grid-template-rows: minmax(220px, 28vh) minmax(220px, 28vh);
+	}
+
+	.hlsl-preview__stage {
+		min-height: 240px;
+		aspect-ratio: 16 / 10;
+	}
+}
