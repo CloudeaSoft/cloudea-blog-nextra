@@ -101,7 +101,7 @@ export function TexturePanel({
 				{" "}
 				in C# (e.g.
 				{" "}
-				<code>GraphicsDevice.Textures[0] = Textures.RingSoft;</code>
+				<code>GraphicsDevice.Textures[0] = Textures.Ring;</code>
 				). Missing textures fall back to white.
 			</p>
 			{renameError && (

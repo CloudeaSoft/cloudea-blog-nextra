@@ -31,7 +31,7 @@ const DEMO_PS_PARAMS: DemoParam[] = [
 ];
 
 /** Names referenced by DEFAULT_CSHARP — also seeded in the Textures panel. */
-const DEFAULT_TEXTURE_NAMES = ["RingSoft", "RingColor", "RingInner"] as const;
+const DEFAULT_TEXTURE_NAMES = ["Ring"] as const;
 
 function makeDefaultTextureItems(): TextureItem[] {
 	return DEFAULT_TEXTURE_NAMES.map((name) => ({
