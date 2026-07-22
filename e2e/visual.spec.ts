@@ -59,7 +59,12 @@ async function gotoStable(page: Page, path: string) {
 		}
 	});
 
-	// Brief settle for layout after theme + fonts.
+	// Splash starts mounted and fades out after hydrate — wait until gone.
+	await page.waitForFunction(() => !document.querySelector(".loader-bg"), {
+		timeout: 5_000,
+	});
+
+	// Brief settle for layout after theme + fonts + splash.
 	await page.waitForTimeout(150);
 }
 
