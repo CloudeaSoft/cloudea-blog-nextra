@@ -29,6 +29,17 @@ body .navbar-header {
 	z-index: 50;
 }
 
+/*
+ * Nextra Search portals ComboboxOptions to <body> with `z-30`. The sticky
+ * header (and the mobile drawer inside it) sit in a z-50 stacking context, so
+ * results paint underneath: clipped by the glass bar on PC, fully hidden on
+ * mobile. Match the About-menu dropdown (`z-[60]`) and stay below Loading
+ * (9999).
+ */
+body .nextra-search-results {
+	z-index: 60;
+}
+
 body .navbar-bar {
 	--navbar-underline-inset: 0.6rem;
 	display: flex;

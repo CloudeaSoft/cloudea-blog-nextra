@@ -303,3 +303,106 @@ test.describe("navbar: mobile menu icon transition", () => {
 		});
 	});
 });
+
+/**
+ * Nextra portals `.nextra-search-results` to <body> (default z-30). The sticky
+ * header / mobile drawer use a z-50 stacking context, so without an override
+ * results paint underneath — clipped by the glass bar on desktop, fully
+ * hidden behind the drawer on mobile.
+ */
+test.describe("navbar: search results stacking", () => {
+	test.beforeEach(async ({ page }) => {
+		await prepare(page);
+	});
+
+	test("desktop results paint above the sticky navbar", async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== "desktop-chromium", "desktop only");
+
+		await gotoLight(page, "/");
+		await page.emulateMedia({ reducedMotion: "reduce" });
+
+		const search = page.locator(".navbar-bar .nextra-search input").first();
+		await search.click();
+		await search.fill("test");
+
+		const results = page.locator(".nextra-search-results");
+		await expect(results).toBeVisible();
+
+		const stacking = await page.evaluate(() => {
+			const panel = document.querySelector(".nextra-search-results");
+			const header = document.querySelector(".navbar-header");
+			if (!(panel instanceof HTMLElement) || !(header instanceof HTMLElement)) {
+				return null;
+			}
+			const panelZ = Number(getComputedStyle(panel).zIndex);
+			const headerZ = Number(getComputedStyle(header).zIndex);
+			const rr = panel.getBoundingClientRect();
+			const hr = header.getBoundingClientRect();
+			// Probe inside the panel, preferring the overlap with the sticky bar
+			// where a too-low z-index would let the header win hit-testing.
+			const y = Math.min(rr.top + 8, Math.max(hr.bottom - 2, rr.top + 2));
+			const x = rr.left + rr.width / 2;
+			const topEl = document.elementFromPoint(x, y);
+			return {
+				panelZ,
+				headerZ,
+				hitResults: !!(topEl && (topEl === panel || panel.contains(topEl))),
+				hitHeader: !!(topEl && (topEl === header || header.contains(topEl))),
+			};
+		});
+
+		expect(stacking).not.toBeNull();
+		expect(stacking!.panelZ).toBeGreaterThan(stacking!.headerZ);
+		expect(stacking!.hitResults).toBeTruthy();
+		expect(stacking!.hitHeader).toBeFalsy();
+	});
+
+	test("mobile results paint above the drawer", async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== "mobile-chromium", "mobile only");
+
+		await gotoLight(page, "/");
+		await page.emulateMedia({ reducedMotion: "reduce" });
+
+		await page.getByTestId("mobile-menu-button").click();
+		const drawer = page.getByTestId("mobile-nav-drawer");
+		await expect(drawer).toHaveAttribute("data-open", "true");
+
+		const search = drawer.locator(".nextra-search input");
+		await search.click();
+		await search.fill("test");
+
+		const results = page.locator(".nextra-search-results");
+		await expect(results).toBeVisible();
+
+		const stacking = await page.evaluate(() => {
+			const panel = document.querySelector(".nextra-search-results");
+			const drawerEl = document.querySelector(
+				"[data-testid='mobile-nav-drawer']",
+			);
+			if (!(panel instanceof HTMLElement) || !(drawerEl instanceof HTMLElement)) {
+				return null;
+			}
+			const panelZ = Number(getComputedStyle(panel).zIndex);
+			const drawerZ = Number(getComputedStyle(drawerEl).zIndex);
+			const rr = panel.getBoundingClientRect();
+			const x = rr.left + rr.width / 2;
+			const y = rr.top + Math.min(80, rr.height / 2);
+			const topEl = document.elementFromPoint(x, y);
+			return {
+				panelZ,
+				drawerZ,
+				inViewport: rr.width > 0 && rr.height > 0
+					&& rr.bottom > 0
+					&& rr.top < window.innerHeight,
+				hitResults: !!(topEl && (topEl === panel || panel.contains(topEl))),
+				hitDrawer: !!(topEl && drawerEl.contains(topEl) && !panel.contains(topEl)),
+			};
+		});
+
+		expect(stacking).not.toBeNull();
+		expect(stacking!.panelZ).toBeGreaterThan(stacking!.drawerZ);
+		expect(stacking!.inViewport).toBeTruthy();
+		expect(stacking!.hitResults).toBeTruthy();
+		expect(stacking!.hitDrawer).toBeFalsy();
+	});
+});
