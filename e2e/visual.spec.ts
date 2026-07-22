@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { scrollPage } from "./helpers";
 
 /**
  * Visual regression suite — screenshot baselines for layout/style changes.
@@ -87,7 +88,7 @@ test.describe("visual regression", () => {
 		await gotoStable(page, "/");
 
 		// BannerBlurTrigger enables blur when scrollY > 420.
-		await page.evaluate(() => window.scrollTo(0, 480));
+		await scrollPage(page, 480);
 		await page.waitForTimeout(300);
 
 		await expect

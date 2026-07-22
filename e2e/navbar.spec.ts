@@ -1,4 +1,5 @@
 import { expect, test, type Page, type Locator } from "@playwright/test";
+import { scrollPage } from "./helpers";
 
 /**
  * Navbar interaction coverage:
@@ -99,7 +100,7 @@ test.describe("navbar: scroll compact", () => {
 		await expect(bar).not.toHaveAttribute("data-compact");
 		await expect(bar).toHaveScreenshot("navbar-expanded.png");
 
-		await page.evaluate(() => window.scrollTo(0, 80));
+		await scrollPage(page, 80);
 		await expect(bar).toHaveAttribute("data-compact", "true");
 		await page.waitForTimeout(350); // height transition ~320ms
 		await expect(bar).toHaveScreenshot("navbar-compact.png");
@@ -114,7 +115,7 @@ test.describe("navbar: scroll compact", () => {
 		const bar = page.locator("nav.navbar-bar").first();
 		await expect(bar).not.toHaveAttribute("data-compact");
 
-		await page.evaluate(() => window.scrollTo(0, 80));
+		await scrollPage(page, 80);
 		await page.waitForTimeout(100);
 		await expect(bar).not.toHaveAttribute("data-compact");
 	});

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { usePathname } from "next/navigation";
 import { backgroundBlurAtom } from "@/stores/background";
+import { getScrollY, onScrollY } from "@/utils/scroll-root";
 
 /** Roughly when the home greeting has scrolled out of view. */
 const HOME_BLUR_SCROLL_Y = 420;
@@ -23,15 +24,11 @@ export function BannerBlurTrigger() {
 		}
 
 		const update = () => {
-			setBlurred(window.scrollY > HOME_BLUR_SCROLL_Y);
+			setBlurred(getScrollY() > HOME_BLUR_SCROLL_Y);
 		};
 
 		update();
-		window.addEventListener("scroll", update, { passive: true });
-		return () => {
-			window.removeEventListener("scroll", update);
-			setBlurred(false);
-		};
+		return onScrollY(update, { passive: true });
 	}, [pathname, setBlurred]);
 
 	return null;
