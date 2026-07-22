@@ -30,6 +30,36 @@ const DEMO_PS_PARAMS: DemoParam[] = [
 	{ id: "tint", label: "tint", value: 0.5, min: 0, max: 1, step: 0.01 },
 ];
 
+/** Names referenced by DEFAULT_CSHARP — also seeded in the Textures panel. */
+const DEFAULT_TEXTURE_NAMES = ["RingSoft", "RingColor", "RingInner"] as const;
+
+function makeDefaultTextureItems(): TextureItem[] {
+	return DEFAULT_TEXTURE_NAMES.map((name) => ({
+		id: `default-${name}`,
+		name,
+		fileName: "(placeholder white)",
+	}));
+}
+
+function createWhiteImage(): Promise<HTMLImageElement> {
+	return new Promise((resolve, reject) => {
+		const canvas = document.createElement("canvas");
+		canvas.width = 1;
+		canvas.height = 1;
+		const ctx = canvas.getContext("2d");
+		if (!ctx) {
+			reject(new Error("2D canvas unavailable"));
+			return;
+		}
+		ctx.fillStyle = "#ffffff";
+		ctx.fillRect(0, 0, 1, 1);
+		const image = new Image();
+		image.onload = () => resolve(image);
+		image.onerror = () => reject(new Error("Failed to create white placeholder"));
+		image.src = canvas.toDataURL("image/png");
+	});
+}
+
 function updateParam(list: DemoParam[], id: string, value: number): DemoParam[] {
 	return list.map((param) => (param.id === id ? { ...param, value } : param));
 }
@@ -48,12 +78,23 @@ export function HlslPreviewTool() {
 	const [csParams, setCsParams] = useState(DEMO_CS_PARAMS);
 	const [vsParams, setVsParams] = useState(DEMO_VS_PARAMS);
 	const [psParams, setPsParams] = useState(DEMO_PS_PARAMS);
-	const [textures, setTextures] = useState<TextureItem[]>([]);
+	const [textures, setTextures] = useState<TextureItem[]>(() => makeDefaultTextureItems());
 	const [error, setError] = useState<string | null>(null);
 	const [status, setStatus] = useState("Ready");
 	const canvasRef = useRef<PreviewCanvasHandle>(null);
 	const assetsRef = useRef(new AssetStore());
 	const programRef = useRef<CsharpProgram | null>(null);
+	const defaultsSeededRef = useRef(false);
+
+	const seedDefaultTextures = useCallback(async (handle?: PreviewCanvasHandle | null) => {
+		const target = handle ?? canvasRef.current;
+		const white = await createWhiteImage();
+		for (const name of DEFAULT_TEXTURE_NAMES) {
+			assetsRef.current.register(name);
+			target?.setTexture(name, white);
+		}
+		setTextures(makeDefaultTextureItems());
+	}, []);
 
 	const compile = useCallback(() => {
 		const vs = transpileHlslToGlsl(vertexSource, "vertex");
@@ -101,8 +142,14 @@ export function HlslPreviewTool() {
 		setCsParams(DEMO_CS_PARAMS);
 		setVsParams(DEMO_VS_PARAMS);
 		setPsParams(DEMO_PS_PARAMS);
-		setError(null);
-		window.setTimeout(() => compile(), 0);
+		for (const item of textures) {
+			assetsRef.current.unregister(item.name);
+			canvasRef.current?.removeTexture(item.name);
+		}
+		void seedDefaultTextures().then(() => {
+			setError(null);
+			compile();
+		});
 	};
 
 	const handleAddTexture = (name: string, file: File, image: HTMLImageElement) => {
@@ -215,7 +262,16 @@ export function HlslPreviewTool() {
 					<PreviewCanvas
 						ref={canvasRef}
 						className="hlsl-preview__canvas"
-						onReady={compile}
+						onReady={() => {
+							const boot = async () => {
+								if (!defaultsSeededRef.current) {
+									defaultsSeededRef.current = true;
+									await seedDefaultTextures(canvasRef.current);
+								}
+								compile();
+							};
+							void boot();
+						}}
 						onFrameError={handleFrameError}
 					/>
 					{error && (
