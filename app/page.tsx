@@ -1,5 +1,6 @@
 import PostsPage from "@/app/_components/posts/post-list";
 import { Hitokoto } from "@/app/_components/home/hitokoto";
+import { bannerGreetingFont } from "@/app/_components/home/font";
 import { BannerBlurTrigger } from "@/app/_components/home/banner-blur-trigger";
 import { Github } from "@/app/_components/layout/navbar/github";
 import { Email } from "@/app/_components/layout/navbar/email";
@@ -38,8 +39,10 @@ const Banner = async () => {
 				alignItems: "center",
 			}}
 		>
-			<div className="flex flex-col gap-7.5 text-center text-[3rem] leading-[1.2] text-(--home-banner-text-color)">
-				<span>Hi! Here is Cloudea.</span>
+			<div className="banner-copy flex w-full flex-col items-center gap-7.5 text-center text-(--home-banner-text-color)">
+				<span className={cn("banner-greeting", bannerGreetingFont.className)}>
+					Hi! Here is Cloudea.
+				</span>
 				<Hitokoto />
 			</div>
 			<BannerBlurTrigger />

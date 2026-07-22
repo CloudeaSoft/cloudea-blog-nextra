@@ -1,4 +1,6 @@
+import cn from "clsx";
 import { GetHitokoto } from "@/utils/hitokoto";
+import { bannerHitokotoFont } from "./font";
 import { TypingEffect } from "./typing-effect";
 
 export const Hitokoto = async () => {
@@ -9,9 +11,12 @@ export const Hitokoto = async () => {
 
 	const text = hito.hitokoto;
 	return (
-		<span data-testid="hitokoto">
+		<span
+			data-testid="hitokoto"
+			className="banner-hitokoto block w-[80%]"
+		>
 			<TypingEffect
-				className="text-[1.25rem]"
+				className={cn("banner-hitokoto__text", bannerHitokotoFont.className)}
 				text={text}
 			/>
 		</span>
