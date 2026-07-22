@@ -4,7 +4,7 @@ Intentional changes kept after the mobile Chrome UA-chrome / background-jump wor
 
 1. **Scrollport** — Document scroll moved to `.app-scroll` (`html`/`body` `overflow: hidden`) so mobile Chrome is less likely to retract its address bar. Scroll listeners and e2e helpers use `[data-scroll-root]`.
 2. **Fixed wallpaper** — Background layer height is `100lvh` (stable) instead of `100dvh`, so `background-size: cover` does not reflow when UA chrome toggles.
-3. **Loading splash** — Dismisses on `load` **or** a ~1.6s timeout, then unmounts after fade (hung analytics / tunnel HMR can no longer trap it).
+3. **Loading splash** — Still waits for `window.load` / `readyState === "complete"` (no early timeout). Vertical text layout was cleaned up separately.
 4. **Visual baselines** — Playwright snapshots refreshed for the scrollport layout; screenshots wait for `.loader-bg` to unmount.
 
 Corrections on top of that:

@@ -11,45 +11,33 @@ const mPlusRounded1c = M_PLUS_Rounded_1c({
 	subsets: ["latin"],
 });
 
-/** Hard cap so a hung deferred script (e.g. analytics) cannot trap the splash. */
-const LOADING_FALLBACK_MS = 1600;
-
 export const Loading = () => {
 	const [isLoading, setIsLoading] = useState(true);
-	const [gone, setGone] = useState(false);
-
 	useEffect(() => {
-		let finished = false;
-		const finish = () => {
-			if (finished) return;
-			finished = true;
-			setIsLoading(false);
-		};
+		// 在客户端执行
+		if (typeof window !== "undefined") {
+			// 如果页面已经加载完成，则直接设置加载状态为 false
+			if (document.readyState === "complete") {
+				setIsLoading(false);
+				return;
+			}
 
-		if (document.readyState === "complete") {
-			finish();
-		} else {
-			window.addEventListener("load", finish, { once: true });
+			// 监听 window.onload 事件
+			const handleLoad = () => {
+				setIsLoading(false);
+			};
+
+			window.addEventListener("load", handleLoad);
+
+			// 组件卸载时移除事件监听
+			return () => {
+				window.removeEventListener("load", handleLoad);
+			};
 		}
-
-		const timeout = window.setTimeout(finish, LOADING_FALLBACK_MS);
-
-		return () => {
-			window.removeEventListener("load", finish);
-			window.clearTimeout(timeout);
-		};
 	}, []);
 
-	if (gone) return null;
-
 	return (
-		<div
-			className={cn("loader-bg", { "fade-out": !isLoading })}
-			onAnimationEnd={(event) => {
-				if (event.target !== event.currentTarget) return;
-				if (!isLoading) setGone(true);
-			}}
-		>
+		<div className={cn("loader-bg", { "fade-out": !isLoading })}>
 			<p
 				id="loading"
 				className={mPlusRounded1c.className}

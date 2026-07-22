@@ -59,10 +59,16 @@ async function gotoStable(page: Page, path: string) {
 		}
 	});
 
-	// Splash starts mounted and fades out after hydrate — wait until gone.
-	await page.waitForFunction(() => !document.querySelector(".loader-bg"), {
-		timeout: 5_000,
-	});
+	// Splash stays mounted and only fades out after `window.load`.
+	await page.waitForFunction(() => {
+		const splash = document.querySelector(".loader-bg");
+		if (!splash) return true;
+		const style = getComputedStyle(splash);
+		return (
+			splash.classList.contains("fade-out")
+			&& (style.visibility === "hidden" || style.opacity === "0")
+		);
+	}, { timeout: 10_000 });
 
 	// Brief settle for layout after theme + fonts + splash.
 	await page.waitForTimeout(150);
