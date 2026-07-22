@@ -71,16 +71,39 @@ function isNavItemActive(page: PageItem | MenuItem, pathname: string): boolean {
 	return isPathActive(getNavHref(page), pathname);
 }
 
+/** Matches Tailwind `lg` / CSS where PC nav links appear. */
+const DESKTOP_NAV_MQ = "(min-width: 1024px)";
+
 export const NavbarShell: FC<{ children: ReactNode }> = ({ children }) => {
 	const [compact, setCompact] = useState(false);
 
+	// Compact shrink is a PC-only affordance. On mobile Chrome-like browsers,
+	// shrinking the bar while the UA chrome also retracts makes the fixed
+	// cover background appear to jump; keep the site navbar height stable.
 	useEffect(() => {
+		const media = window.matchMedia(DESKTOP_NAV_MQ);
 		const update = () => {
+			if (!media.matches) {
+				setCompact(false);
+				return;
+			}
 			setCompact(window.scrollY > SCROLL_COMPACT_THRESHOLD);
 		};
 		update();
 		window.addEventListener("scroll", update, { passive: true });
-		return () => window.removeEventListener("scroll", update);
+		// Safari < 14 / iOS < 14: MediaQueryList is not an EventTarget.
+		if (typeof media.addEventListener === "function") {
+			media.addEventListener("change", update);
+			return () => {
+				window.removeEventListener("scroll", update);
+				media.removeEventListener("change", update);
+			};
+		}
+		media.addListener(update);
+		return () => {
+			window.removeEventListener("scroll", update);
+			media.removeListener(update);
+		};
 	}, []);
 
 	return (

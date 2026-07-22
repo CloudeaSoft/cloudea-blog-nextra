@@ -27,7 +27,9 @@ const Banner = async () => {
 	return (
 		<div
 			style={{
-				height: "calc(100dvh - 4rem)",
+				// `svh` stays locked to the chrome-visible viewport so the hero
+				// does not grow/jump when mobile browser UI retracts on scroll.
+				height: "calc(100svh - 4rem)",
 				position: "relative",
 				display: "flex",
 				width: "100%",

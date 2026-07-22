@@ -104,6 +104,20 @@ test.describe("navbar: scroll compact", () => {
 		await page.waitForTimeout(350); // height transition ~320ms
 		await expect(bar).toHaveScreenshot("navbar-compact.png");
 	});
+
+	test("mobile stays expanded after scroll", async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== "mobile-chromium", "mobile only");
+
+		await gotoLight(page, "/");
+		await page.emulateMedia({ reducedMotion: "reduce" });
+
+		const bar = page.locator("nav.navbar-bar").first();
+		await expect(bar).not.toHaveAttribute("data-compact");
+
+		await page.evaluate(() => window.scrollTo(0, 80));
+		await page.waitForTimeout(100);
+		await expect(bar).not.toHaveAttribute("data-compact");
+	});
 });
 
 test.describe("navbar: mobile drawer slide", () => {
