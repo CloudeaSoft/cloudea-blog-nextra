@@ -81,6 +81,7 @@ export default defineConfig([
 						"e2e/*.ts",
 					],
 					defaultProject: "tsconfig.json",
+					maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 16,
 				},
 				tsconfigRootDir: import.meta.dirname,
 				sourceType: "module",
