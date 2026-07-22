@@ -222,6 +222,35 @@ test.describe("navbar: desktop menu dismiss", () => {
 	});
 });
 
+test.describe("navbar: mobile nested menu", () => {
+	test.beforeEach(async ({ page }) => {
+		await prepare(page);
+	});
+
+	test("About submenu starts expanded and toggles on click", async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== "mobile-chromium", "mobile only");
+
+		await gotoLight(page, "/");
+		await page.getByTestId("mobile-menu-button").click();
+
+		const drawer = page.getByTestId("mobile-nav-drawer");
+		const submenu = drawer.getByTestId("mobile-nav-submenu");
+		const aboutButton = submenu.getByRole("button", { name: /About/i });
+		const friendsLink = submenu.getByRole("link", { name: "Friends" });
+
+		await expect(submenu).toHaveAttribute("data-open", "true");
+		await expect(friendsLink).toBeVisible();
+
+		await aboutButton.click();
+		await expect(submenu).not.toHaveAttribute("data-open", "true");
+		await expect(friendsLink).toHaveCount(0);
+
+		await aboutButton.click();
+		await expect(submenu).toHaveAttribute("data-open", "true");
+		await expect(friendsLink).toBeVisible();
+	});
+});
+
 test.describe("navbar: mobile menu icon transition", () => {
 	test.beforeEach(async ({ page }) => {
 		await prepare(page);
