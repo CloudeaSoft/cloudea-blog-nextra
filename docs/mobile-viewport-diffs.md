@@ -11,4 +11,4 @@ Corrections on top of that:
 
 5. **Home banner height** — Was `100svh - 4rem`, shorter than the app scrollport, so posts peeked under the first screen. Now `100cqh - var(--navbar-height)` against `.app-scroll` (`container-type: size`).
 6. **Navbar compact on mobile** — Temporarily gated to `min-width: 1024px`; restored for all viewports.
-7. **Navbar spacer in flex scrollport** — `.navbar-header` only contains a `position: fixed` bar, so as a flex child it was `flex-shrink`’d to 0 height and the banner started under the overlay. Fixed with `flex-shrink: 0`.
+7. **Navbar spacer in flex scrollport** — `.navbar-header` must keep an in-flow height (`flex-shrink: 0`) so the banner does not start under the bar. The glass bar itself is sticky inside `.app-scroll` (not viewport-`fixed`) so it does not cover the scrollport’s native scrollbar.

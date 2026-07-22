@@ -2,10 +2,13 @@
  * Compact applies on all viewports (scrollport is `.app-scroll`).
  * `body …` prefixes beat the global `body *` color-only transition rule.
  *
- * Layout spacer (`.navbar-header`) and `--navbar-height` stay at 4rem so
- * scroll-compact only reshapes the fixed glass bar. Shrinking the in-flow
- * spacer used to reflow the scrollport when expanding at the top — one bounce
- * every time you scrolled back up. TOC `top` still tracks the visual bar. */
+ * Stick the header inside `.app-scroll` (not `position: fixed` on the
+ * viewport). A viewport-fixed bar paints over the scrollport’s native
+ * scrollbar; sticky stays in the scrollport’s content box so the gutter
+ * remains usable. `--navbar-height` / `.navbar-header` stay at 4rem so
+ * scroll-compact only reshapes the glass bar — shrinking the in-flow box
+ * used to reflow the scrollport when expanding at the top. TOC `top`
+ * still tracks the visual bar height. */
 
 body {
 	--navbar-height: 4rem;
@@ -21,6 +24,9 @@ body:has(.navbar-header[data-compact]) {
 body .navbar-header {
 	height: var(--navbar-height);
 	flex-shrink: 0;
+	position: sticky;
+	top: 0;
+	z-index: 50;
 }
 
 body .navbar-bar {
@@ -28,11 +34,7 @@ body .navbar-bar {
 	display: flex;
 	justify-content: center;
 	height: var(--navbar-bar-height);
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	z-index: 50;
+	width: 100%;
 	background: linear-gradient(
 		120deg,
 		rgba(247, 135, 54, 0.208) 0%,
