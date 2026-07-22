@@ -1,7 +1,8 @@
-export const DEFAULT_CSHARP = `void Draw(float time)
+export const DEFAULT_CSHARP = `// @param wink = 1.0 min=0 max=1 step=0.01
+void Draw(float time)
 {
     Vector2 center = new Vector2(iResolution.x * 0.5f, iResolution.y * 0.5f);
-    DrawRing(center, time, 1.0f);
+    DrawRing(center, time, wink);
 }
 
 void DrawRing(Vector2 drawCenter, float timeValue, float wink)
