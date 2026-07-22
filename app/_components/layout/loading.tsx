@@ -49,26 +49,12 @@ export const Loading = () => {
 				if (event.target !== event.currentTarget) return;
 				if (!isLoading) setGone(true);
 			}}
-			style={{
-				position: "fixed",
-				background: "white",
-				zIndex: 9999,
-				width: "100%",
-				height: "100%",
-			}}
 		>
 			<p
 				id="loading"
 				className={mPlusRounded1c.className}
 			>
-				<span>
-					その歌声は
-					<span style={{ display: "inline-block", marginRight: "-0.3rem" }}>
-						、
-					</span>
-					春風と共に
-				</span>
-				──
+				その歌声は、春風と共に──
 			</p>
 			<div className="loading-bg">
 				<CloudeaImage
