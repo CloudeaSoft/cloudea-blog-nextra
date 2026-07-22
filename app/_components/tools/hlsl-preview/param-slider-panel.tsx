@@ -16,7 +16,7 @@ type ParamSliderPanelProps = {
 	onChange: (id: string, value: number) => void;
 };
 
-/** Layout-demo slider panel (values not yet wired into compile/runtime). */
+/** Slider panel driven by `// @param` annotations. */
 export function ParamSliderPanel({
 	title,
 	hint,
@@ -31,7 +31,13 @@ export function ParamSliderPanel({
 			</header>
 			{params.length === 0
 				? (
-					<p className="param-panel__empty">No params — layout demo placeholders</p>
+					<p className="param-panel__empty">
+						No
+						{" "}
+						<code>@param</code>
+						{" "}
+						in this editor
+					</p>
 				)
 				: (
 					<ul className="param-panel__list">

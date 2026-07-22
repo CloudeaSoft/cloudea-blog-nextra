@@ -10,22 +10,37 @@ import { AssetStore } from "./csharp/runtime";
 import { DEFAULT_FRAGMENT_HLSL, DEFAULT_VERTEX_HLSL } from "./defaults";
 import { CodeEditor } from "./editor";
 import { ParamSliderPanel, type DemoParam } from "./param-slider-panel";
+import { parseParamAnnotations, paramsToRecord } from "./parse-params";
 import { TexturePanel, type TextureItem } from "./texture-panel";
 import { transpileHlslToGlsl } from "./transpile";
 
 import "./hlsl-preview.css";
 
-const DEMO_CS_PARAMS: DemoParam[] = [
-	{ id: "wink", label: "wink", value: 1, min: 0, max: 1, step: 0.01 },
-];
+function paramsFromSource(source: string): DemoParam[] {
+	return parseParamAnnotations(source).map((param) => ({
+		id: param.name,
+		label: param.name,
+		value: param.value,
+		min: param.min,
+		max: param.max,
+		step: param.step,
+	}));
+}
 
-const DEMO_VS_PARAMS: DemoParam[] = [
-	{ id: "scale", label: "scale", value: 1, min: 0.5, max: 2, step: 0.01 },
-];
-
-const DEMO_PS_PARAMS: DemoParam[] = [
-	{ id: "intensity", label: "intensity", value: 1, min: 0, max: 2, step: 0.01 },
-];
+function mergeParsedParams(
+	parsed: ReturnType<typeof parseParamAnnotations>,
+	previous: DemoParam[],
+): DemoParam[] {
+	const prevMap = new Map(previous.map((param) => [param.id, param.value]));
+	return parsed.map((param) => ({
+		id: param.name,
+		label: param.name,
+		value: prevMap.has(param.name) ? prevMap.get(param.name)! : param.value,
+		min: param.min,
+		max: param.max,
+		step: param.step,
+	}));
+}
 
 /** Names referenced by DEFAULT_CSHARP — also seeded in the Textures panel. */
 const DEFAULT_TEXTURE_NAMES = ["Ring"] as const;
@@ -72,9 +87,9 @@ export function HlslPreviewTool() {
 	const [csharpSource, setCsharpSource] = useState(DEFAULT_CSHARP);
 	const [vertexSource, setVertexSource] = useState(DEFAULT_VERTEX_HLSL);
 	const [fragmentSource, setFragmentSource] = useState(DEFAULT_FRAGMENT_HLSL);
-	const [csParams, setCsParams] = useState(DEMO_CS_PARAMS);
-	const [vsParams, setVsParams] = useState(DEMO_VS_PARAMS);
-	const [psParams, setPsParams] = useState(DEMO_PS_PARAMS);
+	const [csParams, setCsParams] = useState(() => paramsFromSource(DEFAULT_CSHARP));
+	const [vsParams, setVsParams] = useState(() => paramsFromSource(DEFAULT_VERTEX_HLSL));
+	const [psParams, setPsParams] = useState(() => paramsFromSource(DEFAULT_FRAGMENT_HLSL));
 	const [textures, setTextures] = useState<TextureItem[]>(() => makeDefaultTextureItems());
 	const [error, setError] = useState<string | null>(null);
 	const [status, setStatus] = useState("Ready");
@@ -82,6 +97,12 @@ export function HlslPreviewTool() {
 	const assetsRef = useRef(new AssetStore());
 	const programRef = useRef<CsharpProgram | null>(null);
 	const defaultsSeededRef = useRef(false);
+	const csParamsRef = useRef(csParams);
+	const vsParamsRef = useRef(vsParams);
+	const psParamsRef = useRef(psParams);
+	csParamsRef.current = csParams;
+	vsParamsRef.current = vsParams;
+	psParamsRef.current = psParams;
 
 	const seedDefaultTextures = useCallback(async (handle?: PreviewCanvasHandle | null) => {
 		const target = handle ?? canvasRef.current;
@@ -91,6 +112,20 @@ export function HlslPreviewTool() {
 			target?.setTexture(name, white);
 		}
 		setTextures(makeDefaultTextureItems());
+	}, []);
+
+	const applyLiveParams = useCallback((
+		nextCs: DemoParam[],
+		nextVs: DemoParam[],
+		nextPs: DemoParam[],
+	) => {
+		const csRecord = paramsToRecord(nextCs);
+		const shaderRecord = {
+			...paramsToRecord(nextVs),
+			...paramsToRecord(nextPs),
+		};
+		programRef.current?.setParams(csRecord);
+		canvasRef.current?.setShaderParams(shaderRecord);
 	}, []);
 
 	const compile = useCallback(() => {
@@ -107,17 +142,37 @@ export function HlslPreviewTool() {
 			return;
 		}
 
+		const nextVs = mergeParsedParams(vs.params, vsParamsRef.current);
+		const nextPs = mergeParsedParams(fs.params, psParamsRef.current);
+		const nextCs = mergeParsedParams(
+			parseParamAnnotations(csharpSource),
+			csParamsRef.current,
+		);
+		setVsParams(nextVs);
+		setPsParams(nextPs);
+		setCsParams(nextCs);
+
+		const shaderParams = {
+			...paramsToRecord(nextVs),
+			...paramsToRecord(nextPs),
+		};
 		const shaderError = canvasRef.current?.compileShaders({
 			vertex: vs.glsl,
 			fragment: fs.glsl,
+			paramNames: [...vs.params, ...fs.params].map((param) => param.name),
 		});
 		if (shaderError) {
 			setError(shaderError);
 			setStatus("Shader compile failed");
 			return;
 		}
+		canvasRef.current?.setShaderParams(shaderParams);
 
-		const compiled = compileCsharp(csharpSource, assetsRef.current);
+		const compiled = compileCsharp(
+			csharpSource,
+			assetsRef.current,
+			paramsToRecord(nextCs),
+		);
 		if (!compiled.ok) {
 			setError(compiled.error);
 			setStatus("C# transpile failed");
@@ -136,9 +191,9 @@ export function HlslPreviewTool() {
 		setCsharpSource(DEFAULT_CSHARP);
 		setVertexSource(DEFAULT_VERTEX_HLSL);
 		setFragmentSource(DEFAULT_FRAGMENT_HLSL);
-		setCsParams(DEMO_CS_PARAMS);
-		setVsParams(DEMO_VS_PARAMS);
-		setPsParams(DEMO_PS_PARAMS);
+		setCsParams(paramsFromSource(DEFAULT_CSHARP));
+		setVsParams(paramsFromSource(DEFAULT_VERTEX_HLSL));
+		setPsParams(paramsFromSource(DEFAULT_FRAGMENT_HLSL));
 		for (const item of textures) {
 			assetsRef.current.unregister(item.name);
 			canvasRef.current?.removeTexture(item.name);
@@ -146,6 +201,30 @@ export function HlslPreviewTool() {
 		void seedDefaultTextures().then(() => {
 			setError(null);
 			compile();
+		});
+	};
+
+	const onCsParamChange = (id: string, value: number) => {
+		setCsParams((prev) => {
+			const next = updateParam(prev, id, value);
+			applyLiveParams(next, vsParamsRef.current, psParamsRef.current);
+			return next;
+		});
+	};
+
+	const onVsParamChange = (id: string, value: number) => {
+		setVsParams((prev) => {
+			const next = updateParam(prev, id, value);
+			applyLiveParams(csParamsRef.current, next, psParamsRef.current);
+			return next;
+		});
+	};
+
+	const onPsParamChange = (id: string, value: number) => {
+		setPsParams((prev) => {
+			const next = updateParam(prev, id, value);
+			applyLiveParams(csParamsRef.current, vsParamsRef.current, next);
+			return next;
 		});
 	};
 
@@ -212,12 +291,11 @@ export function HlslPreviewTool() {
 					</Link>
 					<h1 className="hlsl-preview__title">HLSL Preview</h1>
 					<p className="hlsl-preview__desc">
-						Layout demo:
+						C# geometry + HLSL VS/PS with
 						{" "}
-						<strong>C# / VS / PS</strong>
+						<code>@param</code>
 						{" "}
-						editors on top, matching slider columns below. Sliders are
-						placeholders (not wired to runtime yet).
+						sliders. Drag sliders for live tweaks; Compile rescans annotations.
 					</p>
 				</div>
 				<div className="hlsl-preview__actions">
@@ -308,21 +386,18 @@ export function HlslPreviewTool() {
 				<div className="hlsl-preview__board-row hlsl-preview__board-row--params">
 					<ParamSliderPanel
 						title="C# params"
-						hint="demo"
 						params={csParams}
-						onChange={(id, value) => setCsParams((p) => updateParam(p, id, value))}
+						onChange={onCsParamChange}
 					/>
 					<ParamSliderPanel
 						title="VS params"
-						hint="demo"
 						params={vsParams}
-						onChange={(id, value) => setVsParams((p) => updateParam(p, id, value))}
+						onChange={onVsParamChange}
 					/>
 					<ParamSliderPanel
 						title="PS params"
-						hint="demo"
 						params={psParams}
-						onChange={(id, value) => setPsParams((p) => updateParam(p, id, value))}
+						onChange={onPsParamChange}
 					/>
 				</div>
 			</div>
@@ -342,6 +417,14 @@ export function HlslPreviewTool() {
 						slider columns.
 					</li>
 					<li>
+						Params:
+						{" "}
+						<code>// @param name = def min=… max=… step=…</code>
+						{" "}
+						in each editor; Compile scans them into the matching slider column.
+						Dragging sliders updates live (no recompile).
+					</li>
+					<li>
 						Textures: import images, edit the
 						{" "}
 						<code>XXXX</code>
@@ -353,10 +436,6 @@ export function HlslPreviewTool() {
 						{" "}
 						<code>GraphicsDevice.Textures[0] = Textures.XXXX;</code>
 						.
-					</li>
-					<li>
-						Slider wiring / `@param` scan comes next — values do not affect the
-						preview yet.
 					</li>
 				</ul>
 			</details>

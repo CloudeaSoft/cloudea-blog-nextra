@@ -12,11 +12,14 @@ import { VERTEX_FLOATS, Vector2, type DrawCommand } from "./csharp/runtime";
 export type ShaderProgramSource = {
 	vertex: string;
 	fragment: string;
+	/** VS+PS @param names to bind as float uniforms */
+	paramNames?: string[];
 };
 
 export type PreviewCanvasHandle = {
 	compileShaders: (source: ShaderProgramSource) => string | null;
 	setProgram: (program: CsharpProgram | null) => void;
+	setShaderParams: (params: Record<string, number>) => void;
 	setTexture: (name: string, image: HTMLImageElement | ImageBitmap | null) => void;
 	renameTexture: (oldName: string, newName: string) => void;
 	removeTexture: (name: string) => void;
@@ -76,6 +79,8 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 		const whiteTexRef = useRef<WebGLTexture | null>(null);
 		const texturesRef = useRef(new Map<string, WebGLTexture>());
 		const csharpRef = useRef<CsharpProgram | null>(null);
+		const shaderParamsRef = useRef<Record<string, number>>({});
+		const paramLocsRef = useRef(new Map<string, WebGLUniformLocation | null>());
 		const onReadyRef = useRef(onReady);
 		const onFrameErrorRef = useRef(onFrameError);
 		onReadyRef.current = onReady;
@@ -154,6 +159,14 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 				}
 			};
 
+			const applyShaderParams = () => {
+				for (const [name, loc] of paramLocsRef.current) {
+					if (!loc) continue;
+					const value = shaderParamsRef.current[name];
+					if (typeof value === "number") gl.uniform1f(loc, value);
+				}
+			};
+
 			const drawCommands = (commands: DrawCommand[]) => {
 				const program = programRef.current;
 				if (!program || !buffer || !vao) return;
@@ -203,6 +216,7 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 						mouseRef.current.down,
 						0,
 					);
+					applyShaderParams();
 					try {
 						const commands = csharp.runFrame({
 							iTime: t,
@@ -286,12 +300,21 @@ export const PreviewCanvas = forwardRef<PreviewCanvasHandle, PreviewCanvasProps>
 					iMouse: gl.getUniformLocation(program, "iMouse"),
 					iChannel0: gl.getUniformLocation(program, "iChannel0"),
 				};
+
+				const locs = new Map<string, WebGLUniformLocation | null>();
+				for (const name of source.paramNames ?? []) {
+					locs.set(name, gl.getUniformLocation(program, name));
+				}
+				paramLocsRef.current = locs;
 				startRef.current = performance.now();
 				return null;
 			},
 			setProgram(program) {
 				csharpRef.current = program;
 				startRef.current = performance.now();
+			},
+			setShaderParams(params) {
+				shaderParamsRef.current = { ...shaderParamsRef.current, ...params };
 			},
 			setTexture(name, image) {
 				const gl = glRef.current;

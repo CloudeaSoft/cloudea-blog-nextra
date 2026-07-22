@@ -1,7 +1,9 @@
+import { parseParamAnnotations } from "./parse-params";
+
 export type ShaderStage = "vertex" | "fragment";
 
 export type TranspileResult =
-	| { ok: true; glsl: string }
+	| { ok: true; glsl: string; params: ReturnType<typeof parseParamAnnotations> }
 	| { ok: false; error: string };
 
 const TYPE_REPLACEMENTS: Array<[RegExp, string]> = [
@@ -217,12 +219,19 @@ export function transpileHlslToGlsl(
 		return { ok: false, error: entryError };
 	}
 
+	const params = parseParamAnnotations(trimmed);
+	const paramUniforms = params
+		.map((param) => `uniform float ${param.name};`)
+		.join("\n");
+	const paramBlock = paramUniforms ? `${paramUniforms}\n\n` : "";
+
 	const body = applyReplacements(trimmed);
 	const preamble = stage === "vertex" ? VERTEX_PREAMBLE : FRAGMENT_PREAMBLE;
 	const epilogue = stage === "vertex" ? VERTEX_MAIN : FRAGMENT_MAIN;
 
 	return {
 		ok: true,
-		glsl: `${preamble}${body}\n${epilogue}`,
+		params,
+		glsl: `${preamble}${paramBlock}${body}\n${epilogue}`,
 	};
 }
