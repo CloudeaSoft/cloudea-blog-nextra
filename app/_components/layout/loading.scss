@@ -43,7 +43,10 @@
 	display: none;
 }
 
-.dark .loading-copy--dark,
+.dark .loading-copy--dark {
+	display: block;
+}
+
 .dark .loading-motif--dark {
 	display: block;
 }
@@ -54,9 +57,12 @@
 	z-index: -1;
 }
 
-.sakura-1,
-.leaf-1 {
+.sakura-1 {
 	animation: motif-spin 5s linear infinite;
+}
+
+.loading-leaves {
+	overflow: visible;
 }
 
 @keyframes motif-spin {

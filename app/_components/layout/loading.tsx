@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import "./loading.scss";
 import { CloudeaImage } from "@/app/_components/ui/image";
+import { LoadingLeaves } from "./loading-leaves";
 import { M_PLUS_Rounded_1c } from "next/font/google";
 import cn from "clsx";
 
@@ -66,14 +67,7 @@ export const Loading = () => {
 					height={240}
 					priority={true}
 				/>
-				<CloudeaImage
-					className="leaf-1 loading-motif loading-motif--dark"
-					src="loading-bg-dark.gif"
-					alt="leaf"
-					width={240}
-					height={240}
-					priority={true}
-				/>
+				<LoadingLeaves className="loading-motif loading-motif--dark loading-leaves" />
 			</div>
 		</div>
 	);
