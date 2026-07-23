@@ -1,4 +1,4 @@
-import { normalizeBasePath } from "./base-path";
+import { getBasePath } from "./env";
 
 export const getImageUrl = (path: string): string => {
 	if (!path) return "";
@@ -11,7 +11,7 @@ export const getImageUrl = (path: string): string => {
 		return path;
 	}
 
-	const basePath = normalizeBasePath(process.env.NEXT_PUBLIC_BASE_PATH);
+	const basePath = getBasePath();
 
 	if (path.startsWith("/images")) {
 		return `${basePath}${path}`;

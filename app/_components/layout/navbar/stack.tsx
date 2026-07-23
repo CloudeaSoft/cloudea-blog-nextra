@@ -1,12 +1,9 @@
 import Link from "next/link";
 import { CloudeaImage } from "@/app/_components/ui/image";
-import { normalizeBasePath } from "@/utils/base-path";
+import { getSiteUrl } from "@/utils/env";
 import { navbarFont } from "./font";
 
-const url =
-	(process.env.NEXT_PUBLIC_BASE_URL ?? "")
-	+ normalizeBasePath(process.env.NEXT_PUBLIC_BASE_PATH);
-const homeURL = new URL(url);
+const homeURL = new URL(getSiteUrl());
 
 export const Stack = () => {
 	return (
