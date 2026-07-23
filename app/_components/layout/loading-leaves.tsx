@@ -81,7 +81,7 @@ function SpinLayer({
 
 /**
  * Mixed-size / mixed-color leaflets with bases meeting at the center.
- * Two layers spin in opposite directions; each leaflet also breathes in scale.
+ * Three layers spin at different speeds/directions; each leaflet also breathes in scale.
  */
 export const LoadingLeaves = ({ className }: { className?: string }) => {
 	return (
@@ -119,7 +119,34 @@ export const LoadingLeaves = ({ className }: { className?: string }) => {
 					pulseDelay="-2.0s"
 				/>
 			</SpinLayer>
-			{/* Front — smaller, faster, lighter, offset angles */}
+			{/* Mid — medium size, mid speed, offset between the other rings */}
+			<SpinLayer duration="7.5s">
+				<Leaflet
+					fill="#3d8f5c"
+					scale={0.88}
+					rotate={80}
+					opacity={0.78}
+					pulseDur="3.3s"
+					pulseDelay="-0.7s"
+				/>
+				<Leaflet
+					fill="#4a7d5e"
+					scale={0.76}
+					rotate={200}
+					opacity={0.72}
+					pulseDur="3.8s"
+					pulseDelay="-1.9s"
+				/>
+				<Leaflet
+					fill="#367a50"
+					scale={0.84}
+					rotate={320}
+					opacity={0.8}
+					pulseDur="2.9s"
+					pulseDelay="-1.3s"
+				/>
+			</SpinLayer>
+			{/* Front — smaller, faster, lighter, reverse */}
 			<SpinLayer
 				duration="6s"
 				direction="reverse"
