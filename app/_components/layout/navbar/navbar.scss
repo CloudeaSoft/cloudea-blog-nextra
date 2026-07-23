@@ -340,8 +340,6 @@ body .mobile-nav-link[data-active="true"] :is(span, i, iconify-icon, svg) {
 body .mobile-nav-submenu__option[data-active="true"] {
 	color: var(--primary-color);
 	font-weight: 500;
-	border-radius: 0.55rem;
-	background: color-mix(in srgb, var(--primary-color) 10%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
