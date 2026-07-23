@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import "./loading.scss";
 import { CloudeaImage } from "@/app/_components/ui/image";
+import { LoadingLeaves } from "./loading-leaves";
 import { M_PLUS_Rounded_1c } from "next/font/google";
 import cn from "clsx";
 
@@ -40,19 +41,33 @@ export const Loading = () => {
 		<div className={cn("loader-bg", { "fade-out": !isLoading })}>
 			<p
 				id="loading"
-				className={mPlusRounded1c.className}
+				aria-hidden
+				className={cn(
+					mPlusRounded1c.className,
+					"loading-copy loading-copy--light",
+				)}
 			>
 				その歌声は、春風と共に──
 			</p>
+			<p
+				aria-hidden
+				className={cn(
+					mPlusRounded1c.className,
+					"loading-copy loading-copy--dark",
+				)}
+			>
+				その歌声は、夜風と共に──
+			</p>
 			<div className="loading-bg">
 				<CloudeaImage
-					className="sakura-1"
+					className="sakura-1 loading-motif loading-motif--light"
 					src="loading-bg.gif"
 					alt="sakura"
 					width={240}
 					height={240}
 					priority={true}
 				/>
+				<LoadingLeaves className="loading-motif loading-motif--dark loading-leaves" />
 			</div>
 		</div>
 	);
