@@ -30,6 +30,15 @@ export function getSiteUrl(): string {
 }
 
 /**
+ * In-app home href for Link components.
+ * Prefer a relative path so builds succeed when NEXT_PUBLIC_BASE_URL is unset
+ * (Cloudflare clone has no .env; Build Variables are easy to miss).
+ */
+export function getHomeHref(): string {
+	return getBasePath() || "/";
+}
+
+/**
  * Next.js `output` mode from `NEXT_OUTPUT`.
  *
  * - unset / `export` → static export (GitHub Pages, default)
