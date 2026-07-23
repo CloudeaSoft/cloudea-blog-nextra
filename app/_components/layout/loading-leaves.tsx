@@ -6,25 +6,49 @@ function Leaflet({
 	scale = 1,
 	rotate = 0,
 	opacity = 1,
+	pulseDur = "3.2s",
+	pulseDelay = "0s",
 }: {
 	fill: string;
 	scale?: number;
 	rotate?: number;
 	opacity?: number;
+	/** How long one breathe-in/out cycle takes. */
+	pulseDur?: string;
+	/** Stagger so leaflets don't pulse in sync. */
+	pulseDelay?: string;
 }) {
+	const min = +(scale * 0.72).toFixed(3);
+	const max = +(scale * 1.18).toFixed(3);
+
 	// Soft heart/clover leaflet (similar to the uploaded motif), tip pointing up.
+	// Outer group holds the fixed angle; inner group pulses scale from the base (0,0).
 	return (
-		<path
-			fill={fill}
-			opacity={opacity}
-			transform={`rotate(${rotate}) scale(${scale})`}
-			d="M0 0
-				C-10 -8, -38 -18, -42 -44
-				C-46 -68, -24 -86, 0 -98
-				C24 -86, 46 -68, 42 -44
-				C38 -18, 10 -8, 0 0
-				Z"
-		/>
+		<g transform={`rotate(${rotate})`}>
+			<g>
+				<animateTransform
+					attributeName="transform"
+					type="scale"
+					values={`${min};${max};${min}`}
+					keyTimes="0;0.5;1"
+					dur={pulseDur}
+					begin={pulseDelay}
+					repeatCount="indefinite"
+					calcMode="spline"
+					keySplines="0.45 0 0.55 1;0.45 0 0.55 1"
+				/>
+				<path
+					fill={fill}
+					opacity={opacity}
+					d="M0 0
+						C-10 -8, -38 -18, -42 -44
+						C-46 -68, -24 -86, 0 -98
+						C24 -86, 46 -68, 42 -44
+						C38 -18, 10 -8, 0 0
+						Z"
+				/>
+			</g>
+		</g>
 	);
 }
 
@@ -57,7 +81,7 @@ function SpinLayer({
 
 /**
  * Mixed-size / mixed-color leaflets with bases meeting at the center.
- * Two layers spin in opposite directions for an interlaced effect.
+ * Two layers spin in opposite directions; each leaflet also breathes in scale.
  */
 export const LoadingLeaves = ({ className }: { className?: string }) => {
 	return (
@@ -75,18 +99,24 @@ export const LoadingLeaves = ({ className }: { className?: string }) => {
 					scale={1.14}
 					rotate={0}
 					opacity={0.85}
+					pulseDur="3.6s"
+					pulseDelay="0s"
 				/>
 				<Leaflet
 					fill="#2a6b3f"
 					scale={0.9}
 					rotate={120}
 					opacity={0.8}
+					pulseDur="4.2s"
+					pulseDelay="-1.1s"
 				/>
 				<Leaflet
 					fill="#245c38"
 					scale={1.04}
 					rotate={240}
 					opacity={0.88}
+					pulseDur="3.1s"
+					pulseDelay="-2.0s"
 				/>
 			</SpinLayer>
 			{/* Front — smaller, faster, lighter, offset angles */}
@@ -99,18 +129,24 @@ export const LoadingLeaves = ({ className }: { className?: string }) => {
 					scale={0.72}
 					rotate={40}
 					opacity={0.75}
+					pulseDur="2.8s"
+					pulseDelay="-0.4s"
 				/>
 				<Leaflet
 					fill="#5a9a72"
 					scale={0.52}
 					rotate={160}
 					opacity={0.7}
+					pulseDur="3.4s"
+					pulseDelay="-1.6s"
 				/>
 				<Leaflet
 					fill="#6fa882"
 					scale={0.62}
 					rotate={280}
 					opacity={0.78}
+					pulseDur="2.5s"
+					pulseDelay="-0.9s"
 				/>
 			</SpinLayer>
 		</svg>
