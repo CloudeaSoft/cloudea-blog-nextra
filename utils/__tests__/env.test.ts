@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
 	getBasePath,
 	getBaseUrl,
+	getHomeHref,
 	getNextOutput,
 	getSiteUrl,
 	isStaticExport,
@@ -73,6 +74,18 @@ describe("env accessors", () => {
 
 		process.env.NEXT_PUBLIC_BASE_PATH = "/blog";
 		expect(getSiteUrl()).toBe("https://example.com/blog");
+	});
+
+	it("builds a relative home href without requiring BASE_URL", () => {
+		delete process.env.NEXT_PUBLIC_BASE_URL;
+		delete process.env.NEXT_PUBLIC_BASE_PATH;
+		expect(getHomeHref()).toBe("/");
+
+		process.env.NEXT_PUBLIC_BASE_PATH = "/";
+		expect(getHomeHref()).toBe("/");
+
+		process.env.NEXT_PUBLIC_BASE_PATH = "/blog";
+		expect(getHomeHref()).toBe("/blog");
 	});
 
 	it("defaults NEXT_OUTPUT to static export", () => {

@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { CloudeaImage } from "@/app/_components/ui/image";
-import { getSiteUrl } from "@/utils/env";
+import { getHomeHref } from "@/utils/env";
 import { navbarFont } from "./font";
 
-const homeURL = new URL(getSiteUrl());
+const homeHref = getHomeHref();
 
 export const Stack = () => {
 	return (
 		<Link
 			className={`navbar-brand ${navbarFont.className}`}
-			href={homeURL.toString()}
+			href={homeHref}
 		>
 			<CloudeaImage
 				className="navbar-brand__logo"
