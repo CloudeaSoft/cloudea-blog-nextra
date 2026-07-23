@@ -228,5 +228,17 @@ test.describe("friends: navigation", () => {
 
 		await page.waitForURL("**/friends");
 		await expect(page.getByRole("heading", { level: 1, name: "Friends" })).toBeVisible();
+
+		// About stays the active top-level item while on /friends; Friends is highlighted in the drawer.
+		await page.getByTestId("mobile-menu-button").click();
+		await expect(drawer).toHaveAttribute("data-open", "true");
+		await expect(
+			drawer.locator(".mobile-nav-link[data-active]"),
+		).toBeVisible();
+		await expect(
+			drawer.locator(".mobile-nav-submenu__option[data-active]", {
+				hasText: "Friends",
+			}),
+		).toBeVisible();
 	});
 });

@@ -325,6 +325,25 @@ body .mobile-nav-submenu[data-open] .mobile-nav-submenu__caret {
 	transform: rotate(90deg);
 }
 
+/* Mobile drawer: active route highlight (mirrors desktop primary-color cue).
+ * Must style nested spans/icons too: global `a, a i, a span` sets
+ * `--default-text-color` on children and would otherwise hide the active color. */
+body .mobile-nav-link[data-active="true"] {
+	color: var(--primary-color) !important;
+	font-weight: 500;
+	border-radius: 0.55rem;
+	background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+}
+
+body .mobile-nav-link[data-active="true"] :is(span, i, iconify-icon, svg) {
+	color: var(--primary-color) !important;
+}
+
+body .mobile-nav-submenu__option[data-active="true"] {
+	color: var(--primary-color);
+	font-weight: 500;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	body .mobile-nav-submenu__caret {
 		transition: none;

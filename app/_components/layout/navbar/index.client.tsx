@@ -314,8 +314,10 @@ const MobileNavbarMenu: FC<{
 	menu: MenuItem;
 	children: ReactNode;
 	className?: string;
-}> = ({ menu, children, className }) => {
+	active?: boolean;
+}> = ({ menu, children, className, active }) => {
 	const [open, setOpen] = useState(true);
+	const pathname = usePathname();
 	const items = getNavMenuEntries(menu);
 
 	return (
@@ -329,9 +331,10 @@ const MobileNavbarMenu: FC<{
 				aria-expanded={open}
 				className={cn(
 					classes.link,
-					"w-full items-center justify-between flex cursor-pointer focus:outline-none text-[1.1rem]! text-(--default-text-color)! hover:text-(--primary-color)!",
+					"mobile-nav-link w-full items-center justify-between flex cursor-pointer focus:outline-none text-[1.1rem]! hover:text-(--primary-color)!",
 					className,
 				)}
+				data-active={active || undefined}
 				onClick={() => setOpen((prev) => !prev)}
 			>
 				{children}
@@ -343,16 +346,21 @@ const MobileNavbarMenu: FC<{
 			{open
 				? (
 					<ul className="flex flex-col py-1 text-[1.1rem]!">
-						{items.map((item) => (
-							<li key={item.key}>
-								<Anchor
-									href={item.href}
-									className="block py-1.5 transition-colors ps-3 pe-9 text-gray-600 dark:text-gray-400"
-								>
-									{item.title}
-								</Anchor>
-							</li>
-						))}
+						{items.map((item) => {
+							const itemActive = isPathActive(item.href, pathname);
+							return (
+								<li key={item.key}>
+									<Anchor
+										href={item.href}
+										className="mobile-nav-submenu__option block py-1.5 transition-colors ps-3 pe-9 text-gray-600 dark:text-gray-400"
+										data-active={itemActive || undefined}
+										aria-current={itemActive ? "page" : undefined}
+									>
+										{item.title}
+									</Anchor>
+								</li>
+							);
+						})}
 					</ul>
 				)
 				: null}
@@ -451,6 +459,8 @@ export const MobileNavbar = ({
 					{topLevelNavbarItems.map((page) => {
 						const href = getNavHref(page);
 						if ("display" in page && page.display === "hidden") return;
+						const active = isNavItemActive(page, pathname);
+
 						if (page.type === "menu") {
 							return (
 								<li
@@ -461,6 +471,7 @@ export const MobileNavbar = ({
 									<MobileNavbarMenu
 										key={menu ? "drawer-open" : "drawer-closed"}
 										menu={page as MenuItem}
+										active={active}
 										className="py-1.5 px-2 flex flex-row items-center justify-between"
 									>
 										{page.title}
@@ -477,7 +488,9 @@ export const MobileNavbar = ({
 								<Anchor
 									href={href}
 									style={{ fontSize: "1.1rem" }}
-									className="py-1.5 px-2 flex flex-row items-center justify-between"
+									className="mobile-nav-link py-1.5 px-2 flex flex-row items-center justify-between"
+									data-active={active || undefined}
+									aria-current={active ? "page" : undefined}
 								>
 									{page.title}
 								</Anchor>
