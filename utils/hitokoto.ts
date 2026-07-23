@@ -1,7 +1,7 @@
 const HITOKOTO_URL = "https://v1.hitokoto.cn";
 
 /** Fixed quote used when building for visual regression (stable screenshots). */
-const VISUAL_FIXTURE: Hitokoto = {
+export const VISUAL_FIXTURE: Hitokoto = {
 	id: 0,
 	uuid: "visual-regression-fixture",
 	hitokoto: "意思が希望を生んで、希望が夢を育てて、夢が世界を変えるんだ",
@@ -15,12 +15,11 @@ const VISUAL_FIXTURE: Hitokoto = {
 };
 
 export const GetHitokoto = async (): Promise<Hitokoto | null> => {
-	if (process.env.VISUAL_REGRESSION === "1") {
-		return VISUAL_FIXTURE;
-	}
-
 	try {
-		const response = await fetch(HITOKOTO_URL);
+		const response = await fetch(HITOKOTO_URL, {
+			// Fresh quote on every client load (static export cannot re-fetch on the server).
+			cache: "no-store",
+		});
 		const data = await response.json();
 
 		if (data && typeof data === "object" && (data as Hitokoto).hitokoto) {

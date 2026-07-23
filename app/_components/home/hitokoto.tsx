@@ -1,24 +1,21 @@
-import cn from "clsx";
-import { GetHitokoto } from "@/utils/hitokoto";
+import { VISUAL_FIXTURE } from "@/utils/hitokoto";
 import { bannerHitokotoFont } from "./font";
-import { TypingEffect } from "./typing-effect";
+import { HitokotoClient } from "./hitokoto.client";
 
-export const Hitokoto = async () => {
-	const hito = await GetHitokoto();
-	if (!hito) {
-		return <></>;
-	}
+/**
+ * Static export freezes server fetches at build time, so the live quote is
+ * loaded on the client. Visual builds still inject a fixed string.
+ */
+export const Hitokoto = () => {
+	const initialText =
+		process.env.VISUAL_REGRESSION === "1"
+			? VISUAL_FIXTURE.hitokoto
+			: undefined;
 
-	const text = hito.hitokoto;
 	return (
-		<span
-			data-testid="hitokoto"
-			className="banner-hitokoto block w-[80%]"
-		>
-			<TypingEffect
-				className={cn("banner-hitokoto__text", bannerHitokotoFont.className)}
-				text={text}
-			/>
-		</span>
+		<HitokotoClient
+			fontClassName={bannerHitokotoFont.className}
+			initialText={initialText}
+		/>
 	);
 };
