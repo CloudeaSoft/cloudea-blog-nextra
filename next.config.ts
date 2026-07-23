@@ -1,5 +1,5 @@
 import nextra from "nextra";
-import { getBasePath } from "./utils/env";
+import { getBasePath, getNextOutput } from "./utils/env";
 
 const withNextra = nextra({
 	defaultShowCopyCode: true,
@@ -24,9 +24,10 @@ export default withNextra({
 	basePath: getBasePath(),
 	reactStrictMode: true,
 	cleanDistDir: true,
-	output: "export", // Enable when deploying to github page
+	output: getNextOutput(),
 	images: {
-		unoptimized: true, // Enable when deploying to github page
+		// Required for static export; kept for server builds until an image loader is wired.
+		unoptimized: true,
 	},
 	turbopack: {
 		resolveAlias: {
