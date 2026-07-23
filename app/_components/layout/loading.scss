@@ -88,10 +88,9 @@
 	animation: motif-spin-reverse 6s linear infinite;
 }
 
-/* Pulse from the shared root (viewBox origin = visual center). */
+/* Pulse from the shared root (canvas center 120,120). */
 .leaflet-pulse {
-	transform-box: view-box;
-	transform-origin: center;
+	transform-origin: 120px 120px;
 	animation: leaflet-pulse var(--leaflet-pulse-dur, 3.2s) ease-in-out
 		infinite;
 	animation-delay: var(--leaflet-pulse-delay, 0s);
@@ -119,12 +118,10 @@
 @keyframes leaflet-pulse {
 	0%,
 	100% {
-		transform: rotate(var(--leaflet-rotate, 0deg))
-			scale(var(--leaflet-scale-min, 0.8));
+		transform: scale(var(--leaflet-scale-min, 0.8));
 	}
 	50% {
-		transform: rotate(var(--leaflet-rotate, 0deg))
-			scale(var(--leaflet-scale-max, 1.1));
+		transform: scale(var(--leaflet-scale-max, 1.1));
 	}
 }
 

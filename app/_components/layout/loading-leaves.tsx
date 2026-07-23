@@ -10,7 +10,7 @@ type LeafletProps = {
 	pulseDelay?: string;
 };
 
-/** Heart-shaped clover leaflet; base sits at the SVG origin. */
+/** Heart-shaped clover leaflet; tip up, base at the canvas center (120,120). */
 function Leaflet({
 	fill,
 	scale = 1,
@@ -22,29 +22,32 @@ function Leaflet({
 	const min = +(scale * 0.72).toFixed(3);
 	const max = +(scale * 1.18).toFixed(3);
 
+	// SVG attribute keeps the fixed angle (reliable). CSS only pulses scale
+	// around the shared root so motion starts with the stylesheet.
 	return (
-		<g
-			className="leaflet-pulse"
-			style={
-				{
-					"--leaflet-rotate": `${rotate}deg`,
-					"--leaflet-scale-min": min,
-					"--leaflet-scale-max": max,
-					"--leaflet-pulse-dur": pulseDur,
-					"--leaflet-pulse-delay": pulseDelay,
-				} as CSSProperties
-			}
-		>
-			<path
-				fill={fill}
-				opacity={opacity}
-				d="M0 0
-					C-10 -8, -38 -18, -42 -44
-					C-46 -68, -24 -86, 0 -98
-					C24 -86, 46 -68, 42 -44
-					C38 -18, 10 -8, 0 0
-					Z"
-			/>
+		<g transform={`rotate(${rotate} 120 120)`}>
+			<g
+				className="leaflet-pulse"
+				style={
+					{
+						"--leaflet-scale-min": min,
+						"--leaflet-scale-max": max,
+						"--leaflet-pulse-dur": pulseDur,
+						"--leaflet-pulse-delay": pulseDelay,
+					} as CSSProperties
+				}
+			>
+				<path
+					fill={fill}
+					opacity={opacity}
+					d="M120 120
+						C110 112, 82 102, 78 76
+						C74 52, 96 34, 120 22
+						C144 34, 166 52, 162 76
+						C158 102, 130 112, 120 120
+						Z"
+				/>
+			</g>
 		</g>
 	);
 }
@@ -62,7 +65,7 @@ function LeafRing({ className, leaves }: RingProps) {
 	return (
 		<svg
 			className={className}
-			viewBox="-120 -120 240 240"
+			viewBox="0 0 240 240"
 			width={240}
 			height={240}
 			aria-hidden
