@@ -3,6 +3,13 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+  # Required by wrangler / @opennextjs/cloudflare (Workers runtime binary)
+  workerd: true
+  '@cloudflare/workerd-linux-64': true
+  '@cloudflare/workerd-darwin-64': true
+  '@cloudflare/workerd-darwin-arm64': true
+  '@cloudflare/workerd-windows-64': true
+  '@cloudflare/workerd-linux-arm64': true
 minimumReleaseAgeExclude:
   - '@typescript-eslint/eslint-plugin@8.65.0'
   - '@typescript-eslint/parser@8.65.0'
