@@ -62,7 +62,39 @@
 }
 
 .loading-leaves {
+	position: relative;
+	width: 240px;
+	height: 240px;
 	overflow: visible;
+}
+
+.leaves-ring {
+	position: absolute;
+	inset: 0;
+	overflow: visible;
+	transform-origin: center;
+	will-change: transform;
+}
+
+.leaves-ring--slow {
+	animation: motif-spin 10s linear infinite;
+}
+
+.leaves-ring--mid {
+	animation: motif-spin 7.5s linear infinite;
+}
+
+.leaves-ring--fast {
+	animation: motif-spin-reverse 6s linear infinite;
+}
+
+/* Pulse from the shared root (canvas center 120,120). */
+.leaflet-pulse {
+	transform-origin: 120px 120px;
+	animation: leaflet-pulse var(--leaflet-pulse-dur, 3.2s) ease-in-out
+		infinite;
+	animation-delay: var(--leaflet-pulse-delay, 0s);
+	will-change: transform;
 }
 
 @keyframes motif-spin {
@@ -71,6 +103,25 @@
 	}
 	to {
 		transform: rotate(360deg);
+	}
+}
+
+@keyframes motif-spin-reverse {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(-360deg);
+	}
+}
+
+@keyframes leaflet-pulse {
+	0%,
+	100% {
+		transform: scale(var(--leaflet-scale-min, 0.8));
+	}
+	50% {
+		transform: scale(var(--leaflet-scale-max, 1.1));
 	}
 }
 
