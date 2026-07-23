@@ -16,11 +16,11 @@
 		"postbuild": "pagefind --site .next/server/app --output-path out/_pagefind",
 		"export": "next build && next export",
 		"lint": "eslint .",
+		"test": "vitest run",
 		"test:visual": "playwright test",
-		"test:visual:update": "playwright test --update-snapshots",
+		"test:visual:update": "playwright test --update-snapshots=changed",
 		"typecheck": "tsc --noEmit"
 	},
-
 	"lint-staged": {
 		"*": "eslint --fix"
 	},
@@ -29,10 +29,12 @@
 		"@iconify-json/line-md": "^1.2.16",
 		"@iconify-json/mdi": "^1.2.3",
 		"@iconify-json/mdi-light": "^1.2.2",
+		"@monaco-editor/react": "^4.7.0",
 		"@tailwindcss/postcss": "^4.3.3",
 		"@vitejs/plugin-react": "^5.2.0",
 		"clsx": "^2.1.1",
 		"jotai": "^2.20.2",
+		"monaco-editor": "^0.56.0",
 		"next": "^16.2.10",
 		"next-themes": "^0.4.6",
 		"next-view-transitions": "^0.3.5",

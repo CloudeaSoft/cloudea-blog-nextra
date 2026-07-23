@@ -97,8 +97,8 @@ body .navbar-brand {
 
 @media (min-width: 1024px) {
 	body .navbar-brand {
-		padding: 0 3rem;
-		gap: 1.25rem;
+		padding: 0 clamp(1.25rem, 0.25rem + 2.5vw, 3rem);
+		gap: clamp(0.85rem, 0.45rem + 0.8vw, 1.25rem);
 	}
 }
 
@@ -116,14 +116,16 @@ body .navbar-brand__title {
 	font-weight: 700;
 	letter-spacing: 0.01em;
 	color: var(--first-text-color);
+	white-space: nowrap;
 	transition:
 		font-size 0.32s cubic-bezier(0.22, 1, 0.36, 1),
 		letter-spacing 0.32s ease;
 }
 
+/* Cap title size just above `lg` so it stays one line beside desktop nav. */
 @media (min-width: 1024px) {
 	body .navbar-brand__title {
-		font-size: 1.85rem;
+		font-size: clamp(1.4rem, 0.55rem + 1.35vw, 1.85rem);
 	}
 }
 
@@ -143,7 +145,7 @@ body .navbar-bar[data-compact] .navbar-brand__title {
 
 @media (min-width: 1024px) {
 	body .navbar-bar[data-compact] .navbar-brand__title {
-		font-size: 1.55rem;
+		font-size: clamp(1.3rem, 0.55rem + 1.05vw, 1.55rem);
 	}
 }
 

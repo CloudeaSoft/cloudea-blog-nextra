@@ -62,6 +62,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Unit tests
+        run: pnpm test
+
       - name: Setup Pages
         id: setup_pages
         uses: actions/configure-pages@v5
