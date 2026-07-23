@@ -4,23 +4,48 @@
 	z-index: 9999;
 	display: grid;
 	place-items: center;
-	background: white;
+	/* Follows :root / .dark --background-color so the splash matches theme
+	 * as soon as next-themes applies the class (before React hydration). */
+	background: var(--background-color, #fff);
 }
 
-#loading,
+.loading-copy,
 .loading-bg {
 	grid-area: 1 / 1;
 	user-select: none;
 }
 
-#loading {
+.loading-copy {
 	margin: 0;
 	font-size: 2.6rem;
 	line-height: 1.2;
-	color: #fc4792;
 	writing-mode: vertical-rl;
 	text-orientation: mixed;
 	text-align: center;
+}
+
+.loading-copy--light {
+	color: #fc4792;
+}
+
+.loading-copy--dark {
+	color: #8fbcab;
+}
+
+/* Theme swap via html.dark — no JS flash on first paint. */
+.loading-copy--dark,
+.loading-motif--dark {
+	display: none;
+}
+
+.dark .loading-copy--light,
+.dark .loading-motif--light {
+	display: none;
+}
+
+.dark .loading-copy--dark,
+.dark .loading-motif--dark {
+	display: block;
 }
 
 .loading-bg {
@@ -29,11 +54,12 @@
 	z-index: -1;
 }
 
-.sakura-1 {
-	animation: saku1 5s linear infinite;
+.sakura-1,
+.leaf-1 {
+	animation: motif-spin 5s linear infinite;
 }
 
-@keyframes saku1 {
+@keyframes motif-spin {
 	from {
 		transform: rotate(0deg);
 	}

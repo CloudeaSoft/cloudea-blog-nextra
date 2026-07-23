@@ -40,15 +40,36 @@ export const Loading = () => {
 		<div className={cn("loader-bg", { "fade-out": !isLoading })}>
 			<p
 				id="loading"
-				className={mPlusRounded1c.className}
+				aria-hidden
+				className={cn(
+					mPlusRounded1c.className,
+					"loading-copy loading-copy--light",
+				)}
 			>
 				その歌声は、春風と共に──
 			</p>
+			<p
+				aria-hidden
+				className={cn(
+					mPlusRounded1c.className,
+					"loading-copy loading-copy--dark",
+				)}
+			>
+				その歌声は、夜風と共に──
+			</p>
 			<div className="loading-bg">
 				<CloudeaImage
-					className="sakura-1"
+					className="sakura-1 loading-motif loading-motif--light"
 					src="loading-bg.gif"
 					alt="sakura"
+					width={240}
+					height={240}
+					priority={true}
+				/>
+				<CloudeaImage
+					className="leaf-1 loading-motif loading-motif--dark"
+					src="loading-bg-dark.gif"
+					alt="leaf"
 					width={240}
 					height={240}
 					priority={true}
