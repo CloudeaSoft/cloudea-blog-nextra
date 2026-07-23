@@ -16,9 +16,10 @@
 }
 
 .banner-hitokoto__text {
-	font-size: clamp(1.05rem, 0.9rem + 0.55vw, 1.35rem);
-	font-weight: 500;
-	letter-spacing: 0.08em;
-	line-height: 1.7;
-	opacity: 0.92;
+	/* Brush face reads larger; keep presence without crowding the greeting. */
+	font-size: clamp(1.25rem, 1.05rem + 0.75vw, 1.65rem);
+	font-weight: 400;
+	letter-spacing: 0.04em;
+	line-height: 1.85;
+	opacity: 0.94;
 }

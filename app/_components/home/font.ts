@@ -1,4 +1,4 @@
-import { M_PLUS_Rounded_1c, Noto_Serif_SC } from "next/font/google";
+import { M_PLUS_Rounded_1c, Ma_Shan_Zheng } from "next/font/google";
 
 /** Soft rounded brand face — same family as navbar / loading. */
 export const bannerGreetingFont = M_PLUS_Rounded_1c({
@@ -7,19 +7,17 @@ export const bannerGreetingFont = M_PLUS_Rounded_1c({
 });
 
 /**
- * Literary serif for hitokoto.
- * Noto Serif SC covers Simplified Chinese (and kana), unlike Shippori Mincho's
- * latin-only subset which left most CJK glyphs missing.
+ * Brush-script literary face for hitokoto — heavy, expansive calligraphy
+ * (对联 / 短句气质), with system CJK serifs for any missing glyphs.
  */
-export const bannerHitokotoFont = Noto_Serif_SC({
+export const bannerHitokotoFont = Ma_Shan_Zheng({
 	subsets: ["latin"],
-	weight: ["500"],
+	weight: ["400"],
 	display: "swap",
-	// Full CJK face is large — don't block first paint with a preload.
 	preload: false,
-	// Keep system CJK serifs in the cascade instead of a latin metric fallback.
 	adjustFontFallback: false,
 	fallback: [
+		"ZCOOL XiaoWei",
 		"Source Han Serif SC",
 		"Noto Serif CJK SC",
 		"Songti SC",
