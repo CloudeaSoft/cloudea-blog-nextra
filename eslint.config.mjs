@@ -79,6 +79,7 @@ export default defineConfig([
 						"postcss.config.mjs",
 						"playwright.config.ts",
 						"e2e/*.ts",
+						"scripts/*.mjs",
 					],
 					defaultProject: "tsconfig.json",
 					maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 16,

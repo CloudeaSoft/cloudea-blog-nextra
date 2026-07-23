@@ -1,3 +1,5 @@
+import { getBasePath } from "./env";
+
 export const getImageUrl = (path: string): string => {
 	if (!path) return "";
 
@@ -9,17 +11,19 @@ export const getImageUrl = (path: string): string => {
 		return path;
 	}
 
+	const basePath = getBasePath();
+
 	if (path.startsWith("/images")) {
-		return `${process.env.NEXT_PUBLIC_BASE_PATH || ""}${path}`;
+		return `${basePath}${path}`;
 	}
 
 	if (path.startsWith("images/")) {
-		return `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/${path}`;
+		return `${basePath}/${path}`;
 	}
 
 	if (path.startsWith("/")) {
-		return `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/images${path}`;
+		return `${basePath}/images${path}`;
 	}
 
-	return `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/images/${path}`;
+	return `${basePath}/images/${path}`;
 };
