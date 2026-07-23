@@ -19,6 +19,11 @@ const layerStyle: CSSProperties = {
 	top: 0,
 	height: "100lvh",
 	width: "100%",
+};
+
+const mediaStyle: CSSProperties = {
+	position: "absolute",
+	inset: 0,
 	background: "center no-repeat",
 	backgroundSize: "cover",
 };
@@ -39,22 +44,51 @@ export const Background = () => {
 				aria-hidden
 				className="site-background-layer"
 				data-blurred={blurred || undefined}
+				data-theme-layer="light"
 				style={{
 					...layerStyle,
-					backgroundImage: `url(${getImageUrl("wallhaven-wqery6-light.webp")})`,
 					opacity: isLight ? 1 : 0,
 				}}
-			></div>
+			>
+				<div
+					className="site-background-media"
+					style={{
+						...mediaStyle,
+						backgroundImage: `url(${getImageUrl("wallhaven-wqery6-light.webp")})`,
+					}}
+				/>
+			</div>
 			<div
 				aria-hidden
 				className="site-background-layer"
 				data-blurred={blurred || undefined}
+				data-theme-layer="dark"
 				style={{
 					...layerStyle,
-					backgroundImage: `url(${getImageUrl("wallhaven-wqery6-dark.webp")})`,
 					opacity: isLight ? 0 : 1,
 				}}
-			></div>
+			>
+				<div
+					className="site-background-media"
+					style={{
+						...mediaStyle,
+						backgroundImage: `url(${getImageUrl("wallhaven-wqery6-dark.webp")})`,
+					}}
+				/>
+			</div>
+			{/* Soft atmosphere on top of the wallpaper: mist + floating lights. */}
+			<div
+				aria-hidden
+				className="site-background-atmosphere"
+				data-blurred={blurred || undefined}
+				data-theme={isLight ? "light" : "dark"}
+			>
+				<span className="site-background-mist site-background-mist--a" />
+				<span className="site-background-mist site-background-mist--b" />
+				<span className="site-background-orb site-background-orb--1" />
+				<span className="site-background-orb site-background-orb--2" />
+				<span className="site-background-orb site-background-orb--3" />
+			</div>
 		</>
 	);
 };

@@ -1,6 +1,10 @@
-/* Soft blur when the home greeting has scrolled out of view. */
+/* Soft animated wallpaper: ken burns + drifting mist + floating orbs.
+ * Scroll-blur still lives on the outer layer so transform/filter don't clash
+ * with the media's ken-burns transform. */
 
 body .site-background-layer {
+	overflow: hidden;
+	pointer-events: none;
 	transition:
 		opacity 0.3s ease,
 		filter 0.55s cubic-bezier(0.22, 1, 0.36, 1),
@@ -14,4 +18,245 @@ body .site-background-layer[data-blurred] {
 	/* Scale up slightly so blur doesn't expose empty edges. */
 	filter: blur(14px);
 	transform: scale(1.06);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Ken Burns on the wallpaper itself                                          */
+/* -------------------------------------------------------------------------- */
+
+body .site-background-media {
+	will-change: transform;
+	transform-origin: 55% 40%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	body .site-background-media {
+		animation: site-bg-ken-burns 48s ease-in-out infinite alternate;
+	}
+
+	body .site-background-layer[data-blurred] .site-background-media {
+		/* Calm the drift once content takes focus. */
+		animation-duration: 90s;
+	}
+}
+
+@keyframes site-bg-ken-burns {
+	0% {
+		transform: scale(1) translate3d(0, 0, 0);
+	}
+	100% {
+		transform: scale(1.12) translate3d(-2.2%, 1.4%, 0);
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+/* Atmosphere overlay: mist sheets + soft light orbs                          */
+/* -------------------------------------------------------------------------- */
+
+body .site-background-atmosphere {
+	z-index: -1;
+	position: fixed;
+	top: 0;
+	height: 100lvh;
+	width: 100%;
+	overflow: hidden;
+	pointer-events: none;
+	opacity: 1;
+	filter: blur(0);
+	transition:
+		opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+		filter 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body .site-background-atmosphere[data-blurred] {
+	/* Soften with the wallpaper so mist doesn't stay razor-sharp. */
+	opacity: 0.28;
+	filter: blur(10px);
+}
+
+body .site-background-mist {
+	position: absolute;
+	inset: -20% -30%;
+	opacity: 0.45;
+	mix-blend-mode: soft-light;
+	will-change: transform, opacity;
+}
+
+body .site-background-atmosphere[data-theme="light"] .site-background-mist--a {
+	background:
+		radial-gradient(
+			ellipse 55% 40% at 20% 70%,
+			rgba(255, 214, 170, 0.55),
+			transparent 70%
+		),
+		radial-gradient(
+			ellipse 45% 35% at 75% 55%,
+			rgba(180, 220, 230, 0.35),
+			transparent 70%
+		);
+}
+
+body .site-background-atmosphere[data-theme="light"] .site-background-mist--b {
+	background:
+		radial-gradient(
+			ellipse 50% 30% at 60% 80%,
+			rgba(255, 255, 255, 0.4),
+			transparent 65%
+		),
+		radial-gradient(
+			ellipse 40% 28% at 30% 40%,
+			rgba(255, 196, 150, 0.3),
+			transparent 70%
+		);
+	opacity: 0.35;
+}
+
+body .site-background-atmosphere[data-theme="dark"] .site-background-mist--a {
+	background:
+		radial-gradient(
+			ellipse 55% 40% at 25% 65%,
+			rgba(90, 130, 180, 0.4),
+			transparent 70%
+		),
+		radial-gradient(
+			ellipse 40% 30% at 80% 40%,
+			rgba(140, 160, 200, 0.25),
+			transparent 70%
+		);
+}
+
+body .site-background-atmosphere[data-theme="dark"] .site-background-mist--b {
+	background:
+		radial-gradient(
+			ellipse 50% 28% at 55% 78%,
+			rgba(200, 220, 255, 0.18),
+			transparent 65%
+		),
+		radial-gradient(
+			ellipse 35% 25% at 15% 35%,
+			rgba(70, 100, 150, 0.3),
+			transparent 70%
+		);
+	opacity: 0.4;
+}
+
+body .site-background-orb {
+	position: absolute;
+	border-radius: 50%;
+	filter: blur(1px);
+	will-change: transform, opacity;
+}
+
+body .site-background-atmosphere[data-theme="light"] .site-background-orb {
+	background: radial-gradient(
+		circle,
+		rgba(255, 236, 200, 0.85) 0%,
+		rgba(255, 210, 160, 0.25) 45%,
+		transparent 70%
+	);
+}
+
+body .site-background-atmosphere[data-theme="dark"] .site-background-orb {
+	background: radial-gradient(
+		circle,
+		rgba(220, 235, 255, 0.75) 0%,
+		rgba(140, 180, 230, 0.2) 45%,
+		transparent 70%
+	);
+}
+
+body .site-background-orb--1 {
+	width: 10px;
+	height: 10px;
+	top: 22%;
+	left: 18%;
+	opacity: 0.55;
+}
+
+body .site-background-orb--2 {
+	width: 7px;
+	height: 7px;
+	top: 38%;
+	left: 72%;
+	opacity: 0.4;
+}
+
+body .site-background-orb--3 {
+	width: 12px;
+	height: 12px;
+	top: 58%;
+	left: 42%;
+	opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	body .site-background-mist--a {
+		animation: site-bg-mist-drift 36s ease-in-out infinite alternate;
+	}
+
+	body .site-background-mist--b {
+		animation: site-bg-mist-drift-alt 52s ease-in-out infinite alternate;
+	}
+
+	body .site-background-orb--1 {
+		animation: site-bg-orb-float 18s ease-in-out infinite;
+	}
+
+	body .site-background-orb--2 {
+		animation: site-bg-orb-float-alt 24s ease-in-out infinite;
+	}
+
+	body .site-background-orb--3 {
+		animation: site-bg-orb-float 28s ease-in-out infinite reverse;
+	}
+}
+
+@keyframes site-bg-mist-drift {
+	0% {
+		transform: translate3d(-4%, 2%, 0) scale(1);
+	}
+	100% {
+		transform: translate3d(6%, -3%, 0) scale(1.08);
+	}
+}
+
+@keyframes site-bg-mist-drift-alt {
+	0% {
+		transform: translate3d(5%, -2%, 0) scale(1.05);
+	}
+	100% {
+		transform: translate3d(-7%, 4%, 0) scale(1);
+	}
+}
+
+@keyframes site-bg-orb-float {
+	0%,
+	100% {
+		transform: translate3d(0, 0, 0);
+		opacity: 0.25;
+	}
+	40% {
+		transform: translate3d(18px, -28px, 0);
+		opacity: 0.7;
+	}
+	70% {
+		transform: translate3d(-12px, -10px, 0);
+		opacity: 0.4;
+	}
+}
+
+@keyframes site-bg-orb-float-alt {
+	0%,
+	100% {
+		transform: translate3d(0, 0, 0);
+		opacity: 0.2;
+	}
+	35% {
+		transform: translate3d(-22px, -16px, 0);
+		opacity: 0.65;
+	}
+	65% {
+		transform: translate3d(14px, -32px, 0);
+		opacity: 0.35;
+	}
 }
