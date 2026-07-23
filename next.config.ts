@@ -1,4 +1,5 @@
 import nextra from "nextra";
+import { normalizeBasePath } from "./utils/base-path";
 
 const withNextra = nextra({
 	defaultShowCopyCode: true,
@@ -19,8 +20,10 @@ const withNextra = nextra({
 	},
 });
 
+const basePath = normalizeBasePath(process.env.NEXT_PUBLIC_BASE_PATH);
+
 export default withNextra({
-	basePath: process.env.NEXT_PUBLIC_BASE_PATH,
+	basePath,
 	reactStrictMode: true,
 	cleanDistDir: true,
 	output: "export", // Enable when deploying to github page
