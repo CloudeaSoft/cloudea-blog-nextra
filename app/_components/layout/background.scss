@@ -263,3 +263,11 @@ body .site-background-orb--3 {
 		opacity: 0.45;
 	}
 }
+
+/* Decorative atmosphere is motion-led; keep reduced-motion frames clean
+ * (also keeps Playwright visual baselines stable). */
+@media (prefers-reduced-motion: reduce) {
+	body .site-background-atmosphere {
+		display: none;
+	}
+}
