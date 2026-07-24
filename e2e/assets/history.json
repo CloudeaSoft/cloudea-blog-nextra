@@ -1,0 +1,109 @@
+{
+    "code": 0,
+    "data": {
+      "list": [
+        {
+          "poolId": "LINKAGE_74_0_1",
+          "poolName": "幽境狩人",
+          "charId": "char_253_greyy",
+          "charName": "格雷伊",
+          "rarity": 3,
+          "isNew": false,
+          "gachaTs": "1781262384631",
+          "pos": 0
+        },
+        {
+          "poolId": "LINKAGE_74_0_1",
+          "poolName": "幽境狩人",
+          "charId": "char_237_gravel",
+          "charName": "砾",
+          "rarity": 3,
+          "isNew": false,
+          "gachaTs": "1781262380255",
+          "pos": 0
+        },
+        {
+          "poolId": "LINKAGE_74_0_1",
+          "poolName": "幽境狩人",
+          "charId": "char_117_myrrh",
+          "charName": "末药",
+          "rarity": 3,
+          "isNew": false,
+          "gachaTs": "1781061977630",
+          "pos": 9
+        },
+        {
+          "poolId": "LINKAGE_74_0_1",
+          "poolName": "幽境狩人",
+          "charId": "char_240_wyvern",
+          "charName": "香草",
+          "rarity": 2,
+          "isNew": false,
+          "gachaTs": "1781061977630",
+          "pos": 8
+        },
+        {
+          "poolId": "LINKAGE_74_0_1",
+          "poolName": "幽境狩人",
+          "charId": "char_192_falco",
+          "charName": "翎羽",
+          "rarity": 2,
+          "isNew": false,
+          "gachaTs": "1781061977630",
+          "pos": 7
+        },
+        {
+          "poolId": "LINKAGE_74_0_1",
+          "poolName": "幽境狩人",
+          "charId": "char_118_yuki",
+          "charName": "白雪",
+          "rarity": 3,
+          "isNew": false,
+          "gachaTs": "1781061977630",
+          "pos": 6
+        },
+        {
+          "poolId": "LINKAGE_74_0_1",
+          "poolName": "幽境狩人",
+          "charId": "char_109_fmout",
+          "charName": "远山",
+          "rarity": 3,
+          "isNew": false,
+          "gachaTs": "1781061977630",
+          "pos": 5
+        },
+        {
+          "poolId": "LINKAGE_74_0_1",
+          "poolName": "幽境狩人",
+          "charId": "char_240_wyvern",
+          "charName": "香草",
+          "rarity": 2,
+          "isNew": false,
+          "gachaTs": "1781061977630",
+          "pos": 4
+        },
+        {
+          "poolId": "LINKAGE_74_0_1",
+          "poolName": "幽境狩人",
+          "charId": "char_208_melan",
+          "charName": "玫兰莎",
+          "rarity": 2,
+          "isNew": false,
+          "gachaTs": "1781061977630",
+          "pos": 3
+        },
+        {
+          "poolId": "LINKAGE_74_0_1",
+          "poolName": "幽境狩人",
+          "charId": "char_277_sqrrel",
+          "charName": "阿消",
+          "rarity": 3,
+          "isNew": false,
+          "gachaTs": "1781061977630",
+          "pos": 2
+        }
+      ],
+      "hasMore": true
+    },
+    "msg": ""
+  }

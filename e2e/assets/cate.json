@@ -1,0 +1,22 @@
+{
+    "code": 0,
+    "data": [
+      {
+        "id": "anniver_fest",
+        "name": "限定寻访\n庆典"
+      },
+      {
+        "id": "MH_02",
+        "name": "泡影迷踪\n干员寻访"
+      },
+      {
+        "id": "normal",
+        "name": "标准寻访"
+      },
+      {
+        "id": "classic",
+        "name": "中坚寻访"
+      }
+    ],
+    "msg": ""
+  }

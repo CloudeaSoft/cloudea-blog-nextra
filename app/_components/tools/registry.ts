@@ -15,4 +15,12 @@ export const TOOLS: ToolEntry[] = [
 		href: "/tools/hlsl-preview",
 		icon: "mdi:cube-outline",
 	},
+	{
+		id: "arknights-gacha",
+		title: "Arknights Gacha History",
+		description:
+			"Pull official gacha categories and history with your account tokens, then browse raw records.",
+		href: "/tools/arknights-gacha",
+		icon: "mdi:cards-outline",
+	},
 ];
