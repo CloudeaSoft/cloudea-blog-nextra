@@ -14,6 +14,7 @@ import {
 	fetchCategories,
 } from "./client";
 import { mergeHistoryRecords, rarityStars, recordKey, categoryLabel } from "./parse";
+import { RarityPieChart } from "./rarity-pie";
 import {
 	knownRecordKeys,
 	listCachedCategories,
@@ -23,6 +24,11 @@ import {
 	sortRecordsNewestFirst,
 	type CachedCategoryInfo,
 } from "./records-storage";
+import {
+	computePullCostStats,
+	computeRarityShare,
+	formatAvgPulls,
+} from "./stats";
 import type { GachaAuth, GachaCategory, GachaRecord } from "./types";
 import { GachaApiError } from "./types";
 
@@ -58,7 +64,7 @@ export function ArknightsGachaTool() {
 	const [cachedCategories, setCachedCategories] = useState<CachedCategoryInfo[]>([]);
 	const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
 	const [records, setRecords] = useState<GachaRecord[]>([]);
-	const [recordsExpanded, setRecordsExpanded] = useState(true);
+	const [recordsExpanded, setRecordsExpanded] = useState(false);
 	const [status, setStatus] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [loadingCategories, setLoadingCategories] = useState(false);
@@ -69,6 +75,16 @@ export function ArknightsGachaTool() {
 	const displayCategories = useMemo(
 		() => mergeDisplayCategories(apiCategories, cachedCategories),
 		[apiCategories, cachedCategories],
+	);
+
+	const rarityBuckets = useMemo(
+		() => computeRarityShare(records),
+		[records],
+	);
+
+	const pullCostStats = useMemo(
+		() => computePullCostStats(records),
+		[records],
 	);
 
 	function refreshCachedCategories(uid: string) {
@@ -153,9 +169,39 @@ export function ArknightsGachaTool() {
 		}
 	}
 
-	async function handleSelectCategory(categoryId: string) {
+	function handleSelectCategory(categoryId: string) {
 		if (!auth.uid.trim()) {
 			setError("请先填写 uid");
+			return;
+		}
+
+		// Switching category cancels any in-flight record fetch.
+		abortRef.current?.abort();
+		abortRef.current = null;
+		setLoadingHistory(false);
+
+		const cached = loadCategoryRecords(auth.uid, categoryId);
+		setActiveCategoryId(categoryId);
+		setError(null);
+		setRecords(cached);
+		setStatus(
+			cached.length > 0
+				? `已加载缓存 ${cached.length} 条（点击「拉取记录」同步官网）`
+				: "该分类暂无缓存，点击「拉取记录」从官网获取",
+		);
+	}
+
+	async function handleFetchRecords() {
+		if (!auth.uid.trim()) {
+			setError("请先填写 uid");
+			return;
+		}
+		if (!activeCategoryId) {
+			setError("请先选择卡池分类");
+			return;
+		}
+		if (!isAuthComplete(auth)) {
+			setError("请先填写完整认证信息");
 			return;
 		}
 
@@ -163,27 +209,15 @@ export function ArknightsGachaTool() {
 		const controller = new AbortController();
 		abortRef.current = controller;
 
+		const categoryId = activeCategoryId;
 		const cached = loadCategoryRecords(auth.uid, categoryId);
 		const cacheKeys = knownRecordKeys(cached);
 		const categoryMeta = displayCategories.find((item) => item.id === categoryId);
 		const name = categoryMeta?.name ?? categoryId;
 		const label = categoryMeta?.label ?? categoryLabel(name);
 
-		setActiveCategoryId(categoryId);
-		setRecordsExpanded(true);
 		setError(null);
 		setRecords(cached);
-
-		if (!isAuthComplete(auth)) {
-			setLoadingHistory(false);
-			setStatus(
-				cached.length > 0
-					? `已加载缓存 ${cached.length} 条（认证不完整，无法同步）`
-					: "认证不完整，无法拉取记录",
-			);
-			return;
-		}
-
 		setLoadingHistory(true);
 		setStatus(
 			cached.length > 0
@@ -247,7 +281,7 @@ export function ArknightsGachaTool() {
 					<h1 className="ak-gacha__title">Arknights Gacha History</h1>
 					<p className="ak-gacha__desc">
 						填写官网认证信息后，经 Cloudflare Worker 拉取卡池分类与寻访记录。
-						已缓存分类会始终展示；拉取卡池时再补上未缓存的分类。仅在真正拉到记录后写入缓存。
+						选择分类仅读取本地缓存；点击「拉取记录」才会请求官网并增量同步。
 					</p>
 				</div>
 			</header>
@@ -260,6 +294,15 @@ export function ArknightsGachaTool() {
 					<p className="ak-gacha__hint">
 						从官网寻访记录页 Network 中复制 Cookie、x-account-token、x-role-token 与 uid。
 						明文保存在 localStorage。Cookie 经 Worker 的 x-cookie 头转发（浏览器无法直接设置 Cookie）。
+						后端代理源码：
+						<a
+							href="https://github.com/CloudeaSoft/cloudea-blog-nextra/blob/main/scripts/cloudflare-worker.mjs"
+							target="_blank"
+							rel="noreferrer"
+						>
+							scripts/cloudflare-worker.mjs
+						</a>
+						。
 					</p>
 				</div>
 
@@ -335,7 +378,7 @@ export function ArknightsGachaTool() {
 				</div>
 			</section>
 
-			{(status || error) && (
+			{(error || (status && displayCategories.length === 0)) && (
 				<div
 					className={
 						error ? "ak-gacha__banner ak-gacha__banner--error" : "ak-gacha__banner"
@@ -351,6 +394,9 @@ export function ArknightsGachaTool() {
 					<h2 id="ak-gacha-cate-heading" className="ak-gacha__panel-title">
 						卡池分类
 					</h2>
+					<p className="ak-gacha__hint">
+						点击分类切换本地缓存；确认后再点「拉取记录」同步官网，避免误触频繁请求。
+					</p>
 					<div className="ak-gacha__chips" role="tablist" aria-label="卡池分类">
 						{displayCategories.map((category) => {
 							const selected = category.id === activeCategoryId;
@@ -365,8 +411,8 @@ export function ArknightsGachaTool() {
 											? "ak-gacha__chip ak-gacha__chip--active"
 											: "ak-gacha__chip"
 									}
-									onClick={() => void handleSelectCategory(category.id)}
-									disabled={busy}
+									onClick={() => handleSelectCategory(category.id)}
+									disabled={loadingCategories}
 									title={category.id}
 								>
 									<span className="ak-gacha__chip-name">{category.label}</span>
@@ -385,46 +431,138 @@ export function ArknightsGachaTool() {
 							);
 						})}
 					</div>
+					<div className="ak-gacha__actions">
+						<button
+							type="button"
+							className="ak-gacha__btn ak-gacha__btn--primary"
+							onClick={() => void handleFetchRecords()}
+							disabled={
+								!hydrated
+								|| busy
+								|| !activeCategoryId
+								|| !isAuthComplete(auth)
+							}
+						>
+							<Icon icon="mdi:download" width={16} height={16} />
+							拉取记录
+						</button>
+						{status
+							? (
+								<span className="ak-gacha__action-status" role="status">
+									{status}
+								</span>
+							)
+							: null}
+					</div>
+				</section>
+			)}
+
+			{records.length > 0 && (
+				<section className="ak-gacha__panel" aria-labelledby="ak-gacha-analysis-heading">
+					<h2 id="ak-gacha-analysis-heading" className="ak-gacha__panel-title">
+						卡池分析
+					</h2>
+					<p className="ak-gacha__hint">
+						基于当前分类已加载的
+						{" "}
+						{records.length}
+						{" "}
+						条记录。平均消耗按相邻同星出货间隔计算；保底为距上次六星的抽数。
+					</p>
+					<ul className="ak-gacha__metrics">
+						<li className="ak-gacha__metric">
+							<span className="ak-gacha__metric-label">5★ 平均消耗</span>
+							<span className="ak-gacha__metric-value">
+								{formatAvgPulls(pullCostStats.avgFiveStar)}
+								{pullCostStats.avgFiveStar !== null
+									? (
+										<span className="ak-gacha__metric-unit">抽</span>
+									)
+									: null}
+							</span>
+							<span className="ak-gacha__metric-sub">
+								共
+								{" "}
+								{pullCostStats.fiveStarCount}
+								{" "}
+								次
+							</span>
+						</li>
+						<li className="ak-gacha__metric">
+							<span className="ak-gacha__metric-label">6★ 平均消耗</span>
+							<span className="ak-gacha__metric-value">
+								{formatAvgPulls(pullCostStats.avgSixStar)}
+								{pullCostStats.avgSixStar !== null
+									? (
+										<span className="ak-gacha__metric-unit">抽</span>
+									)
+									: null}
+							</span>
+							<span className="ak-gacha__metric-sub">
+								共
+								{" "}
+								{pullCostStats.sixStarCount}
+								{" "}
+								次
+							</span>
+						</li>
+						<li className="ak-gacha__metric">
+							<span className="ak-gacha__metric-label">当次保底已抽</span>
+							<span className="ak-gacha__metric-value">
+								{pullCostStats.currentPity}
+								<span className="ak-gacha__metric-unit">抽</span>
+							</span>
+							<span className="ak-gacha__metric-sub">距上次六星</span>
+						</li>
+					</ul>
+					<RarityPieChart buckets={rarityBuckets} total={records.length} />
 				</section>
 			)}
 
 			{(loadingHistory || records.length > 0 || activeCategoryId) && (
 				<section className="ak-gacha__panel" aria-labelledby="ak-gacha-list-heading">
-					<div className="ak-gacha__panel-head">
-						<div className="ak-gacha__panel-title-row">
-							<h2 id="ak-gacha-list-heading" className="ak-gacha__panel-title">
-								抽卡记录
-								{records.length > 0
-									? (
-										<span className="ak-gacha__count">
-											(
-											{records.length}
-											)
-										</span>
-									)
-									: null}
-							</h2>
-							<button
-								type="button"
-								className="ak-gacha__btn ak-gacha__collapse-btn"
-								aria-expanded={recordsExpanded}
-								aria-controls="ak-gacha-records-body"
-								onClick={() => setRecordsExpanded((open) => !open)}
-							>
+					<div
+						className={
+							recordsExpanded
+								? "ak-gacha__panel-head"
+								: "ak-gacha__panel-head ak-gacha__panel-head--collapsed"
+						}
+					>
+						<button
+							type="button"
+							className="ak-gacha__panel-title-row ak-gacha__collapse-trigger"
+							aria-expanded={recordsExpanded}
+							aria-controls="ak-gacha-records-body"
+							onClick={() => setRecordsExpanded((open) => !open)}
+						>
+							<div className="ak-gacha__panel-title-group">
+								<span id="ak-gacha-list-heading" className="ak-gacha__panel-title">
+									抽卡记录
+									{records.length > 0
+										? (
+											<span className="ak-gacha__count">
+												(
+												{records.length}
+												)
+											</span>
+										)
+										: null}
+								</span>
+								{loadingHistory && (
+									<span className="ak-gacha__loading">
+										<Icon icon="mdi:loading" width={16} height={16} className="ak-gacha__spin" />
+										加载中
+									</span>
+								)}
+							</div>
+							<span className="ak-gacha__collapse-btn" aria-hidden>
 								<Icon
 									icon={recordsExpanded ? "mdi:chevron-up" : "mdi:chevron-down"}
-									width={18}
-									height={18}
+									width={22}
+									height={22}
 								/>
-								{recordsExpanded ? "折叠" : "展开"}
-							</button>
-						</div>
-						{loadingHistory && (
-							<span className="ak-gacha__loading">
-								<Icon icon="mdi:loading" width={16} height={16} className="ak-gacha__spin" />
-								加载中
 							</span>
-						)}
+						</button>
 					</div>
 
 					{recordsExpanded

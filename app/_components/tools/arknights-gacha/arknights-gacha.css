@@ -54,6 +54,10 @@
 	margin-bottom: 0.85rem;
 }
 
+.ak-gacha__panel-head--collapsed {
+	margin-bottom: 0;
+}
+
 .ak-gacha__panel-title {
 	margin: 0;
 	font-size: 1.05rem;
@@ -63,10 +67,35 @@
 
 .ak-gacha__panel-title-row {
 	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.55rem 0.85rem;
+	width: 100%;
+	min-width: 0;
+}
+
+.ak-gacha__collapse-trigger {
+	margin: 0;
+	padding: 0;
+	border: none;
+	background: transparent;
+	font: inherit;
+	color: inherit;
+	text-align: left;
+	cursor: pointer;
+	border-radius: 8px;
+}
+
+.ak-gacha__collapse-trigger:hover .ak-gacha__collapse-btn {
+	color: var(--primary-color);
+	background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+}
+
+.ak-gacha__panel-title-group {
+	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	gap: 0.55rem 0.85rem;
-	flex: 1;
 	min-width: 0;
 }
 
@@ -78,8 +107,15 @@
 }
 
 .ak-gacha__collapse-btn {
-	padding: 0.35rem 0.7rem;
-	font-size: 0.85rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	margin-left: auto;
+	padding: 0.2rem;
+	border-radius: 8px;
+	color: var(--third-text-color);
+	pointer-events: none;
 }
 
 .ak-gacha__hint {
@@ -87,6 +123,16 @@
 	font-size: 0.88rem;
 	line-height: 1.5;
 	color: var(--third-text-color);
+}
+
+.ak-gacha__hint a {
+	color: var(--primary-color);
+	text-decoration: underline;
+	text-underline-offset: 0.12em;
+}
+
+.ak-gacha__hint a:hover {
+	opacity: 0.85;
 }
 
 .ak-gacha__form {
@@ -133,8 +179,17 @@
 .ak-gacha__actions {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.55rem;
+	align-items: center;
+	gap: 0.55rem 0.75rem;
 	margin-top: 0.95rem;
+}
+
+.ak-gacha__action-status {
+	flex: 1 1 12rem;
+	min-width: 0;
+	font-size: 0.88rem;
+	line-height: 1.4;
+	color: var(--third-text-color);
 }
 
 .ak-gacha__btn {
@@ -241,6 +296,107 @@
 .ak-gacha__chip:disabled {
 	opacity: 0.55;
 	cursor: not-allowed;
+}
+
+.ak-gacha__pie {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 1.25rem 1.75rem;
+}
+
+.ak-gacha__metrics {
+	list-style: none;
+	margin: 0 0 1.1rem;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+	gap: 0.65rem;
+}
+
+.ak-gacha__metric {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	padding: 0.75rem 0.85rem;
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	background: var(--background-color-transparent-80);
+}
+
+.ak-gacha__metric-label {
+	font-size: 0.8rem;
+	color: var(--third-text-color);
+}
+
+.ak-gacha__metric-value {
+	font-size: 1.35rem;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	color: var(--first-text-color);
+	line-height: 1.2;
+}
+
+.ak-gacha__metric-unit {
+	margin-left: 0.2rem;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--second-text-color);
+}
+
+.ak-gacha__metric-sub {
+	font-size: 0.78rem;
+	color: var(--third-text-color);
+}
+
+.ak-gacha__pie-svg {
+	flex: 0 0 auto;
+	display: block;
+}
+
+.ak-gacha__pie-legend {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 0.45rem;
+	min-width: 10rem;
+}
+
+.ak-gacha__pie-legend-item {
+	display: grid;
+	grid-template-columns: auto auto 1fr;
+	align-items: center;
+	gap: 0.45rem 0.55rem;
+	font-size: 0.9rem;
+	color: var(--first-text-color);
+}
+
+.ak-gacha__pie-swatch {
+	width: 0.7rem;
+	height: 0.7rem;
+	border-radius: 2px;
+}
+
+.ak-gacha__pie-legend-label {
+	font-weight: 600;
+	color: var(--second-text-color);
+}
+
+.ak-gacha__pie-legend-count {
+	justify-self: end;
+	color: var(--third-text-color);
+	font-variant-numeric: tabular-nums;
+}
+
+.ak-gacha__pie-legend-total {
+	margin-top: 0.25rem;
+	padding-top: 0.45rem;
+	border-top: 1px solid var(--border-color);
+	font-size: 0.88rem;
+	font-weight: 600;
+	color: var(--second-text-color);
 }
 
 .ak-gacha__loading {
