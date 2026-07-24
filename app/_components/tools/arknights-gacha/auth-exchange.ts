@@ -1,14 +1,16 @@
 import {
+	getArknightsAsServiceBaseUrl,
+	getArknightsBindingServiceBaseUrl,
+} from "@/utils/env";
+import {
 	ARKNIGHTS_SERVICE_BASE_URL,
 	type FetchLike,
 } from "./client";
 import { GachaApiError, type GachaAuth } from "./types";
 
-export const AS_SERVICE_BASE_URL =
-	"https://blog-backend.cloudeasoft.workers.dev/arknights-as-service";
+export const AS_SERVICE_BASE_URL = getArknightsAsServiceBaseUrl();
 
-export const BINDING_SERVICE_BASE_URL =
-	"https://blog-backend.cloudeasoft.workers.dev/arknights-binding-service";
+export const BINDING_SERVICE_BASE_URL = getArknightsBindingServiceBaseUrl();
 
 /** Official web app code used by ak.hypergryph.com oauth grant. */
 export const HG_WEB_APP_CODE = "be36d44aa36bfb5b";

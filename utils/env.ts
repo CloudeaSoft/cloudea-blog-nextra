@@ -68,3 +68,32 @@ export function getNextOutput(): "export" | undefined {
 export function isStaticExport(): boolean {
 	return getNextOutput() === "export";
 }
+
+/** Production Arknights proxy Worker (workers.dev). */
+export const DEFAULT_BLOG_BACKEND_URL =
+	"https://blog-backend.cloudeasoft.workers.dev";
+
+/**
+ * Origin of the blog Cloudflare Worker proxy.
+ *
+ * - unset → production Worker
+ * - local: `http://127.0.0.1:8787` (`pnpm worker:dev`)
+ * - debug deploy: `https://blog-backend-dev.<account>.workers.dev`
+ */
+export function getBlogBackendUrl(): string {
+	const raw = (process.env.NEXT_PUBLIC_BLOG_BACKEND_URL ?? "").trim();
+	if (!raw) return DEFAULT_BLOG_BACKEND_URL;
+	return raw.replace(/\/+$/, "");
+}
+
+export function getArknightsServiceBaseUrl(): string {
+	return `${getBlogBackendUrl()}/arknights-service`;
+}
+
+export function getArknightsAsServiceBaseUrl(): string {
+	return `${getBlogBackendUrl()}/arknights-as-service`;
+}
+
+export function getArknightsBindingServiceBaseUrl(): string {
+	return `${getBlogBackendUrl()}/arknights-binding-service`;
+}

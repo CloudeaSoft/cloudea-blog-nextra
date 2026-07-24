@@ -1,3 +1,4 @@
+import { getArknightsServiceBaseUrl } from "@/utils/env";
 import {
 	mergeHistoryRecords,
 	parseCategoriesPayload,
@@ -12,8 +13,7 @@ import {
 	type GachaRecord,
 } from "./types";
 
-export const ARKNIGHTS_SERVICE_BASE_URL =
-	"https://blog-backend.cloudeasoft.workers.dev/arknights-service";
+export const ARKNIGHTS_SERVICE_BASE_URL = getArknightsServiceBaseUrl();
 
 export const DEFAULT_HISTORY_PAGE_SIZE = 50;
 export const DEFAULT_PAGE_DELAY_MS = 300;
