@@ -10,6 +10,13 @@ describe("tools registry", () => {
 		expect(hlsl!.title).toMatch(/HLSL/i);
 	});
 
+	it("lists Arknights Gacha History with a stable route", () => {
+		const gacha = TOOLS.find((tool) => tool.id === "arknights-gacha");
+		expect(gacha).toBeDefined();
+		expect(gacha!.href).toBe("/tools/arknights-gacha");
+		expect(gacha!.title).toMatch(/Arknights/i);
+	});
+
 	it("keeps unique ids and hrefs", () => {
 		const ids = TOOLS.map((tool) => tool.id);
 		const hrefs = TOOLS.map((tool) => tool.href);
