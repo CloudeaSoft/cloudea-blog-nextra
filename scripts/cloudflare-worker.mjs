@@ -1,11 +1,13 @@
 /**
- * Welcome to Cloudflare Workers! This is your first worker.
+ * Cloudflare Worker proxy for Arknights / Hypergryph APIs.
  *
- * - Run "npm run dev" in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run "npm run deploy" to publish your worker
+ * - /arknights-service → https://ak.hypergryph.com
+ * - /arknights-as-service → https://as.hypergryph.com
+ * - /arknights-binding-service → https://binding-api-account-prod.hypergryph.com
  *
- * Learn more at https://developers.cloudflare.com/workers/
+ * Browser JS cannot set Cookie; clients send `x-cookie` and we rewrite it.
+ * Upstream `Set-Cookie: ak-user-center=...` is exposed as `x-ak-user-center`
+ * (browsers block reading Set-Cookie from fetch).
  */
 
 const ROUTES = {
@@ -13,8 +15,32 @@ const ROUTES = {
 		targetHost: "https://ak.hypergryph.com",
 		rewritePath: true,
 	},
+	"/arknights-as-service": {
+		targetHost: "https://as.hypergryph.com",
+		rewritePath: true,
+	},
+	"/arknights-binding-service": {
+		targetHost: "https://binding-api-account-prod.hypergryph.com",
+		rewritePath: true,
+	},
 	"default": null,
 };
+
+function extractAkUserCenter(response) {
+	const cookies = typeof response.headers.getSetCookie === "function"
+		? response.headers.getSetCookie()
+		: [];
+
+	for (const raw of cookies) {
+		const match = /^ak-user-center=([^;]+)/i.exec(raw);
+		if (match) return match[1];
+	}
+
+	const single = response.headers.get("set-cookie");
+	if (!single) return null;
+	const match = /(?:^|,\s*)ak-user-center=([^;]+)/i.exec(single);
+	return match ? match[1] : null;
+}
 
 export default {
 	async fetch(request, env, ctx) {
@@ -24,6 +50,7 @@ export default {
 			"Access-Control-Allow-Origin": "*",
 			"Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
 			"Access-Control-Allow-Headers": request.headers.get("Access-Control-Request-Headers") || "*",
+			"Access-Control-Expose-Headers": "x-ak-user-center",
 			"Access-Control-Max-Age": "86400",
 		};
 
@@ -34,9 +61,10 @@ export default {
 			});
 		}
 
-		// 2. 匹配路由规则
-		let matchedPrefix = Object.keys(ROUTES).find((prefix) => prefix !== "default" && url.pathname.startsWith(prefix));
-		let rule = matchedPrefix ? ROUTES[matchedPrefix] : ROUTES["default"];
+		const matchedPrefix = Object.keys(ROUTES).find(
+			(prefix) => prefix !== "default" && url.pathname.startsWith(prefix),
+		);
+		const rule = matchedPrefix ? ROUTES[matchedPrefix] : ROUTES.default;
 		if (!matchedPrefix || !rule) {
 			return new Response(null, {
 				status: 404,
@@ -44,33 +72,26 @@ export default {
 			});
 		}
 
-		// 3. 计算实际的 pathname
 		let realPathname = url.pathname;
-		if (matchedPrefix && rule.rewritePath) {
-			// 抹去前缀：比如把 /user-service/v1/info 变成 /v1/info
+		if (rule.rewritePath) {
 			realPathname = url.pathname.replace(matchedPrefix, "") || "/";
 		}
 
-		// 4. 拼接最终目标 URL
 		const targetUrl = `${rule.targetHost}${realPathname}${url.search}`;
 
-		// 5. 组装 Header
 		const newHeaders = new Headers(request.headers);
 		newHeaders.set("Host", new URL(rule.targetHost).host);
 
-		// Browser JS cannot set Cookie; clients send x-cookie and we rewrite it.
 		const proxyCookie = request.headers.get("x-cookie");
 		if (proxyCookie) {
 			newHeaders.set("Cookie", proxyCookie);
 			newHeaders.delete("x-cookie");
 		}
 
-		// 如果该规则下有特殊要求的 Header，注入进去
 		if (rule.headers) {
 			Object.entries(rule.headers).forEach(([k, v]) => newHeaders.set(k, v));
 		}
 
-		// 6. 发起转发
 		try {
 			const response = await fetch(new Request(targetUrl, {
 				method: request.method,
@@ -79,9 +100,13 @@ export default {
 				redirect: "follow",
 			}));
 
-			// 7. 拼接并返回带有 CORS 的响应
 			const modifiedHeaders = new Headers(response.headers);
 			Object.entries(corsHeaders).forEach(([k, v]) => modifiedHeaders.set(k, v));
+
+			const akUserCenter = extractAkUserCenter(response);
+			if (akUserCenter) {
+				modifiedHeaders.set("x-ak-user-center", akUserCenter);
+			}
 
 			return new Response(response.body, {
 				status: response.status,

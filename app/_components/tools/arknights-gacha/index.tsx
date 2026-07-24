@@ -9,6 +9,7 @@ import {
 	loadAuth,
 	saveAuth,
 } from "./auth-storage";
+import { exchangeHgToken } from "./auth-exchange";
 import {
 	fetchAllHistoryForCategory,
 	fetchCategories,
@@ -59,6 +60,8 @@ function errorMessage(error: unknown): string {
 
 export function ArknightsGachaTool() {
 	const [auth, setAuth] = useState<GachaAuth>(emptyAuth);
+	const [hgToken, setHgToken] = useState("");
+	const [roleLabel, setRoleLabel] = useState("");
 	const [hydrated, setHydrated] = useState(false);
 	const [apiCategories, setApiCategories] = useState<GachaCategory[]>([]);
 	const [cachedCategories, setCachedCategories] = useState<CachedCategoryInfo[]>([]);
@@ -95,6 +98,10 @@ export function ArknightsGachaTool() {
 		startTransition(() => {
 			const loaded = loadAuth();
 			setAuth(loaded);
+			setHgToken(loaded.accountToken);
+			if (loaded.uid) {
+				setRoleLabel(`uid ${loaded.uid}`);
+			}
 			setCachedCategories(
 				loaded.uid.trim() ? listCachedCategories(loaded.uid) : [],
 			);
@@ -105,28 +112,12 @@ export function ArknightsGachaTool() {
 		};
 	}, []);
 
-	function updateField<K extends keyof GachaAuth>(key: K, value: GachaAuth[K]) {
-		setAuth((prev) => {
-			const next = { ...prev, [key]: value };
-			if (key === "uid") {
-				refreshCachedCategories(String(value));
-			}
-			return next;
-		});
-	}
-
-	function handleSaveAuth() {
-		const saved = saveAuth(auth);
-		setAuth(saved);
-		refreshCachedCategories(saved.uid);
-		setStatus("认证信息已保存到 localStorage");
-		setError(null);
-	}
-
 	function handleClearAuth() {
 		clearAuth();
 		abortRef.current?.abort();
 		setAuth(emptyAuth());
+		setHgToken("");
+		setRoleLabel("");
 		setApiCategories([]);
 		setCachedCategories([]);
 		setActiveCategoryId(null);
@@ -135,21 +126,36 @@ export function ArknightsGachaTool() {
 		setError(null);
 	}
 
-	async function handleFetchCategories() {
+	async function handleUpdateCategories() {
+		if (!hgToken.trim()) {
+			setError("请先填写 token");
+			return;
+		}
+
 		abortRef.current?.abort();
 		const controller = new AbortController();
 		abortRef.current = controller;
 
 		setLoadingCategories(true);
 		setError(null);
-		setStatus("正在拉取卡池分类…");
+		setStatus("正在验证账号…");
 		setActiveCategoryId(null);
 		setRecords([]);
 
 		try {
-			const saved = saveAuth(auth);
+			const result = await exchangeHgToken(hgToken, {
+				signal: controller.signal,
+				preferUid: auth.uid || undefined,
+			});
+			const saved = saveAuth(result.auth);
 			setAuth(saved);
+			setHgToken(saved.accountToken);
+			setRoleLabel(
+				`${result.role.nickName} · ${result.role.channelName || "未知渠道"} · uid ${result.role.uid}`,
+			);
 			refreshCachedCategories(saved.uid);
+			setStatus("账号验证成功，正在更新卡池…");
+
 			const next = await fetchCategories(saved, { signal: controller.signal });
 			setApiCategories(next);
 			const cached = listCachedCategories(saved.uid);
@@ -280,7 +286,7 @@ export function ArknightsGachaTool() {
 					</Link>
 					<h1 className="ak-gacha__title">Arknights Gacha History</h1>
 					<p className="ak-gacha__desc">
-						填写官网认证信息后，经 Cloudflare Worker 拉取卡池分类与寻访记录。
+						填写鹰角账号 token 后点击「更新卡池」即可登录并刷新分类。
 						选择分类仅读取本地缓存；点击「拉取记录」才会请求官网并增量同步。
 					</p>
 				</div>
@@ -292,8 +298,40 @@ export function ArknightsGachaTool() {
 						认证信息
 					</h2>
 					<p className="ak-gacha__hint">
-						从官网寻访记录页 Network 中复制 Cookie、x-account-token、x-role-token 与 uid。
-						明文保存在 localStorage。Cookie 经 Worker 的 x-cookie 头转发（浏览器无法直接设置 Cookie）。
+						1. 在
+						{" "}
+						<a
+							href="https://ak.hypergryph.com/"
+							target="_blank"
+							rel="noreferrer"
+						>
+							ak.hypergryph.com
+						</a>
+						{" "}
+						登录后，打开
+						{" "}
+						<a
+							href="https://web-api.hypergryph.com/account/info/hg"
+							target="_blank"
+							rel="noreferrer"
+						>
+							web-api.hypergryph.com/account/info/hg
+						</a>
+						。
+						<br />
+						2. 页面上会出现一大段文字。找到
+						{" "}
+						<code>content</code>
+						{" "}
+						这个词，它后面有一对英文引号
+						{" "}
+						<code>&quot;…&quot;</code>
+						，中间那一长串才是密钥。
+						<br />
+						3. 只复制引号里的内容（不要带上引号），填到下方输入框。
+						<br />
+						注：点击「更新卡池」会自动登录并刷新分类。密钥会保存在本机浏览器里。
+						<br />
 						后端代理源码：
 						<a
 							href="https://github.com/CloudeaSoft/cloudea-blog-nextra/blob/main/scripts/cloudflare-worker.mjs"
@@ -308,64 +346,35 @@ export function ArknightsGachaTool() {
 
 				<div className="ak-gacha__form">
 					<label className="ak-gacha__field">
-						<span>uid</span>
+						<span>token</span>
 						<input
-							value={auth.uid}
-							onChange={(e) => updateField("uid", e.target.value)}
+							value={hgToken}
+							onChange={(e) => setHgToken(e.target.value)}
 							autoComplete="off"
 							spellCheck={false}
 							disabled={!hydrated || busy}
+							placeholder="鹰角账号 token"
 						/>
 					</label>
-					<label className="ak-gacha__field">
-						<span>Cookie</span>
-						<textarea
-							value={auth.cookie}
-							onChange={(e) => updateField("cookie", e.target.value)}
-							rows={2}
-							spellCheck={false}
-							disabled={!hydrated || busy}
-						/>
-					</label>
-					<label className="ak-gacha__field">
-						<span>x-account-token</span>
-						<input
-							value={auth.accountToken}
-							onChange={(e) => updateField("accountToken", e.target.value)}
-							autoComplete="off"
-							spellCheck={false}
-							disabled={!hydrated || busy}
-						/>
-					</label>
-					<label className="ak-gacha__field">
-						<span>x-role-token</span>
-						<input
-							value={auth.roleToken}
-							onChange={(e) => updateField("roleToken", e.target.value)}
-							autoComplete="off"
-							spellCheck={false}
-							disabled={!hydrated || busy}
-						/>
-					</label>
+					{roleLabel
+						? (
+							<p className="ak-gacha__session">
+								当前角色：
+								{roleLabel}
+							</p>
+						)
+						: null}
 				</div>
 
 				<div className="ak-gacha__actions">
 					<button
 						type="button"
 						className="ak-gacha__btn ak-gacha__btn--primary"
-						onClick={() => void handleFetchCategories()}
-						disabled={!hydrated || busy || !isAuthComplete(auth)}
+						onClick={() => void handleUpdateCategories()}
+						disabled={!hydrated || busy || !hgToken.trim()}
 					>
 						<Icon icon="mdi:download" width={16} height={16} />
-						拉取卡池
-					</button>
-					<button
-						type="button"
-						className="ak-gacha__btn"
-						onClick={handleSaveAuth}
-						disabled={!hydrated || busy}
-					>
-						保存认证
+						更新卡池
 					</button>
 					<button
 						type="button"

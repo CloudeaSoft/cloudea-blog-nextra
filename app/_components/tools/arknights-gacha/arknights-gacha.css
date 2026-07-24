@@ -47,10 +47,9 @@
 
 .ak-gacha__panel-head {
 	display: flex;
-	flex-wrap: wrap;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 0.5rem 1rem;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 0.35rem;
 	margin-bottom: 0.85rem;
 }
 
@@ -119,7 +118,7 @@
 }
 
 .ak-gacha__hint {
-	margin: 0.35rem 0 0.9rem;
+	margin: 0;
 	font-size: 0.88rem;
 	line-height: 1.5;
 	color: var(--third-text-color);
@@ -133,6 +132,13 @@
 
 .ak-gacha__hint a:hover {
 	opacity: 0.85;
+}
+
+.ak-gacha__session {
+	margin: 0;
+	font-size: 0.9rem;
+	line-height: 1.45;
+	color: var(--second-text-color);
 }
 
 .ak-gacha__form {
