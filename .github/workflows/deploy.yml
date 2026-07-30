@@ -2,6 +2,8 @@ name: Deploy Next.js site to Pages
 
 env:
   NEXT_PUBLIC_BASE_URL: ${{ vars.BASE_URL }}
+  # Optional. Unset → utils/env.ts production default.
+  NEXT_PUBLIC_BACKEND_URL: ${{ vars.BACKEND_URL }}
 
 on:
   # Runs on pushes targeting the main branch

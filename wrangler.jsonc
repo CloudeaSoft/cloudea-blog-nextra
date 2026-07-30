@@ -1,0 +1,16 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	// Same Worker script for local (`pnpm worker:dev`), debug, and production.
+	// Top-level name matches the existing workers.dev hostname.
+	"name": "blog-backend",
+	"main": "scripts/cloudflare-worker.mjs",
+	"compatibility_date": "2026-07-24",
+	"workers_dev": true,
+	"env": {
+		// Debug Worker: `pnpm worker:deploy:dev` → blog-backend-dev.*.workers.dev
+		"dev": {
+			"name": "blog-backend-dev",
+			"workers_dev": true
+		}
+	}
+}

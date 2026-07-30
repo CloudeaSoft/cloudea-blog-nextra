@@ -21,7 +21,10 @@
 		"test": "vitest run",
 		"test:visual": "playwright test",
 		"test:visual:update": "playwright test --update-snapshots=changed",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+		"worker:dev": "wrangler dev",
+		"worker:deploy": "wrangler deploy --env=\"\"",
+		"worker:deploy:dev": "wrangler deploy --env=dev"
 	},
 	"lint-staged": {
 		"*": "eslint --fix"
@@ -64,6 +67,7 @@
 		"serve": "^14.2.6",
 		"typescript": "6.0.3",
 		"typescript-eslint": "^8.65.0",
-		"vitest": "^4.1.10"
+		"vitest": "^4.1.10",
+		"wrangler": "^4.113.0"
 	}
 }

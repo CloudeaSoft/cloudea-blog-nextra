@@ -1,7 +1,12 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
+	DEFAULT_BLOG_BACKEND_URL,
+	getArknightsAsServiceBaseUrl,
+	getArknightsBindingServiceBaseUrl,
+	getArknightsServiceBaseUrl,
 	getBasePath,
 	getBaseUrl,
+	getBlogBackendUrl,
 	getHomeHref,
 	getNextOutput,
 	getSiteUrl,
@@ -12,6 +17,7 @@ import {
 const ORIGINAL_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const ORIGINAL_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH;
 const ORIGINAL_NEXT_OUTPUT = process.env.NEXT_OUTPUT;
+const ORIGINAL_BLOG_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 afterEach(() => {
 	if (ORIGINAL_BASE_URL === undefined) {
@@ -30,6 +36,12 @@ afterEach(() => {
 		delete process.env.NEXT_OUTPUT;
 	} else {
 		process.env.NEXT_OUTPUT = ORIGINAL_NEXT_OUTPUT;
+	}
+
+	if (ORIGINAL_BLOG_BACKEND_URL === undefined) {
+		delete process.env.NEXT_PUBLIC_BACKEND_URL;
+	} else {
+		process.env.NEXT_PUBLIC_BACKEND_URL = ORIGINAL_BLOG_BACKEND_URL;
 	}
 });
 
@@ -103,5 +115,27 @@ describe("env accessors", () => {
 			expect(getNextOutput()).toBeUndefined();
 			expect(isStaticExport()).toBe(false);
 		}
+	});
+
+	it("defaults blog backend URL to production Worker", () => {
+		delete process.env.NEXT_PUBLIC_BACKEND_URL;
+		expect(getBlogBackendUrl()).toBe(DEFAULT_BLOG_BACKEND_URL);
+		expect(getArknightsServiceBaseUrl()).toBe(
+			`${DEFAULT_BLOG_BACKEND_URL}/arknights-service`,
+		);
+		expect(getArknightsAsServiceBaseUrl()).toBe(
+			`${DEFAULT_BLOG_BACKEND_URL}/arknights-as-service`,
+		);
+		expect(getArknightsBindingServiceBaseUrl()).toBe(
+			`${DEFAULT_BLOG_BACKEND_URL}/arknights-binding-service`,
+		);
+	});
+
+	it("reads and trims NEXT_PUBLIC_BACKEND_URL", () => {
+		process.env.NEXT_PUBLIC_BACKEND_URL = " http://127.0.0.1:8787/ ";
+		expect(getBlogBackendUrl()).toBe("http://127.0.0.1:8787");
+		expect(getArknightsServiceBaseUrl()).toBe(
+			"http://127.0.0.1:8787/arknights-service",
+		);
 	});
 });
