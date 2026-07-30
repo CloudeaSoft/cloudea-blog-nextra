@@ -17,6 +17,7 @@ import type { MDXWrapper } from "nextra";
 import { Meta } from "@/app/_components/mdx/meta";
 import { GoBack } from "@/app/_components/mdx/go-back";
 import { InPageAnchors } from "@/app/_components/mdx/in-page-anchors";
+import { FigureImage } from "@/app/_components/mdx/figure-image";
 import { isValidDate } from "@/utils/is-valid-date";
 import { TOC } from "@/app/_components/mdx/toc";
 import { MobileToc } from "@/app/_components/mdx/toc-mobile";
@@ -86,6 +87,7 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <T 
 	const { DateFormatter, ...components } = comp ?? {};
 	return {
 		...DEFAULT_COMPONENTS,
+		FigureImage,
 		wrapper({ toc, children, metadata }: ComponentProps<MDXWrapper>) {
 			const date = (metadata as BlogMetadata).date;
 			if (date && !isValidDate(date)) {

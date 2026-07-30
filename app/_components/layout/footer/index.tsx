@@ -1,8 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { FC } from "react";
-import { CloudeaImage } from "@/app/_components/ui/image";
 import { getPosts } from "@/app/posts/get-posts";
 import formatWords from "@/utils/format-words";
+import { getImageUrl } from "@/utils/get-resources-url";
 import { ClientFooter } from "./index.client";
 
 export const Footer: FC = async () => {
@@ -37,8 +38,8 @@ export const Footer: FC = async () => {
 						}}
 					>
 						<span>
-							<CloudeaImage
-								src="nextra.svg"
+							<Image
+								src={getImageUrl("nextra.svg")}
 								style={{
 									display: "inline-block",
 								}}

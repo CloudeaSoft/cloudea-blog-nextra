@@ -4,7 +4,7 @@ import { bannerGreetingFont } from "@/app/_components/home/font";
 import { BannerBlurTrigger } from "@/app/_components/home/banner-blur-trigger";
 import { Github } from "@/app/_components/layout/navbar/github";
 import { Email } from "@/app/_components/layout/navbar/email";
-import { CloudeaImage } from "@/app/_components/ui/image";
+import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@iconify-icon/react";
 import cn from "clsx";
@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 
 import "./page.css";
 import { getCategories, getPosts, getTags } from "@/app/posts/get-posts";
+import { getImageUrl } from "@/utils/get-resources-url";
 
 export default async function Index() {
 	return (
@@ -114,7 +115,7 @@ const Content = async ({ children }: { children: ReactNode }) => {
 								background: "var(--background-color-transparent-80)",
 							}}
 						>
-							<CloudeaImage
+							<Image
 								style={{
 									borderRadius: "16px",
 									border: "2px solid var(--border-color)",
@@ -122,7 +123,7 @@ const Content = async ({ children }: { children: ReactNode }) => {
 									width: "80px",
 									height: "80px",
 								}}
-								src="avatar.jpg"
+								src={getImageUrl("avatar.jpg")}
 								alt="CloudeaSoft"
 								width={80}
 								height={80}
