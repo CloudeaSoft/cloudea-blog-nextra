@@ -1,7 +1,8 @@
 import { Icon } from "@iconify-icon/react";
+import Image from "next/image";
 import { Link } from "next-view-transitions";
 import type { FC } from "react";
-import { CloudeaImage } from "@/app/_components/ui/image";
+import { getImageUrl } from "@/utils/get-resources-url";
 
 interface PostCardProps {
 	post: {
@@ -30,10 +31,12 @@ export const PostCard: FC<PostCardProps> = ({ post }) => {
 					href={post.route}
 					className="post-card-cover relative block w-full h-37.5 overflow-hidden"
 				>
-					<CloudeaImage
-						src={post.frontMatter.cover}
+					<Image
+						src={getImageUrl(post.frontMatter.cover)}
 						alt={title ?? "Post Cover"}
+						fill
 						className="object-cover"
+						sizes="(max-width: 768px) 100vw, 720px"
 					/>
 				</Link>
 			)}

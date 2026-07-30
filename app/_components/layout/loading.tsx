@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import "./loading.scss";
-import { CloudeaImage } from "@/app/_components/ui/image";
+import Image from "next/image";
 import { LoadingLeaves } from "./loading-leaves";
 import { M_PLUS_Rounded_1c } from "next/font/google";
 import cn from "clsx";
+import { getImageUrl } from "@/utils/get-resources-url";
 
 const mPlusRounded1c = M_PLUS_Rounded_1c({
 	weight: "400",
@@ -59,9 +60,9 @@ export const Loading = () => {
 				その歌声は、夜風と共に──
 			</p>
 			<div className="loading-bg">
-				<CloudeaImage
+				<Image
 					className="sakura-1 loading-motif loading-motif--light"
-					src="loading-bg.gif"
+					src={getImageUrl("loading-bg.gif")}
 					alt="sakura"
 					width={240}
 					height={240}

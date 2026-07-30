@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
-import { CloudeaImage } from "@/app/_components/ui/image";
 import { getHomeHref } from "@/utils/env";
+import { getImageUrl } from "@/utils/get-resources-url";
 import { navbarFont } from "./font";
 
 const homeHref = getHomeHref();
@@ -11,9 +12,9 @@ export const Stack = () => {
 			className={`navbar-brand ${navbarFont.className}`}
 			href={homeHref}
 		>
-			<CloudeaImage
+			<Image
 				className="navbar-brand__logo"
-				src="favicon-96.ico"
+				src={getImageUrl("favicon-96.ico")}
 				alt="Cloudea's Blog"
 				width={50}
 				height={50}
