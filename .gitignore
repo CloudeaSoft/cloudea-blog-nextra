@@ -24,3 +24,5 @@ docs/public/sitemap.xml
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+next-env.d.ts
