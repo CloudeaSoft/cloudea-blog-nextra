@@ -81,7 +81,7 @@ export const DEFAULT_BLOG_BACKEND_URL =
  * - debug deploy: `https://blog-backend-dev.<account>.workers.dev`
  */
 export function getBlogBackendUrl(): string {
-	const raw = (process.env.NEXT_PUBLIC_BLOG_BACKEND_URL ?? "").trim();
+	const raw = (process.env.NEXT_PUBLIC_BACKEND_URL ?? "").trim();
 	if (!raw) return DEFAULT_BLOG_BACKEND_URL;
 	return raw.replace(/\/+$/, "");
 }
