@@ -1,9 +1,19 @@
+/* Footer is a sibling of <main> inside .app-scroll — hide on tool details only */
+.app-scroll:has(.tool-workspace) > footer {
+	display: none;
+}
+
 .tool-workspace {
 	--tool-nav-width: 15.5rem;
 	--tool-nav-width-collapsed: 3.75rem;
 	--tool-workspace-veil: rgba(12, 14, 18, 0.42);
 	display: flex;
 	align-items: stretch;
+	/*
+	 * Lock to the in-flow navbar shell (--navbar-height stays 4rem).
+	 * Do NOT track --navbar-bar-height / compact: any shared transition
+	 * still feels delayed next to the glass bar.
+	 */
 	min-height: calc(100dvh - var(--navbar-height, 4rem));
 	width: 100%;
 	background: var(--tool-workspace-veil);

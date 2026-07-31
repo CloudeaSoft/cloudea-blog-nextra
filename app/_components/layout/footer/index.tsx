@@ -15,10 +15,10 @@ export const Footer: FC = async () => {
 
 	return (
 		<footer
+			className="site-footer flex"
 			style={{
 				background: "var(--background-color-transparent-80)",
 				padding: 20,
-				display: "flex",
 				justifyContent: "space-between",
 
 				borderTop: "1px solid var(--border-color)",
