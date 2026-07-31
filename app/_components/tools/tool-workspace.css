@@ -12,15 +12,25 @@
 		var(--background-color) 55%,
 		transparent
 	);
+	position: relative;
 	display: flex;
 	align-items: stretch;
 	/* Literal lengths so compact end-state can match the glass bar (like .toc-sticky) */
 	min-height: calc(100dvh - 4rem);
 	width: 100%;
-	background: var(--tool-workspace-veil);
-	backdrop-filter: blur(8px);
 	transition: min-height var(--navbar-compact-duration, 0.32s)
 		var(--navbar-compact-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+/* Veil on ::before so it doesn't create a fixed containing block for the drawer */
+.tool-workspace::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	background: var(--tool-workspace-veil);
+	backdrop-filter: blur(8px);
+	pointer-events: none;
 }
 
 .dark .tool-workspace {
@@ -80,6 +90,8 @@ body:has(.navbar-header[data-compact]) .tool-workspace__sidebar {
 	min-width: 0;
 	display: flex;
 	flex-direction: column;
+	position: relative;
+	z-index: 1;
 }
 
 .tool-workspace__mobile-bar {
@@ -257,12 +269,7 @@ body:has(.navbar-header[data-compact]) .tool-workspace__mobile-bar {
 @media (max-width: 1023px) {
 	.tool-workspace {
 		flex-direction: column;
-		min-height: auto;
 		transition: none;
-	}
-
-	body:has(.navbar-header[data-compact]) .tool-workspace {
-		min-height: auto;
 	}
 
 	.tool-workspace__backdrop {
@@ -273,25 +280,38 @@ body:has(.navbar-header[data-compact]) .tool-workspace__mobile-bar {
 		background: color-mix(in srgb, #000 40%, transparent);
 	}
 
-	.tool-workspace__sidebar,
-	body:has(.navbar-header[data-compact]) .tool-workspace__sidebar {
+	.tool-workspace__sidebar {
 		position: fixed;
-		top: 0;
+		top: 4rem;
 		left: 0;
 		z-index: 50;
 		width: min(18rem, 86vw);
-		height: 100dvh;
-		max-height: 100dvh;
+		height: calc(100dvh - 4rem);
+		max-height: calc(100dvh - 4rem);
 		transform: translateX(-105%);
-		transition: transform 0.22s ease;
+		transition:
+			transform 0.22s ease,
+			top var(--navbar-compact-duration, 0.32s)
+				var(--navbar-compact-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+			height var(--navbar-compact-duration, 0.32s)
+				var(--navbar-compact-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+			max-height var(--navbar-compact-duration, 0.32s)
+				var(--navbar-compact-ease, cubic-bezier(0.22, 1, 0.36, 1));
 		box-shadow: var(--cloudea-box-shadow);
+	}
+
+	body:has(.navbar-header[data-compact]) .tool-workspace__sidebar {
+		top: 3rem;
+		height: calc(100dvh - 3rem);
+		max-height: calc(100dvh - 3rem);
 	}
 
 	.tool-workspace__sidebar.is-collapsed {
 		width: min(18rem, 86vw);
 	}
 
-	.tool-workspace__sidebar.is-open {
+	.tool-workspace__sidebar.is-open,
+	body:has(.navbar-header[data-compact]) .tool-workspace__sidebar.is-open {
 		transform: translateX(0);
 	}
 
