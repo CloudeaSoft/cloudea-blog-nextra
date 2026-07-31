@@ -6,7 +6,12 @@
 .tool-workspace {
 	--tool-nav-width: 15.5rem;
 	--tool-nav-width-collapsed: 3.75rem;
-	--tool-workspace-veil: rgba(12, 14, 18, 0.42);
+	/* Light: pale wash so site atmosphere stays visible without a muddy cast */
+	--tool-workspace-veil: color-mix(
+		in srgb,
+		var(--background-color) 55%,
+		transparent
+	);
 	display: flex;
 	align-items: stretch;
 	/* Literal lengths so compact end-state can match the glass bar (like .toc-sticky) */
@@ -19,7 +24,12 @@
 }
 
 .dark .tool-workspace {
-	--tool-workspace-veil: rgba(0, 0, 0, 0.55);
+	/* Dark: deeper scrim over the atmospheric background */
+	--tool-workspace-veil: color-mix(
+		in srgb,
+		var(--background-color) 72%,
+		transparent
+	);
 }
 
 body:has(.navbar-header[data-compact]) .tool-workspace {
