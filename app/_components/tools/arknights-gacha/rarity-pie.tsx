@@ -47,17 +47,19 @@ function describeSlice(
 type RarityPieChartProps = {
 	buckets: RarityShareBucket[];
 	total: number;
+	/** Compact variant for per-pool cards (smaller chart and legend). */
+	compact?: boolean;
 };
 
-export function RarityPieChart({ buckets, total }: RarityPieChartProps) {
+export function RarityPieChart({ buckets, total, compact = false }: RarityPieChartProps) {
 	if (total === 0 || buckets.length === 0) {
 		return <p className="ak-gacha__empty">暂无数据可分析。</p>;
 	}
 
-	const size = 180;
+	const size = compact ? 96 : 180;
 	const cx = size / 2;
 	const cy = size / 2;
-	const radius = 78;
+	const radius = compact ? 40 : 78;
 
 	let angle = 0;
 	const slices = buckets.map((bucket, index) => {
@@ -77,7 +79,7 @@ export function RarityPieChart({ buckets, total }: RarityPieChartProps) {
 	});
 
 	return (
-		<div className="ak-gacha__pie">
+		<div className={compact ? "ak-gacha__pie ak-gacha__pie--compact" : "ak-gacha__pie"}>
 			<svg
 				className="ak-gacha__pie-svg"
 				viewBox={`0 0 ${size} ${size}`}

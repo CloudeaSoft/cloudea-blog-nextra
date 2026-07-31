@@ -176,6 +176,10 @@
 	margin-top: 0.95rem;
 }
 
+.ak-gacha__records-panel {
+	margin-top: 1rem;
+}
+
 .ak-gacha__action-status {
 	flex: 1 1 12rem;
 	min-width: 0;
@@ -288,6 +292,91 @@
 .ak-gacha__chip:disabled {
 	opacity: 0.55;
 	cursor: not-allowed;
+}
+
+.ak-gacha__pool-chips {
+	margin: 0.85rem 0 1rem;
+}
+
+.ak-gacha__pool-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+	gap: 0.9rem;
+	margin: 0.85rem 0 1.1rem;
+}
+
+.ak-gacha__pool-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	padding: 0.95rem 1rem;
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	background: var(--background-color-transparent-80);
+}
+
+.ak-gacha__pool-card-title {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5rem;
+	margin: 0 0 0.6rem;
+	font-size: 1rem;
+	font-weight: 600;
+	color: var(--first-text-color);
+}
+
+.ak-gacha__pool-card-name {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.ak-gacha__pool-card .ak-gacha__metrics {
+	margin-bottom: 0.85rem;
+}
+
+.ak-gacha__pool-card .ak-gacha__six-history {
+	margin-bottom: 0.85rem;
+	font-size: 0.82rem;
+}
+
+.ak-gacha__pool-card .ak-gacha__pie {
+	justify-content: flex-start;
+	gap: 0.9rem 1.1rem;
+}
+
+.ak-gacha__pool-card .ak-gacha__pie-legend {
+	gap: 0.3rem;
+	min-width: 0;
+	font-size: 0.8rem;
+}
+
+.ak-gacha__six-history {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.35rem 0.65rem;
+	margin: 0 0 1.1rem;
+	font-size: 0.88rem;
+	color: var(--second-text-color);
+}
+
+.ak-gacha__six-history-label {
+	font-weight: 600;
+	color: var(--first-text-color);
+}
+
+.ak-gacha__six-history-empty {
+	color: var(--third-text-color);
+}
+
+.ak-gacha__six-history-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem 0.55rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	font-variant-numeric: tabular-nums;
 }
 
 .ak-gacha__pie {
