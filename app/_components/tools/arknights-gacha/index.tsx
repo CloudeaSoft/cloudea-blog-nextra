@@ -27,7 +27,11 @@ import {
 import {
 	computePullCostStats,
 	computeRarityShare,
+	filterRecordsByPool,
 	formatAvgPulls,
+	formatPercent,
+	listPoolsFromRecords,
+	sixStarHistory,
 } from "./stats";
 import type { GachaAuth, GachaCategory, GachaRecord } from "./types";
 import { GachaApiError } from "./types";
@@ -49,6 +53,14 @@ function formatTime(date: Date): string {
 		second: "2-digit",
 		hour12: false,
 	});
+}
+
+/** 6★ 出货成本对应的状态（欧皇/正常/非酋）。 */
+function sixStarLuck(avg: number | null): { label: string; tone: "lucky" | "normal" | "unlucky" } | null {
+	if (avg === null) return null;
+	if (avg <= 35) return { label: "欧皇", tone: "lucky" };
+	if (avg <= 50) return { label: "正常", tone: "normal" };
+	return { label: "非酋", tone: "unlucky" };
 }
 
 function errorMessage(error: unknown): string {
@@ -79,14 +91,37 @@ export function ArknightsGachaTool() {
 		[apiCategories, cachedCategories],
 	);
 
-	const rarityBuckets = useMemo(
-		() => computeRarityShare(records),
-		[records],
+	/** All records across every cached category (global analysis), newest-first. */
+	const analysisRecords = useMemo(() => {
+		const uid = auth.uid.trim();
+		if (!uid) return [];
+		let merged: GachaRecord[] = [];
+		for (const category of cachedCategories) {
+			merged = mergeHistoryRecords(merged, loadCategoryRecords(uid, category.id));
+		}
+		return sortRecordsNewestFirst(merged);
+	}, [auth.uid, cachedCategories]);
+
+	const analysisPools = useMemo(
+		() => listPoolsFromRecords(analysisRecords),
+		[analysisRecords],
 	);
 
-	const pullCostStats = useMemo(
-		() => computePullCostStats(records),
-		[records],
+	/**
+	 * Per-pool analysis cards for the 全卡池一览 panel.
+	 * Each pool gets its own stats and rarity share; pity never spans pools.
+	 */
+	const poolAnalyses = useMemo(
+		() => analysisPools.map((pool) => {
+			const poolRecords = filterRecordsByPool(analysisRecords, pool.poolId);
+			return {
+				...pool,
+				stats: computePullCostStats(poolRecords),
+				sixHistory: sixStarHistory(poolRecords),
+				rarityBuckets: computeRarityShare(poolRecords),
+			};
+		}),
+		[analysisPools, analysisRecords],
 	);
 
 	function refreshCachedCategories(uid: string) {
@@ -458,166 +493,243 @@ export function ArknightsGachaTool() {
 							)
 							: null}
 					</div>
+
+					{(loadingHistory || records.length > 0 || activeCategoryId) && (
+						<section
+							className="ak-gacha__panel ak-gacha__records-panel"
+							aria-labelledby="ak-gacha-list-heading"
+						>
+							<div
+								className={
+									recordsExpanded
+										? "ak-gacha__panel-head"
+										: "ak-gacha__panel-head ak-gacha__panel-head--collapsed"
+								}
+							>
+								<button
+									type="button"
+									className="ak-gacha__panel-title-row ak-gacha__collapse-trigger"
+									aria-expanded={recordsExpanded}
+									aria-controls="ak-gacha-records-body"
+									onClick={() => setRecordsExpanded((open) => !open)}
+								>
+									<div className="ak-gacha__panel-title-group">
+										<span id="ak-gacha-list-heading" className="ak-gacha__panel-title">
+											抽卡记录
+											{records.length > 0
+												? (
+													<span className="ak-gacha__count">
+														(
+														{records.length}
+														)
+													</span>
+												)
+												: null}
+										</span>
+										{loadingHistory && (
+											<span className="ak-gacha__loading">
+												<Icon icon="mdi:loading" width={16} height={16} className="ak-gacha__spin" />
+												加载中
+											</span>
+										)}
+									</div>
+									<span className="ak-gacha__collapse-btn" aria-hidden>
+										<Icon
+											icon={recordsExpanded ? "mdi:chevron-up" : "mdi:chevron-down"}
+											width={22}
+											height={22}
+										/>
+									</span>
+								</button>
+							</div>
+
+							{recordsExpanded
+								? (
+									<div id="ak-gacha-records-body">
+										{!loadingHistory && records.length === 0
+											? (
+												<p className="ak-gacha__empty">该分类暂无记录，或尚未完成拉取。</p>
+											)
+											: (
+												<div className="ak-gacha__table-wrap">
+													<table className="ak-gacha__table">
+														<thead>
+															<tr>
+																<th>时间</th>
+																<th>卡池</th>
+																<th>干员</th>
+																<th>稀有度</th>
+															</tr>
+														</thead>
+														<tbody>
+															{records.map((record) => (
+																<tr key={`${record.gachaTs}-${record.pos}-${record.charId}`}>
+																	<td>{formatTime(record.gachaAt)}</td>
+																	<td>{record.poolName}</td>
+																	<td>
+																		<span className="ak-gacha__char">
+																			{record.charName}
+																			{record.isNew
+																				? (
+																					<span className="ak-gacha__new-tag">NEW</span>
+																				)
+																				: null}
+																		</span>
+																	</td>
+																	<td>
+																		<span
+																			className={`ak-gacha__rarity ak-gacha__rarity--${rarityStars(record.rarity)}`}
+																		>
+																			{"★".repeat(rarityStars(record.rarity))}
+																		</span>
+																	</td>
+																</tr>
+															))}
+														</tbody>
+													</table>
+												</div>
+											)}
+									</div>
+								)
+								: null}
+						</section>
+					)}
 				</section>
 			)}
 
-			{records.length > 0 && (
+			{analysisRecords.length > 0 && (
 				<section className="ak-gacha__panel" aria-labelledby="ak-gacha-analysis-heading">
 					<h2 id="ak-gacha-analysis-heading" className="ak-gacha__panel-title">
 						卡池分析
 					</h2>
 					<p className="ak-gacha__hint">
-						基于当前分类已加载的
+						基于全部
 						{" "}
-						{records.length}
+						{analysisRecords.length}
 						{" "}
-						条记录。平均消耗按相邻同星出货间隔计算；保底为距上次六星的抽数。
+						条记录（
+						{cachedCategories.length}
+						{" "}
+						个分类），按卡池分别统计。平均消耗按相邻同星出货间隔计算；「距上次六星」为距上一次出货六星的抽数。
 					</p>
-					<ul className="ak-gacha__metrics">
-						<li className="ak-gacha__metric">
-							<span className="ak-gacha__metric-label">5★ 平均消耗</span>
-							<span className="ak-gacha__metric-value">
-								{formatAvgPulls(pullCostStats.avgFiveStar)}
-								{pullCostStats.avgFiveStar !== null
-									? (
-										<span className="ak-gacha__metric-unit">抽</span>
-									)
-									: null}
-							</span>
-							<span className="ak-gacha__metric-sub">
-								共
-								{" "}
-								{pullCostStats.fiveStarCount}
-								{" "}
-								次
-							</span>
-						</li>
-						<li className="ak-gacha__metric">
-							<span className="ak-gacha__metric-label">6★ 平均消耗</span>
-							<span className="ak-gacha__metric-value">
-								{formatAvgPulls(pullCostStats.avgSixStar)}
-								{pullCostStats.avgSixStar !== null
-									? (
-										<span className="ak-gacha__metric-unit">抽</span>
-									)
-									: null}
-							</span>
-							<span className="ak-gacha__metric-sub">
-								共
-								{" "}
-								{pullCostStats.sixStarCount}
-								{" "}
-								次
-							</span>
-						</li>
-						<li className="ak-gacha__metric">
-							<span className="ak-gacha__metric-label">当次保底已抽</span>
-							<span className="ak-gacha__metric-value">
-								{pullCostStats.currentPity}
-								<span className="ak-gacha__metric-unit">抽</span>
-							</span>
-							<span className="ak-gacha__metric-sub">距上次六星</span>
-						</li>
-					</ul>
-					<RarityPieChart buckets={rarityBuckets} total={records.length} />
-				</section>
-			)}
+					<div className="ak-gacha__pool-grid">
+						{poolAnalyses.map((pool) => {
+							const luck = sixStarLuck(pool.stats.avgSixStar);
 
-			{(loadingHistory || records.length > 0 || activeCategoryId) && (
-				<section className="ak-gacha__panel" aria-labelledby="ak-gacha-list-heading">
-					<div
-						className={
-							recordsExpanded
-								? "ak-gacha__panel-head"
-								: "ak-gacha__panel-head ak-gacha__panel-head--collapsed"
-						}
-					>
-						<button
-							type="button"
-							className="ak-gacha__panel-title-row ak-gacha__collapse-trigger"
-							aria-expanded={recordsExpanded}
-							aria-controls="ak-gacha-records-body"
-							onClick={() => setRecordsExpanded((open) => !open)}
-						>
-							<div className="ak-gacha__panel-title-group">
-								<span id="ak-gacha-list-heading" className="ak-gacha__panel-title">
-									抽卡记录
-									{records.length > 0
-										? (
+							return (
+								<article
+									key={pool.poolId}
+									className="ak-gacha__pool-card"
+									title={pool.poolId}
+								>
+									<div className="ak-gacha__pool-card-head">
+										<h3 className="ak-gacha__pool-card-title">
+											<span className="ak-gacha__pool-card-name">{pool.poolName}</span>
 											<span className="ak-gacha__count">
-												(
-												{records.length}
-												)
+												{pool.count}
+												抽
 											</span>
-										)
-										: null}
-								</span>
-								{loadingHistory && (
-									<span className="ak-gacha__loading">
-										<Icon icon="mdi:loading" width={16} height={16} className="ak-gacha__spin" />
-										加载中
-									</span>
-								)}
-							</div>
-							<span className="ak-gacha__collapse-btn" aria-hidden>
-								<Icon
-									icon={recordsExpanded ? "mdi:chevron-up" : "mdi:chevron-down"}
-									width={22}
-									height={22}
-								/>
-							</span>
-						</button>
-					</div>
+										</h3>
+										{luck
+											? (
+												<span
+													className={`ak-gacha__luck ak-gacha__luck--${luck.tone}`}
+													title={`6★ 平均消耗 ${formatAvgPulls(pool.stats.avgSixStar)} 抽`}
+												>
+													{luck.label}
+												</span>
+											)
+											: null}
+									</div>
 
-					{recordsExpanded
-						? (
-							<div id="ak-gacha-records-body">
-								{!loadingHistory && records.length === 0
-									? (
-										<p className="ak-gacha__empty">该分类暂无记录，或尚未完成拉取。</p>
-									)
-									: (
-										<div className="ak-gacha__table-wrap">
-											<table className="ak-gacha__table">
-												<thead>
-													<tr>
-														<th>时间</th>
-														<th>卡池</th>
-														<th>干员</th>
-														<th>稀有度</th>
-													</tr>
-												</thead>
-												<tbody>
-													{records.map((record) => (
-														<tr key={`${record.gachaTs}-${record.pos}-${record.charId}`}>
-															<td>{formatTime(record.gachaAt)}</td>
-															<td>{record.poolName}</td>
-															<td>
-																<span className="ak-gacha__char">
-																	{record.charName}
-																	{record.isNew
-																		? (
-																			<span className="ak-gacha__new-tag">NEW</span>
-																		)
-																		: null}
-																</span>
-															</td>
-															<td>
-																<span
-																	className={`ak-gacha__rarity ak-gacha__rarity--${rarityStars(record.rarity)}`}
-																>
-																	{"★".repeat(rarityStars(record.rarity))}
-																</span>
-															</td>
-														</tr>
-													))}
-												</tbody>
-											</table>
-										</div>
-									)}
-							</div>
-						)
-						: null}
+									{/* 稀有度分布条 */}
+									<div
+										className="ak-gacha__rarity-bar"
+										role="img"
+										aria-label={`稀有度分布：${pool.rarityBuckets.map((b) => `${b.stars}★ ${b.count}次`).join("，")}`}
+									>
+										{pool.rarityBuckets.map((bucket) => (
+											<span
+												key={bucket.stars}
+												className={`ak-gacha__rarity-bar-seg ak-gacha__rarity-bar-seg--${bucket.stars}`}
+												style={{ width: `${bucket.ratio * 100}%` }}
+												title={`${bucket.stars}★ ${bucket.count} 次 (${formatPercent(bucket.ratio)})`}
+											/>
+										))}
+									</div>
+
+									<ul className="ak-gacha__metrics">
+										<li className="ak-gacha__metric ak-gacha__metric--5star">
+											<span className="ak-gacha__metric-label">5★ 平均消耗</span>
+											<span className="ak-gacha__metric-value">
+												{formatAvgPulls(pool.stats.avgFiveStar)}
+												{pool.stats.avgFiveStar !== null
+													? (
+														<span className="ak-gacha__metric-unit">抽</span>
+													)
+													: null}
+											</span>
+											<span className="ak-gacha__metric-sub">
+												共
+												{" "}
+												{pool.stats.fiveStarCount}
+												{" "}
+												次
+											</span>
+										</li>
+										<li className="ak-gacha__metric ak-gacha__metric--6star">
+											<span className="ak-gacha__metric-label">6★ 平均消耗</span>
+											<span className="ak-gacha__metric-value">
+												{formatAvgPulls(pool.stats.avgSixStar)}
+												{pool.stats.avgSixStar !== null
+													? (
+														<span className="ak-gacha__metric-unit">抽</span>
+													)
+													: null}
+											</span>
+											<span className="ak-gacha__metric-sub">
+												共
+												{" "}
+												{pool.stats.sixStarCount}
+												{" "}
+												次
+											</span>
+										</li>
+										<li className="ak-gacha__metric ak-gacha__metric--pity">
+											<span className="ak-gacha__metric-label">距上次六星</span>
+											<span className="ak-gacha__metric-value">
+												{pool.stats.currentPity}
+												<span className="ak-gacha__metric-unit">抽</span>
+											</span>
+
+										</li>
+									</ul>
+
+									{/* 六星历史：角色名以空格分隔 */}
+									<div className="ak-gacha__six-history">
+										<span className="ak-gacha__six-history-label">六星历史</span>
+										{pool.sixHistory.length === 0
+											? (
+												<span className="ak-gacha__six-history-empty">无</span>
+											)
+											: (
+												<p className="ak-gacha__six-history-names">
+													{pool.sixHistory
+														.map((entry) => `${entry.name}[${entry.count}]`)
+														.join(" ")}
+												</p>
+											)}
+									</div>
+
+									<RarityPieChart
+										compact
+										buckets={pool.rarityBuckets}
+										total={pool.count}
+									/>
+								</article>
+							);
+						})}
+					</div>
 				</section>
 			)}
 		</div>

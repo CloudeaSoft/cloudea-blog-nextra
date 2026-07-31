@@ -5,8 +5,6 @@ const STAR_COLORS: Record<number, string> = {
 	5: "#e6b422",
 	4: "#7a45e8",
 	3: "#9aa3ab",
-	2: "#b0bec5",
-	1: "#90a4ae",
 };
 
 function starColor(stars: number): string {
@@ -47,17 +45,25 @@ function describeSlice(
 type RarityPieChartProps = {
 	buckets: RarityShareBucket[];
 	total: number;
+	/** Compact variant for per-pool cards (smaller chart and legend). */
+	compact?: boolean;
 };
 
-export function RarityPieChart({ buckets, total }: RarityPieChartProps) {
+/** Fixed star-rarity key, high→low, so legend height is stable across pools.
+ *  Arknights gacha only ever yields 3★–6★, so the key covers those four. */
+const ALL_STARS = [6, 5, 4, 3];
+
+export function RarityPieChart({ buckets, total, compact = false }: RarityPieChartProps) {
 	if (total === 0 || buckets.length === 0) {
 		return <p className="ak-gacha__empty">暂无数据可分析。</p>;
 	}
 
-	const size = 180;
+	const size = compact ? 96 : 180;
 	const cx = size / 2;
 	const cy = size / 2;
-	const radius = 78;
+	const radius = compact ? 40 : 78;
+
+	const byStars = new Map(buckets.map((bucket) => [bucket.stars, bucket]));
 
 	let angle = 0;
 	const slices = buckets.map((bucket, index) => {
@@ -77,7 +83,7 @@ export function RarityPieChart({ buckets, total }: RarityPieChartProps) {
 	});
 
 	return (
-		<div className="ak-gacha__pie">
+		<div className={compact ? "ak-gacha__pie ak-gacha__pie--compact" : "ak-gacha__pie"}>
 			<svg
 				className="ak-gacha__pie-svg"
 				viewBox={`0 0 ${size} ${size}`}
@@ -114,26 +120,47 @@ export function RarityPieChart({ buckets, total }: RarityPieChartProps) {
 			</svg>
 
 			<ul className="ak-gacha__pie-legend">
-				{buckets.map((bucket) => (
-					<li key={bucket.stars} className="ak-gacha__pie-legend-item">
-						<span
-							className="ak-gacha__pie-swatch"
-							style={{ background: starColor(bucket.stars) }}
-							aria-hidden
-						/>
-						<span className="ak-gacha__pie-legend-label">
-							{bucket.stars}
-							★
-						</span>
-						<span className="ak-gacha__pie-legend-count">
-							{bucket.count}
-							{" "}
-							(
-							{formatPercent(bucket.ratio)}
-							)
-						</span>
-					</li>
-				))}
+				{ALL_STARS.map((stars) => {
+					const bucket = byStars.get(stars);
+					if (bucket) {
+						return (
+							<li key={stars} className="ak-gacha__pie-legend-item">
+								<span
+									className="ak-gacha__pie-swatch"
+									style={{ background: starColor(stars) }}
+									aria-hidden
+								/>
+								<span className="ak-gacha__pie-legend-label">
+									{stars}
+									★
+								</span>
+								<span className="ak-gacha__pie-legend-count">
+									{bucket.count}
+									{" "}
+									(
+									{formatPercent(bucket.ratio)}
+									)
+								</span>
+							</li>
+						);
+					}
+					return (
+						<li
+							key={stars}
+							className="ak-gacha__pie-legend-item ak-gacha__pie-legend-item--muted"
+						>
+							<span
+								className="ak-gacha__pie-swatch ak-gacha__pie-swatch--muted"
+								aria-hidden
+							/>
+							<span className="ak-gacha__pie-legend-label">
+								{stars}
+								★
+							</span>
+							<span className="ak-gacha__pie-legend-count">—</span>
+						</li>
+					);
+				})}
 				<li className="ak-gacha__pie-legend-total">
 					合计
 					{" "}
