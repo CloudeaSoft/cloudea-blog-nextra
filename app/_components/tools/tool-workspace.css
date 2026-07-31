@@ -9,19 +9,21 @@
 	--tool-workspace-veil: rgba(12, 14, 18, 0.42);
 	display: flex;
 	align-items: stretch;
-	/*
-	 * Lock to the in-flow navbar shell (--navbar-height stays 4rem).
-	 * Do NOT track --navbar-bar-height / compact: any shared transition
-	 * still feels delayed next to the glass bar.
-	 */
-	min-height: calc(100dvh - var(--navbar-height, 4rem));
+	/* Literal lengths so compact end-state can match the glass bar (like .toc-sticky) */
+	min-height: calc(100dvh - 4rem);
 	width: 100%;
 	background: var(--tool-workspace-veil);
 	backdrop-filter: blur(8px);
+	transition: min-height var(--navbar-compact-duration, 0.32s)
+		var(--navbar-compact-ease, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
 .dark .tool-workspace {
 	--tool-workspace-veil: rgba(0, 0, 0, 0.55);
+}
+
+body:has(.navbar-header[data-compact]) .tool-workspace {
+	min-height: calc(100dvh - 3rem);
 }
 
 .tool-workspace__backdrop {
@@ -30,18 +32,33 @@
 
 .tool-workspace__sidebar {
 	position: sticky;
-	top: var(--navbar-height, 4rem);
+	top: 4rem;
 	align-self: flex-start;
 	z-index: 20;
 	display: flex;
 	flex-direction: column;
 	width: var(--tool-nav-width);
-	height: calc(100dvh - var(--navbar-height, 4rem));
+	height: calc(100dvh - 4rem);
+	max-height: calc(100dvh - 4rem);
 	flex-shrink: 0;
 	border-right: 1px solid var(--border-color);
 	background: var(--background-color-transparent-80);
 	backdrop-filter: blur(10px);
-	transition: width 0.2s ease;
+	transition:
+		width 0.2s ease,
+		top var(--navbar-compact-duration, 0.32s)
+			var(--navbar-compact-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+		height var(--navbar-compact-duration, 0.32s)
+			var(--navbar-compact-ease, cubic-bezier(0.22, 1, 0.36, 1)),
+		max-height var(--navbar-compact-duration, 0.32s)
+			var(--navbar-compact-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+/* Final resting state must flush to the visual bar (3rem when compact) */
+body:has(.navbar-header[data-compact]) .tool-workspace__sidebar {
+	top: 3rem;
+	height: calc(100dvh - 3rem);
+	max-height: calc(100dvh - 3rem);
 }
 
 .tool-workspace__sidebar.is-collapsed {
@@ -64,8 +81,14 @@
 	background: var(--background-color-transparent-80);
 	backdrop-filter: blur(8px);
 	position: sticky;
-	top: var(--navbar-height, 4rem);
+	top: 4rem;
 	z-index: 15;
+	transition: top var(--navbar-compact-duration, 0.32s)
+		var(--navbar-compact-ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+body:has(.navbar-header[data-compact]) .tool-workspace__mobile-bar {
+	top: 3rem;
 }
 
 .tool-workspace__menu-btn {
@@ -225,6 +248,11 @@
 	.tool-workspace {
 		flex-direction: column;
 		min-height: auto;
+		transition: none;
+	}
+
+	body:has(.navbar-header[data-compact]) .tool-workspace {
+		min-height: auto;
 	}
 
 	.tool-workspace__backdrop {
@@ -235,13 +263,15 @@
 		background: color-mix(in srgb, #000 40%, transparent);
 	}
 
-	.tool-workspace__sidebar {
+	.tool-workspace__sidebar,
+	body:has(.navbar-header[data-compact]) .tool-workspace__sidebar {
 		position: fixed;
 		top: 0;
 		left: 0;
 		z-index: 50;
 		width: min(18rem, 86vw);
 		height: 100dvh;
+		max-height: 100dvh;
 		transform: translateX(-105%);
 		transition: transform 0.22s ease;
 		box-shadow: var(--cloudea-box-shadow);
