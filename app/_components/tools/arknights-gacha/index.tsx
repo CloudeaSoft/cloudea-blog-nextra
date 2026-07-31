@@ -29,6 +29,7 @@ import {
 	computeRarityShare,
 	filterRecordsByPool,
 	formatAvgPulls,
+	formatPercent,
 	listPoolsFromRecords,
 	sixStarHistory,
 } from "./stats";
@@ -52,6 +53,29 @@ function formatTime(date: Date): string {
 		second: "2-digit",
 		hour12: false,
 	});
+}
+
+/** 6★ 出货成本对应的状态（欧皇/正常/非酋）。 */
+function sixStarLuck(avg: number | null): { label: string; tone: "lucky" | "normal" | "unlucky" } | null {
+	if (avg === null) return null;
+	if (avg <= 35) return { label: "欧皇", tone: "lucky" };
+	if (avg <= 50) return { label: "正常", tone: "normal" };
+	return { label: "非酋", tone: "unlucky" };
+}
+
+/** 单个六星出货在横向时间线上的颜色（按成本从绿到红渐变）。 */
+function sixStarCostColor(cost: number): string {
+	// 1-30: 绿 → 黄；31-60: 黄 → 橙；61+: 橙 → 红
+	if (cost <= 30) {
+		const t = cost / 30;
+		return `hsl(${Math.round(140 - t * 60)}, 70%, 55%)`;
+	}
+	if (cost <= 60) {
+		const t = (cost - 30) / 30;
+		return `hsl(${Math.round(80 - t * 40)}, 75%, 55%)`;
+	}
+	const t = Math.min((cost - 60) / 40, 1);
+	return `hsl(${Math.round(40 - t * 30)}, 80%, 55%)`;
 }
 
 function errorMessage(error: unknown): string {
@@ -604,91 +628,151 @@ export function ArknightsGachaTool() {
 						个分类），按卡池分别统计。平均消耗按相邻同星出货间隔计算；保底为距上次六星的抽数。
 					</p>
 					<div className="ak-gacha__pool-grid">
-						{poolAnalyses.map((pool) => (
-							<article
-								key={pool.poolId}
-								className="ak-gacha__pool-card"
-								title={pool.poolId}
-							>
-								<h3 className="ak-gacha__pool-card-title">
-									<span className="ak-gacha__pool-card-name">{pool.poolName}</span>
-									<span className="ak-gacha__count">
-										{pool.count}
-										抽
-									</span>
-								</h3>
-								<ul className="ak-gacha__metrics">
-									<li className="ak-gacha__metric">
-										<span className="ak-gacha__metric-label">5★ 平均消耗</span>
-										<span className="ak-gacha__metric-value">
-											{formatAvgPulls(pool.stats.avgFiveStar)}
-											{pool.stats.avgFiveStar !== null
-												? (
-													<span className="ak-gacha__metric-unit">抽</span>
-												)
-												: null}
-										</span>
-										<span className="ak-gacha__metric-sub">
-											共
-											{" "}
-											{pool.stats.fiveStarCount}
-											{" "}
-											次
-										</span>
-									</li>
-									<li className="ak-gacha__metric">
-										<span className="ak-gacha__metric-label">6★ 平均消耗</span>
-										<span className="ak-gacha__metric-value">
-											{formatAvgPulls(pool.stats.avgSixStar)}
-											{pool.stats.avgSixStar !== null
-												? (
-													<span className="ak-gacha__metric-unit">抽</span>
-												)
-												: null}
-										</span>
-										<span className="ak-gacha__metric-sub">
-											共
-											{" "}
-											{pool.stats.sixStarCount}
-											{" "}
-											次
-										</span>
-									</li>
-									<li className="ak-gacha__metric">
-										<span className="ak-gacha__metric-label">当次保底已抽</span>
-										<span className="ak-gacha__metric-value">
-											{pool.stats.currentPity}
-											<span className="ak-gacha__metric-unit">抽</span>
-										</span>
-										<span className="ak-gacha__metric-sub">距上次六星</span>
-									</li>
-								</ul>
-								<div className="ak-gacha__six-history">
-									<span className="ak-gacha__six-history-label">六星历史</span>
-									{pool.sixHistory.length === 0
-										? (
-											<span className="ak-gacha__six-history-empty">无</span>
-										)
-										: (
-											<ul className="ak-gacha__six-history-list">
-												{pool.sixHistory.map((entry, index) => (
-													<li key={`${entry.name}-${entry.count}-${index}`}>
-														{entry.name}
-														[
-														{entry.count}
-														]
-													</li>
-												))}
-											</ul>
-										)}
-								</div>
-								<RarityPieChart
-									compact
-									buckets={pool.rarityBuckets}
-									total={pool.count}
-								/>
-							</article>
-						))}
+						{poolAnalyses.map((pool) => {
+							const luck = sixStarLuck(pool.stats.avgSixStar);
+							const maxSixCost = Math.max(1, ...pool.sixHistory.map((e) => e.count));
+							return (
+								<article
+									key={pool.poolId}
+									className="ak-gacha__pool-card"
+									title={pool.poolId}
+								>
+									<div className="ak-gacha__pool-card-head">
+										<h3 className="ak-gacha__pool-card-title">
+											<span className="ak-gacha__pool-card-name">{pool.poolName}</span>
+											<span className="ak-gacha__count">
+												{pool.count}
+												抽
+											</span>
+										</h3>
+										{luck
+											? (
+												<span
+													className={`ak-gacha__luck ak-gacha__luck--${luck.tone}`}
+													title={`6★ 平均消耗 ${formatAvgPulls(pool.stats.avgSixStar)} 抽`}
+												>
+													{luck.label}
+												</span>
+											)
+											: null}
+									</div>
+
+									{/* 稀有度分布条 */}
+									<div
+										className="ak-gacha__rarity-bar"
+										role="img"
+										aria-label={`稀有度分布：${pool.rarityBuckets.map((b) => `${b.stars}★ ${b.count}次`).join("，")}`}
+									>
+										{pool.rarityBuckets.map((bucket) => (
+											<span
+												key={bucket.stars}
+												className={`ak-gacha__rarity-bar-seg ak-gacha__rarity-bar-seg--${bucket.stars}`}
+												style={{ width: `${bucket.ratio * 100}%` }}
+												title={`${bucket.stars}★ ${bucket.count} 次 (${formatPercent(bucket.ratio)})`}
+											/>
+										))}
+									</div>
+
+									<ul className="ak-gacha__metrics">
+										<li className="ak-gacha__metric ak-gacha__metric--5star">
+											<span className="ak-gacha__metric-label">5★ 平均消耗</span>
+											<span className="ak-gacha__metric-value">
+												{formatAvgPulls(pool.stats.avgFiveStar)}
+												{pool.stats.avgFiveStar !== null
+													? (
+														<span className="ak-gacha__metric-unit">抽</span>
+													)
+													: null}
+											</span>
+											<span className="ak-gacha__metric-sub">
+												共
+												{" "}
+												{pool.stats.fiveStarCount}
+												{" "}
+												次
+											</span>
+										</li>
+										<li className="ak-gacha__metric ak-gacha__metric--6star">
+											<span className="ak-gacha__metric-label">6★ 平均消耗</span>
+											<span className="ak-gacha__metric-value">
+												{formatAvgPulls(pool.stats.avgSixStar)}
+												{pool.stats.avgSixStar !== null
+													? (
+														<span className="ak-gacha__metric-unit">抽</span>
+													)
+													: null}
+											</span>
+											<span className="ak-gacha__metric-sub">
+												共
+												{" "}
+												{pool.stats.sixStarCount}
+												{" "}
+												次
+											</span>
+										</li>
+										<li className="ak-gacha__metric ak-gacha__metric--pity">
+											<span className="ak-gacha__metric-label">当次保底已抽</span>
+											<span className="ak-gacha__metric-value">
+												{pool.stats.currentPity}
+												<span className="ak-gacha__metric-unit">抽</span>
+											</span>
+											<span className="ak-gacha__metric-sub">距上次六星</span>
+											<span
+												className="ak-gacha__pity-track"
+												aria-hidden
+											>
+												<span
+													className="ak-gacha__pity-fill"
+													style={{ width: `${Math.min((pool.stats.currentPity / 99) * 100, 100)}%` }}
+												/>
+											</span>
+										</li>
+									</ul>
+
+									{/* 六星历史时间线 */}
+									<div className="ak-gacha__six-history">
+										<span className="ak-gacha__six-history-label">六星历史</span>
+										{pool.sixHistory.length === 0
+											? (
+												<span className="ak-gacha__six-history-empty">无</span>
+											)
+											: (
+												<ul className="ak-gacha__six-history-list">
+													{pool.sixHistory.map((entry, index) => (
+														<li
+															key={`${entry.name}-${entry.count}-${index}`}
+															className="ak-gacha__six-history-item"
+															style={{ flexGrow: entry.count }}
+															title={`${entry.name} · ${entry.count} 抽`}
+														>
+															<span
+																className="ak-gacha__six-history-bar"
+																style={{
+																	backgroundColor: sixStarCostColor(entry.count),
+																	opacity: 0.25 + (entry.count / maxSixCost) * 0.75,
+																}}
+															/>
+															<span className="ak-gacha__six-history-tip">
+																<span className="ak-gacha__six-history-name">{entry.name}</span>
+																<span className="ak-gacha__six-history-count">
+																	{entry.count}
+																	抽
+																</span>
+															</span>
+														</li>
+													))}
+												</ul>
+											)}
+									</div>
+
+									<RarityPieChart
+										compact
+										buckets={pool.rarityBuckets}
+										total={pool.count}
+									/>
+								</article>
+							);
+						})}
 					</div>
 				</section>
 			)}
