@@ -1,7 +1,6 @@
 "use client";
 
 import { Icon } from "@iconify-icon/react";
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
 	clearAuth,
@@ -280,10 +279,6 @@ export function ArknightsGachaTool() {
 		<div className="ak-gacha">
 			<header className="ak-gacha__header">
 				<div>
-					<Link href="/tools" className="ak-gacha__back">
-						<Icon icon="mdi:arrow-left" width={16} height={16} />
-						Tools
-					</Link>
 					<h1 className="ak-gacha__title">Arknights Gacha History</h1>
 					<p className="ak-gacha__desc">
 						填写鹰角账号 token 后点击「更新卡池」即可登录并刷新分类。

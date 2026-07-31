@@ -1,7 +1,6 @@
 "use client";
 
 import { Icon } from "@iconify-icon/react";
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PreviewCanvas, type PreviewCanvasHandle } from "./canvas";
 import { DEFAULT_CSHARP } from "./csharp/defaults";
@@ -438,17 +437,6 @@ export function HlslPreviewTool() {
 		<div className="hlsl-preview">
 			<header className="hlsl-preview__header">
 				<div className="hlsl-preview__heading">
-					<Link
-						href="/tools"
-						className="hlsl-preview__back"
-					>
-						<Icon
-							icon="mdi:arrow-left"
-							width={18}
-							height={18}
-						/>
-						Tools
-					</Link>
 					<h1 className="hlsl-preview__title">HLSL Preview</h1>
 					<p className="hlsl-preview__desc">
 						C# geometry + HLSL VS/PS with

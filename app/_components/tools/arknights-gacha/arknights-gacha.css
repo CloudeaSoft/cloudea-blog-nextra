@@ -8,20 +8,6 @@
 	animation: ak-gacha-fade-up 0.4s ease-out both;
 }
 
-.ak-gacha__back {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.35rem;
-	margin-bottom: 0.65rem;
-	color: var(--third-text-color);
-	text-decoration: none;
-	font-size: 0.9rem;
-}
-
-.ak-gacha__back:hover {
-	color: var(--primary-color);
-}
-
 .ak-gacha__title {
 	margin: 0;
 	font-size: 1.75rem;
