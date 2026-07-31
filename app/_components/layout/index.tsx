@@ -16,6 +16,7 @@ export const Layout: FC<LayoutProps> = ({ children, ...themeConfig }) => {
 		<ThemeProvider
 			attribute="class"
 			enableColorScheme
+			disableTransitionOnChange
 			themes={["light", "dark"]}
 			{...nextThemes}
 		>

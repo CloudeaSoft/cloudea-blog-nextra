@@ -5,8 +5,9 @@
 body .site-background-layer {
 	overflow: hidden;
 	pointer-events: none;
+	/* Opacity snaps with the theme class so View Transition snapshots stay
+	 * clean; scroll-blur still animates filter/transform. */
 	transition:
-		opacity 0.3s ease,
 		filter 0.55s cubic-bezier(0.22, 1, 0.36, 1),
 		transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 	filter: blur(0);

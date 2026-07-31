@@ -1,6 +1,6 @@
 /* PC navbar visual interactions: active underline, hover bounce, scroll compact.
  * Compact applies on all viewports (scrollport is `.app-scroll`).
- * `body …` prefixes beat the global `body *` color-only transition rule.
+ * `body …` prefixes keep specificity aligned with other layout rules.
  *
  * Stick the header inside `.app-scroll` (not `position: fixed` on the
  * viewport). A viewport-fixed bar paints over the scrollport’s native
