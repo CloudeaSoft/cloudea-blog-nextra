@@ -63,21 +63,6 @@ function sixStarLuck(avg: number | null): { label: string; tone: "lucky" | "norm
 	return { label: "非酋", tone: "unlucky" };
 }
 
-/** 单个六星出货在横向时间线上的颜色（按成本从绿到红渐变）。 */
-function sixStarCostColor(cost: number): string {
-	// 1-30: 绿 → 黄；31-60: 黄 → 橙；61+: 橙 → 红
-	if (cost <= 30) {
-		const t = cost / 30;
-		return `hsl(${Math.round(140 - t * 60)}, 70%, 55%)`;
-	}
-	if (cost <= 60) {
-		const t = (cost - 30) / 30;
-		return `hsl(${Math.round(80 - t * 40)}, 75%, 55%)`;
-	}
-	const t = Math.min((cost - 60) / 40, 1);
-	return `hsl(${Math.round(40 - t * 30)}, 80%, 55%)`;
-}
-
 function errorMessage(error: unknown): string {
 	if (error instanceof GachaApiError) return error.message;
 	if (error instanceof Error) return error.message;
@@ -625,12 +610,12 @@ export function ArknightsGachaTool() {
 						条记录（
 						{cachedCategories.length}
 						{" "}
-						个分类），按卡池分别统计。平均消耗按相邻同星出货间隔计算；保底为距上次六星的抽数。
+						个分类），按卡池分别统计。平均消耗按相邻同星出货间隔计算；「距上次六星」为距上一次出货六星的抽数。
 					</p>
 					<div className="ak-gacha__pool-grid">
 						{poolAnalyses.map((pool) => {
 							const luck = sixStarLuck(pool.stats.avgSixStar);
-							const maxSixCost = Math.max(1, ...pool.sixHistory.map((e) => e.count));
+
 							return (
 								<article
 									key={pool.poolId}
@@ -711,25 +696,16 @@ export function ArknightsGachaTool() {
 											</span>
 										</li>
 										<li className="ak-gacha__metric ak-gacha__metric--pity">
-											<span className="ak-gacha__metric-label">当次保底已抽</span>
+											<span className="ak-gacha__metric-label">距上次六星</span>
 											<span className="ak-gacha__metric-value">
 												{pool.stats.currentPity}
 												<span className="ak-gacha__metric-unit">抽</span>
 											</span>
-											<span className="ak-gacha__metric-sub">距上次六星</span>
-											<span
-												className="ak-gacha__pity-track"
-												aria-hidden
-											>
-												<span
-													className="ak-gacha__pity-fill"
-													style={{ width: `${Math.min((pool.stats.currentPity / 99) * 100, 100)}%` }}
-												/>
-											</span>
+
 										</li>
 									</ul>
 
-									{/* 六星历史时间线 */}
+									{/* 六星历史：角色名以空格分隔 */}
 									<div className="ak-gacha__six-history">
 										<span className="ak-gacha__six-history-label">六星历史</span>
 										{pool.sixHistory.length === 0
@@ -737,31 +713,11 @@ export function ArknightsGachaTool() {
 												<span className="ak-gacha__six-history-empty">无</span>
 											)
 											: (
-												<ul className="ak-gacha__six-history-list">
-													{pool.sixHistory.map((entry, index) => (
-														<li
-															key={`${entry.name}-${entry.count}-${index}`}
-															className="ak-gacha__six-history-item"
-															style={{ flexGrow: entry.count }}
-															title={`${entry.name} · ${entry.count} 抽`}
-														>
-															<span
-																className="ak-gacha__six-history-bar"
-																style={{
-																	backgroundColor: sixStarCostColor(entry.count),
-																	opacity: 0.25 + (entry.count / maxSixCost) * 0.75,
-																}}
-															/>
-															<span className="ak-gacha__six-history-tip">
-																<span className="ak-gacha__six-history-name">{entry.name}</span>
-																<span className="ak-gacha__six-history-count">
-																	{entry.count}
-																	抽
-																</span>
-															</span>
-														</li>
-													))}
-												</ul>
+												<p className="ak-gacha__six-history-names">
+													{pool.sixHistory
+														.map((entry) => `${entry.name}[${entry.count}]`)
+														.join(" ")}
+												</p>
 											)}
 									</div>
 
