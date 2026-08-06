@@ -7,13 +7,16 @@ import { getImageUrl } from "@/utils/get-resources-url";
 
 import "./globals.css";
 
+const SITE_DESCRIPTION =
+	"Cloudea's personal blog — notes on .NET, game development, algorithms, and travel.";
+
 export const metadata: Metadata = {
 	metadataBase: new URL("https://blog.cloudea.work"),
 	title: {
 		absolute: "Cloudea's Blog",
 		template: "%s - Cloudea's Blog",
 	},
-	description: "",
+	description: SITE_DESCRIPTION,
 	applicationName: "Cloudea's Blog",
 	generator: "Next.js",
 	appleWebApp: {
@@ -24,6 +27,13 @@ export const metadata: Metadata = {
 		getImageUrl("favicon-32.ico"),
 		getImageUrl("favicon-96.ico"),
 	],
+	openGraph: {
+		type: "website",
+		siteName: "Cloudea's Blog",
+		title: "Cloudea's Blog",
+		description: SITE_DESCRIPTION,
+		images: [getImageUrl("wallhaven-wqery6-light.webp")],
+	},
 };
 
 const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
