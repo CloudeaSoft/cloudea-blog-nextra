@@ -35,6 +35,7 @@ async function prepare(page: Page) {
 	await page.route("**/vercount.one/**", (route) => route.abort());
 	// Avatars are decorative for these assertions; avoid flaky external loads.
 	await page.route("**/avatar.png", (route) => route.abort());
+	await page.route("**/avatar.jpg", (route) => route.abort());
 	await page.route("**/dicebear.com/**", (route) => route.abort());
 	await page.addInitScript(() => {
 		try {
