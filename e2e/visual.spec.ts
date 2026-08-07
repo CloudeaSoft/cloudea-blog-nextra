@@ -24,9 +24,10 @@ async function preparePage(page: Page) {
 	// Block third-party analytics that can mutate the DOM.
 	await page.route("https://events.vercount.one/**", (route) => route.abort());
 	await page.route("**/vercount.one/**", (route) => route.abort());
-	// Friend avatars are external; abort so networkidle is not blocked by remote hosts.
-	await page.route("**/avatar.png", (route) => route.abort());
-	await page.route("**/avatar.jpg", (route) => route.abort());
+	// Friend avatars are external; abort remote hosts so networkidle is stable.
+	// Keep same-origin /images/avatar.jpg available for Exchange site info.
+	await page.route("https://evan.beee.top/**", (route) => route.abort());
+	await page.route("https://blog-img.l3zc.com/**", (route) => route.abort());
 	await page.route("**/dicebear.com/**", (route) => route.abort());
 
 	// Force light theme before first paint (next-themes reads localStorage).

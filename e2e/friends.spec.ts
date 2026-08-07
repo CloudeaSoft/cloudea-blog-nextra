@@ -33,9 +33,9 @@ function loadFriendsYaml(): FriendCategory[] {
 async function prepare(page: Page) {
 	await page.route("https://events.vercount.one/**", (route) => route.abort());
 	await page.route("**/vercount.one/**", (route) => route.abort());
-	// Avatars are decorative for these assertions; avoid flaky external loads.
-	await page.route("**/avatar.png", (route) => route.abort());
-	await page.route("**/avatar.jpg", (route) => route.abort());
+	// Friend avatars are decorative; abort remote hosts only (keep site /images).
+	await page.route("https://evan.beee.top/**", (route) => route.abort());
+	await page.route("https://blog-img.l3zc.com/**", (route) => route.abort());
 	await page.route("**/dicebear.com/**", (route) => route.abort());
 	await page.addInitScript(() => {
 		try {
@@ -109,6 +109,22 @@ test.describe("friends: page content", () => {
 		}
 
 		await expect(page.getByRole("heading", { name: "Exchange" })).toBeVisible();
+		const siteInfo = page.getByTestId("friends-exchange-site");
+		await expect(siteInfo).toBeVisible();
+		await expect(siteInfo.getByText("Cloudea's Blog").first()).toBeVisible();
+		await expect(siteInfo.getByText("清露茶坊")).toBeVisible();
+		await expect(
+			siteInfo.getByRole("link", {
+				name: "https://blog.cloudea.work/",
+				exact: true,
+			}),
+		).toHaveAttribute("href", "https://blog.cloudea.work/");
+		await expect(
+			siteInfo.getByRole("link", {
+				name: "https://blog.cloudea.work/images/avatar.jpg",
+				exact: true,
+			}),
+		).toHaveAttribute("href", "https://blog.cloudea.work/images/avatar.jpg");
 		await expect(
 			page.locator(".friends-exchange__mail"),
 		).toHaveAttribute("href", /mailto:cloudeasoft@qq\.com/);

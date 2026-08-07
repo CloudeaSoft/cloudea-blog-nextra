@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Icon } from "@iconify-icon/react";
 import cn from "clsx";
+import { getImageUrl } from "@/utils/get-resources-url";
 import { getFriendCategories } from "./friends";
 
 import "./friends.css";
@@ -11,6 +12,14 @@ export const metadata: Metadata = {
 };
 
 const EXCHANGE_EMAIL = "cloudeasoft@qq.com";
+
+/** Site info for link exchange — avatar is hosted on this domain. */
+const SITE_FRIEND_LINK = {
+	title: "Cloudea's Blog",
+	description: "清露茶坊",
+	website: "https://blog.cloudea.work/",
+	image: "https://blog.cloudea.work/images/avatar.jpg",
+} as const;
 
 export default function FriendsPage() {
 	const categories = getFriendCategories();
@@ -137,6 +146,65 @@ export default function FriendsPage() {
 							feel free to apply. Please include your site name, URL, a short
 							description, and an avatar if you have one.
 						</p>
+
+						<div
+							className="friends-exchange__site"
+							data-testid="friends-exchange-site"
+						>
+							<div className="friends-exchange__site-heading">
+								<img
+									src={getImageUrl("avatar.jpg")}
+									alt=""
+									width={44}
+									height={44}
+									loading="lazy"
+									className="friends-exchange__site-avatar"
+								/>
+								<div className="min-w-0">
+									<p className="friends-exchange__site-label m-0">
+										本站信息 · This site
+									</p>
+									<p className="friends-exchange__site-title m-0">
+										{SITE_FRIEND_LINK.title}
+									</p>
+								</div>
+							</div>
+							<dl className="friends-exchange__site-fields m-0">
+								<div>
+									<dt>Title</dt>
+									<dd>{SITE_FRIEND_LINK.title}</dd>
+								</div>
+								<div>
+									<dt>Description</dt>
+									<dd>{SITE_FRIEND_LINK.description}</dd>
+								</div>
+								<div>
+									<dt>Website</dt>
+									<dd>
+										<a
+											href={SITE_FRIEND_LINK.website}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{SITE_FRIEND_LINK.website}
+										</a>
+									</dd>
+								</div>
+								<div>
+									<dt>Avatar</dt>
+									<dd>
+										<a
+											href={SITE_FRIEND_LINK.image}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{SITE_FRIEND_LINK.image}
+										</a>
+									</dd>
+								</div>
+							</dl>
+						</div>
+
 						<a
 							href={`mailto:${EXCHANGE_EMAIL}?subject=${encodeURIComponent("Friend link exchange")}`}
 							className="friends-exchange__mail inline-flex items-center gap-2 text-(--primary-color) no-underline hover:underline"
