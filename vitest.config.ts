@@ -7,6 +7,7 @@ export default defineConfig({
 		include: [
 			"app/_components/tools/**/__tests__/**/*.test.ts",
 			"app/_components/mdx/**/__tests__/**/*.test.ts",
+			"app/friends/**/__tests__/**/*.test.ts",
 			"utils/**/__tests__/**/*.test.ts",
 		],
 		exclude: [
