@@ -97,3 +97,18 @@ export function getArknightsAsServiceBaseUrl(): string {
 export function getArknightsBindingServiceBaseUrl(): string {
 	return `${getBlogBackendUrl()}/arknights-binding-service`;
 }
+
+/** Production Waline comment server. */
+export const DEFAULT_WALINE_SERVER_URL = "https://blog-comment.cloudea.work";
+
+/**
+ * Origin of the Waline comment backend.
+ *
+ * - unset → production: https://blog-comment.cloudea.work
+ * - override with NEXT_PUBLIC_WALINE_SERVER_URL when pointing at a local/debug instance
+ */
+export function getWalineServerUrl(): string {
+	const raw = (process.env.NEXT_PUBLIC_WALINE_SERVER_URL ?? "").trim();
+	if (!raw) return DEFAULT_WALINE_SERVER_URL;
+	return raw.replace(/\/+$/, "");
+}
