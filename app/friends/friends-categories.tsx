@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FC } from "react";
+import { useLayoutEffect, useState, type FC } from "react";
 import { Icon } from "@iconify-icon/react";
 import type { FriendCategory } from "./friends";
 import { shuffle } from "./shuffle";
@@ -19,7 +19,7 @@ export const FriendsCategories: FC<FriendsCategoriesProps> = ({
 }) => {
 	const [ordered, setOrdered] = useState(categories);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		setOrdered(
 			categories.map((category) => ({
 				...category,
