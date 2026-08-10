@@ -22,11 +22,11 @@ permissions:
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# Keep builds isolated per pull request or branch. A newer commit on the same
+# pull request/branch supersedes its older build without affecting other PRs.
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
