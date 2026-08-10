@@ -4,7 +4,7 @@ import { useEffect, useRef, type FC } from "react";
 import { usePathname } from "next/navigation";
 import { init, type WalineInstance } from "@waline/client";
 import "@waline/client/style";
-import { getWalineServerUrl } from "@/utils/env";
+import { getCommentUrl } from "@/utils/env";
 import { getWalinePath, isPostArticlePath } from "./waline-path";
 
 export const Comments: FC = () => {
@@ -20,7 +20,7 @@ export const Comments: FC = () => {
 
 		instanceRef.current = init({
 			el: containerRef.current,
-			serverURL: getWalineServerUrl(),
+			serverURL: getCommentUrl(),
 			path,
 			lang: "zh-CN",
 			dark: "html[class~='dark']",
