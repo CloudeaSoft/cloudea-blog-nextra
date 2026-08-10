@@ -1,12 +1,14 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
 	DEFAULT_BLOG_BACKEND_URL,
+	DEFAULT_COMMENT_URL,
 	getArknightsAsServiceBaseUrl,
 	getArknightsBindingServiceBaseUrl,
 	getArknightsServiceBaseUrl,
 	getBasePath,
 	getBaseUrl,
 	getBlogBackendUrl,
+	getCommentUrl,
 	getHomeHref,
 	getNextOutput,
 	getSiteUrl,
@@ -18,6 +20,7 @@ const ORIGINAL_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const ORIGINAL_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH;
 const ORIGINAL_NEXT_OUTPUT = process.env.NEXT_OUTPUT;
 const ORIGINAL_BLOG_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const ORIGINAL_COMMENT_URL = process.env.NEXT_PUBLIC_COMMENT_URL;
 
 afterEach(() => {
 	if (ORIGINAL_BASE_URL === undefined) {
@@ -42,6 +45,12 @@ afterEach(() => {
 		delete process.env.NEXT_PUBLIC_BACKEND_URL;
 	} else {
 		process.env.NEXT_PUBLIC_BACKEND_URL = ORIGINAL_BLOG_BACKEND_URL;
+	}
+
+	if (ORIGINAL_COMMENT_URL === undefined) {
+		delete process.env.NEXT_PUBLIC_COMMENT_URL;
+	} else {
+		process.env.NEXT_PUBLIC_COMMENT_URL = ORIGINAL_COMMENT_URL;
 	}
 });
 
@@ -137,5 +146,15 @@ describe("env accessors", () => {
 		expect(getArknightsServiceBaseUrl()).toBe(
 			"http://127.0.0.1:8787/arknights-service",
 		);
+	});
+
+	it("defaults comment URL to production Waline", () => {
+		delete process.env.NEXT_PUBLIC_COMMENT_URL;
+		expect(getCommentUrl()).toBe(DEFAULT_COMMENT_URL);
+	});
+
+	it("reads and trims NEXT_PUBLIC_COMMENT_URL", () => {
+		process.env.NEXT_PUBLIC_COMMENT_URL = " https://waline.example.com/ ";
+		expect(getCommentUrl()).toBe("https://waline.example.com");
 	});
 });
