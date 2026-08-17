@@ -6,14 +6,14 @@ import { init, type WalineInstance } from "@waline/client";
 import "@waline/client/style";
 import "./comments.css";
 import { getCommentUrl } from "@/utils/env";
-import { getWalinePath, isPostArticlePath } from "./waline-path";
+import { getWalinePath, isCommentsEnabledPath } from "./waline-path";
 
 export const Comments: FC = () => {
 	const pathname = usePathname();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const instanceRef = useRef<WalineInstance | null>(null);
 
-	const enabled = isPostArticlePath(pathname);
+	const enabled = isCommentsEnabledPath(pathname);
 	const path = getWalinePath(pathname);
 
 	useEffect(() => {
@@ -40,6 +40,7 @@ export const Comments: FC = () => {
 			className="waline-comments not-prose mt-12 pt-8 border-t border-solid"
 			style={{ borderColor: "var(--border-color)" }}
 			data-pagefind-ignore
+			data-testid="comments"
 			aria-label="评论"
 		>
 			<div ref={containerRef} />

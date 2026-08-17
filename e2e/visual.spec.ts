@@ -24,6 +24,8 @@ async function preparePage(page: Page) {
 	// Block third-party analytics that can mutate the DOM.
 	await page.route("https://events.vercount.one/**", (route) => route.abort());
 	await page.route("**/vercount.one/**", (route) => route.abort());
+	// Waline comment counts / widgets must not affect layout snapshots.
+	await page.route("https://blog-comment.cloudea.work/**", (route) => route.abort());
 	// Friend avatars are external; abort so networkidle is not blocked by remote hosts.
 	await page.route("**/avatar.png", (route) => route.abort());
 	await page.route("**/avatar.jpg", (route) => route.abort());

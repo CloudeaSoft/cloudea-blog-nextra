@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Icon } from "@iconify-icon/react";
+import { Callout } from "nextra/components";
 import cn from "clsx";
+import { Comments } from "@/app/_components/mdx/comments";
 import { FriendsCategories } from "./friends-categories";
 import { getFriendCategories } from "./friends";
 
@@ -11,7 +12,15 @@ export const metadata: Metadata = {
 	description: "Friend links — blogs and sites I follow and recommend.",
 };
 
-const EXCHANGE_EMAIL = "cloudeasoft@qq.com";
+const SITE_YAML = `name: 清露茶坊
+link: https://blog.cloudea.work
+description: 雨落生烟，云过留露
+avatar: https://blog.cloudea.work/images/avatar.jpg`;
+
+const APPLY_YAML = `name: 你的站点名
+link: https://your.site
+description: 一句话简介
+avatar: https://your.site/avatar.png`;
 
 export default function FriendsPage() {
 	const categories = getFriendCategories();
@@ -53,28 +62,50 @@ export default function FriendsPage() {
 								暂无友链 · No friends listed yet
 							</p>
 						)
-						: <FriendsCategories categories={categories} />}
+						: (
+							<FriendsCategories
+								categories={categories}
+								stabilizeOrder={process.env.VISUAL_REGRESSION === "1"}
+							/>
+						)}
 
-					<section className="friends-exchange mt-10 pt-8 border-t border-solid border-(--border-color)">
+					<section
+						id="exchange"
+						className="friends-exchange mt-10 pt-8 border-t border-solid border-(--border-color)"
+					>
 						<h2 className="text-xl font-semibold text-(--first-text-color) m-0 mb-3">
 							Exchange
 						</h2>
 						<p className="m-0 mb-4 text-(--third-text-color) leading-relaxed">
 							If your site has original content and is online most of the time,
-							feel free to apply. Please include your site name, URL, a short
-							description, and an avatar if you have one.
+							feel free to apply.
 						</p>
-						<a
-							href={`mailto:${EXCHANGE_EMAIL}?subject=${encodeURIComponent("Friend link exchange")}`}
-							className="friends-exchange__mail inline-flex items-center gap-2 text-(--primary-color) no-underline hover:underline"
-						>
-							<Icon
-								icon="lucide:mail"
-								width={18}
-								height={18}
-							/>
-							{EXCHANGE_EMAIL}
-						</a>
+						<Callout type="important">
+							请先将本站加入你的友链，确认可以访问后，再在下方评论区按格式留言。未先添加本站的申请不会处理。
+						</Callout>
+						<h3 className="friends-exchange__subtitle">
+							本站信息
+						</h3>
+						<p className="friends-exchange__hint">
+							把下面这段 YAML 加到你的友链列表里：
+						</p>
+						<pre className="friends-yaml">
+							<code>{SITE_YAML}</code>
+						</pre>
+						<h3 className="friends-exchange__subtitle">
+							申请留言格式
+						</h3>
+						<p className="friends-exchange__hint">
+							添加完成后，在下方评论中粘贴并填写你的站点信息（字段与
+							{" "}
+							<code>friends.yml</code>
+							{" "}
+							一致）：
+						</p>
+						<pre className="friends-yaml">
+							<code>{APPLY_YAML}</code>
+						</pre>
+						<Comments />
 					</section>
 				</div>
 			</div>

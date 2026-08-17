@@ -145,6 +145,41 @@
 	animation: friends-fade-up 0.45s ease-out 0.12s both;
 }
 
+.friends-exchange__subtitle {
+	margin: 1.5rem 0 0.5rem;
+	font-size: 1.05rem;
+	font-weight: 600;
+	color: var(--first-text-color);
+}
+
+.friends-exchange__hint {
+	margin: 0 0 0.75rem;
+	color: var(--third-text-color);
+	line-height: 1.6;
+}
+
+.friends-yaml {
+	margin: 0 0 0.25rem;
+	padding: 1rem 1.1rem;
+	overflow-x: auto;
+	border-radius: 8px;
+	border: 1px solid var(--border-color);
+	background: var(--background-color);
+	color: var(--default-text-color);
+	font-size: 0.9em;
+	line-height: 1.55;
+}
+
+.friends-yaml code {
+	font-family:
+		ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono",
+		"Courier New", monospace;
+}
+
+.friends-exchange .waline-comments {
+	margin-top: 2.5rem;
+}
+
 @keyframes friends-fade-up {
 	from {
 		opacity: 0;

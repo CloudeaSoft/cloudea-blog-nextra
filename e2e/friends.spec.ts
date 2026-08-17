@@ -33,6 +33,7 @@ function loadFriendsYaml(): FriendCategory[] {
 async function prepare(page: Page) {
 	await page.route("https://events.vercount.one/**", (route) => route.abort());
 	await page.route("**/vercount.one/**", (route) => route.abort());
+	await page.route("https://blog-comment.cloudea.work/**", (route) => route.abort());
 	// Avatars are decorative for these assertions; avoid flaky external loads.
 	await page.route("**/avatar.png", (route) => route.abort());
 	await page.route("**/avatar.jpg", (route) => route.abort());
@@ -109,9 +110,30 @@ test.describe("friends: page content", () => {
 		}
 
 		await expect(page.getByRole("heading", { name: "Exchange" })).toBeVisible();
-		await expect(
-			page.locator(".friends-exchange__mail"),
-		).toHaveAttribute("href", /mailto:cloudeasoft@qq\.com/);
+		await expect(page.getByText("请先将本站加入你的友链")).toBeVisible();
+
+		const siteYaml = page.locator("pre").filter({
+			hasText: "link: https://blog.cloudea.work",
+		});
+		await expect(siteYaml).toBeVisible();
+		await expect(siteYaml).toContainText("name: 清露茶坊");
+		await expect(siteYaml).toContainText("description: 雨落生烟，云过留露");
+		await expect(siteYaml).toContainText(
+			"avatar: https://blog.cloudea.work/images/avatar.jpg",
+		);
+
+		const applyYaml = page.locator("pre").filter({
+			hasText: "link: https://your.site",
+		});
+		await expect(applyYaml).toBeVisible();
+		await expect(applyYaml).toContainText("name: 你的站点名");
+		await expect(applyYaml).toContainText("avatar: https://your.site/avatar.png");
+
+		await expect(page.getByTestId("comments")).toBeVisible();
+		await expect(page.getByTestId("comments")).toHaveAttribute(
+			"aria-label",
+			"评论",
+		);
 	});
 
 	test("title and description stay single-line", async ({ page }) => {
