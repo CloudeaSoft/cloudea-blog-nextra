@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
 	getWalinePath,
-	isAboutPath,
 	isCommentsEnabledPath,
+	isFriendsPath,
 	isPostArticlePath,
 } from "../waline-path";
 
@@ -27,33 +27,34 @@ describe("isPostArticlePath", () => {
 		expect(isPostArticlePath("/posts/")).toBe(false);
 		expect(isPostArticlePath("/")).toBe(false);
 		expect(isPostArticlePath("/about")).toBe(false);
+		expect(isPostArticlePath("/friends")).toBe(false);
 		expect(isPostArticlePath("/tools/hlsl-preview")).toBe(false);
 	});
 });
 
-describe("isAboutPath", () => {
-	it("matches /about with or without a trailing slash", () => {
-		expect(isAboutPath("/about")).toBe(true);
-		expect(isAboutPath("/about/")).toBe(true);
+describe("isFriendsPath", () => {
+	it("matches /friends with or without a trailing slash", () => {
+		expect(isFriendsPath("/friends")).toBe(true);
+		expect(isFriendsPath("/friends/")).toBe(true);
 	});
 
 	it("rejects nested or unrelated routes", () => {
-		expect(isAboutPath("/about/team")).toBe(false);
-		expect(isAboutPath("/posts/about")).toBe(false);
-		expect(isAboutPath("/")).toBe(false);
+		expect(isFriendsPath("/friends/list")).toBe(false);
+		expect(isFriendsPath("/about")).toBe(false);
+		expect(isFriendsPath("/")).toBe(false);
 	});
 });
 
 describe("isCommentsEnabledPath", () => {
-	it("enables comments on post articles and About", () => {
+	it("enables comments on post articles and Friends", () => {
 		expect(isCommentsEnabledPath("/posts/github-250910")).toBe(true);
-		expect(isCommentsEnabledPath("/about")).toBe(true);
-		expect(isCommentsEnabledPath("/about/")).toBe(true);
+		expect(isCommentsEnabledPath("/friends")).toBe(true);
+		expect(isCommentsEnabledPath("/friends/")).toBe(true);
 	});
 
-	it("keeps comments off indexes and other pages", () => {
+	it("keeps comments off About, indexes, and other pages", () => {
+		expect(isCommentsEnabledPath("/about")).toBe(false);
 		expect(isCommentsEnabledPath("/posts")).toBe(false);
-		expect(isCommentsEnabledPath("/friends")).toBe(false);
 		expect(isCommentsEnabledPath("/")).toBe(false);
 		expect(isCommentsEnabledPath("/docs")).toBe(false);
 	});

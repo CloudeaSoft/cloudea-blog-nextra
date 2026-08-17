@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Icon } from "@iconify-icon/react";
+import { Callout } from "nextra/components";
 import cn from "clsx";
+import { Comments } from "@/app/_components/mdx/comments";
 import { FriendsCategories } from "./friends-categories";
 import { getFriendCategories } from "./friends";
 
@@ -13,6 +14,16 @@ export const metadata: Metadata = {
 };
 
 const EXCHANGE_EMAIL = "cloudeasoft@qq.com";
+
+const SITE_YAML = `name: 清露茶坊
+link: https://blog.cloudea.work
+description: 雨落生烟，云过留露
+avatar: https://blog.cloudea.work/images/avatar.jpg`;
+
+const APPLY_YAML = `name: 你的站点名
+link: https://your.site
+description: 一句话简介
+avatar: https://your.site/avatar.png`;
 
 export default function FriendsPage() {
 	const categories = getFriendCategories();
@@ -61,24 +72,44 @@ export default function FriendsPage() {
 							/>
 						)}
 
-					<section className="friends-exchange mt-10 pt-8 border-t border-solid border-(--border-color)">
+					<section
+						id="exchange"
+						className="friends-exchange mt-10 pt-8 border-t border-solid border-(--border-color)"
+					>
 						<h2 className="text-xl font-semibold text-(--first-text-color) m-0 mb-3">
 							Exchange
 						</h2>
 						<p className="m-0 mb-4 text-(--third-text-color) leading-relaxed">
 							If your site has original content and is online most of the time,
-							feel free to apply. Add this site to your friend links first, then
-							leave a comment on the
+							feel free to apply.
+						</p>
+						<Callout type="important">
+							请先将本站加入你的友链，确认可以访问后，再在下方评论区按格式留言。未先添加本站的申请不会处理。
+						</Callout>
+						<h3 className="friends-exchange__subtitle">
+							本站信息
+						</h3>
+						<p className="friends-exchange__hint">
+							把下面这段 YAML 加到你的友链列表里：
+						</p>
+						<pre className="friends-yaml">
+							<code>{SITE_YAML}</code>
+						</pre>
+						<h3 className="friends-exchange__subtitle">
+							申请留言格式
+						</h3>
+						<p className="friends-exchange__hint">
+							添加完成后，在下方评论中粘贴并填写你的站点信息（字段与
 							{" "}
-							<Link
-								href="/about#友链交换"
-								className="friends-exchange__about text-(--primary-color) no-underline hover:underline"
-							>
-								About
-							</Link>
+							<code>friends.yml</code>
 							{" "}
-							page using the YAML template there. Applications without a
-							reciprocal link will be skipped. You can also email:
+							一致）：
+						</p>
+						<pre className="friends-yaml">
+							<code>{APPLY_YAML}</code>
+						</pre>
+						<p className="m-0 mb-4 text-(--third-text-color) leading-relaxed">
+							You can also email:
 						</p>
 						<a
 							href={`mailto:${EXCHANGE_EMAIL}?subject=${encodeURIComponent("Friend link exchange")}`}
@@ -91,6 +122,7 @@ export default function FriendsPage() {
 							/>
 							{EXCHANGE_EMAIL}
 						</a>
+						<Comments />
 					</section>
 				</div>
 			</div>
