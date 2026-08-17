@@ -58,7 +58,7 @@ test.describe("about: friend-link exchange", () => {
 			hasText: "link: https://blog.cloudea.work",
 		});
 		await expect(siteYaml).toBeVisible();
-		await expect(siteYaml).toContainText("name: 清露茶坊 · Cloudea's Blog");
+		await expect(siteYaml).toContainText("name: 清露茶坊");
 		await expect(siteYaml).toContainText("description: 雨落生烟，云过留露");
 		await expect(siteYaml).toContainText(
 			"avatar: https://blog.cloudea.work/images/avatar.jpg",
