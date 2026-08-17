@@ -198,6 +198,25 @@
 	margin-bottom: 0;
 }
 
+/* Nextra <Callout> (also used for GitHub alerts) is a padded flex box:
+ * icon + body wrapper. MDX still wraps the body in <p>/<ul>/…, and those
+ * pick up the article block margins above. Margins do not collapse through
+ * the callout's `py-[.5em]`, so the last child's `margin-bottom: 1rem`
+ * shows up as extra empty space inside the chrome.
+ *
+ * Trim only the outer edges of the body wrapper — same idea as native
+ * blockquotes and GitHub's `.markdown-alert > :first-child/:last-child`.
+ * Do not blanket-reset `.nextra-callout p`: a multi-paragraph callout
+ * should keep the 1rem gap between inner blocks. Token styles (links,
+ * inline code, list markers, selection) stay inherited on purpose. */
+.markdown-body .nextra-callout > :last-child > :first-child {
+	margin-top: 0;
+}
+
+.markdown-body .nextra-callout > :last-child > :last-child {
+	margin-bottom: 0;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Lists                                                                       */
 /* -------------------------------------------------------------------------- */

@@ -76,4 +76,43 @@ test.describe("about: friend-link exchange", () => {
 			"评论",
 		);
 	});
+
+	test("callout keeps type color and does not stack article p margins", async ({
+		page,
+	}) => {
+		await gotoLight(page, "/about");
+
+		const metrics = await page.evaluate(() => {
+			const articleP = [...document.querySelectorAll("article.markdown-body p")]
+				.find((node) => !node.closest(".nextra-callout"));
+			const callout = document.querySelector(".nextra-callout");
+			const calloutP = callout?.querySelector("p");
+			if (
+				!(articleP instanceof HTMLElement)
+				|| !(callout instanceof HTMLElement)
+				|| !(calloutP instanceof HTMLElement)
+			) {
+				return null;
+			}
+
+			const articleStyle = getComputedStyle(articleP);
+			const calloutStyle = getComputedStyle(callout);
+			const calloutPStyle = getComputedStyle(calloutP);
+			return {
+				articleMarginBottom: articleStyle.marginBottom,
+				calloutPMarginTop: calloutPStyle.marginTop,
+				calloutPMarginBottom: calloutPStyle.marginBottom,
+				articleColor: articleStyle.color,
+				calloutColor: calloutStyle.color,
+				calloutPColor: calloutPStyle.color,
+			};
+		});
+
+		expect(metrics).not.toBeNull();
+		expect(parseFloat(metrics!.articleMarginBottom)).toBeGreaterThan(0);
+		expect(metrics!.calloutPMarginTop).toBe("0px");
+		expect(metrics!.calloutPMarginBottom).toBe("0px");
+		expect(metrics!.calloutPColor).toBe(metrics!.calloutColor);
+		expect(metrics!.calloutPColor).not.toBe(metrics!.articleColor);
+	});
 });
