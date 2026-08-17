@@ -82,3 +82,74 @@ test.describe("Waline comment theme", () => {
 		});
 	}
 });
+
+async function stubWaline(page: Page) {
+	await page.unroute("https://blog-comment.cloudea.work/**");
+	await page.route("https://blog-comment.cloudea.work/**", async (route) => {
+		if (route.request().method() === "OPTIONS") {
+			await route.fulfill({ status: 204 });
+			return;
+		}
+
+		await route.fulfill({
+			status: 200,
+			contentType: "application/json",
+			body: JSON.stringify({
+				errno: 0,
+				errmsg: "",
+				data: {
+					page: 1,
+					pageSize: 10,
+					count: 0,
+					data: [],
+				},
+			}),
+		});
+	});
+}
+
+test.describe("Waline comment layout", () => {
+	test.beforeEach(async ({ page }) => {
+		await prepare(page);
+		await stubWaline(page);
+	});
+
+	test("markdown toolbar control keeps Waline action metrics", async ({ page }) => {
+		await gotoThemed(page, POST_WITH_COMMENTS, "light");
+		const comments = page.locator(".waline-comments");
+		await comments.waitFor();
+		await comments.scrollIntoViewIfNeeded();
+
+		const nestedInMarkdown = await comments.evaluate((el) => (
+			el.closest(".markdown-body") !== null
+		));
+		expect(nestedInMarkdown).toBe(false);
+
+		const markdown = comments.locator('a.wl-action[title="Markdown Guide"]');
+		await markdown.waitFor();
+		const sibling = comments.locator("button.wl-action").first();
+		await sibling.waitFor();
+
+		const mdStyle = await markdown.evaluate((el) => {
+			const style = getComputedStyle(el);
+			return {
+				display: style.display,
+				paddingBottom: style.paddingBottom,
+				backgroundImage: style.backgroundImage,
+				width: style.width,
+				height: style.height,
+			};
+		});
+
+		expect(mdStyle.display).toBe("inline-flex");
+		expect(mdStyle.paddingBottom).toBe("0px");
+		expect(mdStyle.backgroundImage).toBe("none");
+
+		const siblingStyle = await sibling.evaluate((el) => {
+			const style = getComputedStyle(el);
+			return { width: style.width, height: style.height };
+		});
+		expect(mdStyle.height).toBe(siblingStyle.height);
+		expect(mdStyle.width).toBe(siblingStyle.width);
+	});
+});

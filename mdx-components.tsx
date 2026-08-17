@@ -107,7 +107,7 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <T 
 					<MobileToc toc={toc} />
 					<article
 						className={cn(
-							"page-sheet__panel markdown-body lg:container px-8 py-8 max-lg:px-5 max-lg:py-6 prose max-md:prose-sm dark:prose-invert backdrop-blur-2xl rounded-2xl border-2 border-solid",
+							"page-sheet__panel lg:container px-8 py-8 max-lg:px-5 max-lg:py-6 backdrop-blur-2xl rounded-2xl border-2 border-solid",
 							"max-lg:rounded-none max-lg:border-none! max-lg:shadow-none w-full",
 						)}
 						dir="ltr"
@@ -117,25 +117,29 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <T 
 							backgroundColor: "var(--background-color-transparent-80)",
 						}}
 					>
-						<GoBack />
-						<InPageAnchors />
-						<header className="mb-8">
-							<h1 className="post-title">{metadata.title}</h1>
-							<Meta {...(metadata as BlogMetadata)}>
-								{dateObj && (
-									<time dateTime={dateObj.toISOString()}>
-										{DateFormatter
-											? (
-												<DateFormatter date={dateObj} />
-											)
-											: (
-												dateObj.toLocaleDateString()
-											)}
-									</time>
-								)}
-							</Meta>
-						</header>
-						{children}
+						{/* Post typography stays on this inner wrapper so Waline
+						    (sibling, like MobileToc) is not restyled by markdown.css. */}
+						<div className="markdown-body prose max-md:prose-sm dark:prose-invert">
+							<GoBack />
+							<InPageAnchors />
+							<header className="mb-8">
+								<h1 className="post-title">{metadata.title}</h1>
+								<Meta {...(metadata as BlogMetadata)}>
+									{dateObj && (
+										<time dateTime={dateObj.toISOString()}>
+											{DateFormatter
+												? (
+													<DateFormatter date={dateObj} />
+												)
+												: (
+													dateObj.toLocaleDateString()
+												)}
+										</time>
+									)}
+								</Meta>
+							</header>
+							{children}
+						</div>
 						<Comments />
 					</article>
 					<TOC
