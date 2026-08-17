@@ -1,0 +1,28 @@
+/* Waline chrome uses its own CSS variables, defaulting to a green accent
+ * (#27ae60 / #2ecc71). Remap them to the site tokens in theme.scss so links,
+ * the submit button, and hover states follow light/dark the same way as the
+ * rest of the blog.
+ *
+ * Scoped to `.waline-comments` (the section in comments.tsx) so the values
+ * win over Waline's `:root` defaults and the dark-mode sheet it injects on
+ * `html[class~='dark']`. Button label text stays white on the crimson fill. */
+
+.waline-comments {
+	--waline-theme-color: var(--primary-color);
+	--waline-active-color: var(--selection-color);
+	--waline-white: #fff;
+	--waline-light-grey: var(--third-text-color);
+	--waline-dark-grey: var(--second-text-color);
+	--waline-color: var(--default-text-color);
+	--waline-bg-color: var(--background-color);
+	--waline-bg-color-light: var(--second-background-color);
+	--waline-bg-color-hover: var(--third-background-color);
+	--waline-border-color: var(--border-color);
+	--waline-disable-bg-color: var(--third-background-color);
+	--waline-disable-color: var(--third-text-color);
+	--waline-bq-color: var(--third-background-color);
+	--waline-badge-color: var(--primary-color);
+	--waline-info-bg-color: var(--second-background-color);
+	--waline-info-color: var(--third-text-color);
+	--waline-border: 1px solid var(--border-color);
+}

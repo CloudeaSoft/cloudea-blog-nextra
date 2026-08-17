@@ -4,6 +4,7 @@ import { useEffect, useRef, type FC } from "react";
 import { usePathname } from "next/navigation";
 import { init, type WalineInstance } from "@waline/client";
 import "@waline/client/style";
+import "./comments.css";
 import { getCommentUrl } from "@/utils/env";
 import { getWalinePath, isPostArticlePath } from "./waline-path";
 
