@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Icon } from "@iconify-icon/react";
 import cn from "clsx";
 import { FriendsCategories } from "./friends-categories";
@@ -56,8 +57,18 @@ export default function FriendsPage() {
 						</h2>
 						<p className="m-0 mb-4 text-(--third-text-color) leading-relaxed">
 							If your site has original content and is online most of the time,
-							feel free to apply. Please include your site name, URL, a short
-							description, and an avatar if you have one.
+							feel free to apply. Add this site to your friend links first, then
+							leave a comment on the
+							{" "}
+							<Link
+								href="/about#友链交换"
+								className="friends-exchange__about text-(--primary-color) no-underline hover:underline"
+							>
+								About
+							</Link>
+							{" "}
+							page using the YAML template there. Applications without a
+							reciprocal link will be skipped. You can also email:
 						</p>
 						<a
 							href={`mailto:${EXCHANGE_EMAIL}?subject=${encodeURIComponent("Friend link exchange")}`}

@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { getWalinePath, isPostArticlePath } from "../waline-path";
+import {
+	getWalinePath,
+	isAboutPath,
+	isCommentsEnabledPath,
+	isPostArticlePath,
+} from "../waline-path";
 
 const ORIGINAL_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH;
 
@@ -21,7 +26,36 @@ describe("isPostArticlePath", () => {
 		expect(isPostArticlePath("/posts")).toBe(false);
 		expect(isPostArticlePath("/posts/")).toBe(false);
 		expect(isPostArticlePath("/")).toBe(false);
+		expect(isPostArticlePath("/about")).toBe(false);
 		expect(isPostArticlePath("/tools/hlsl-preview")).toBe(false);
+	});
+});
+
+describe("isAboutPath", () => {
+	it("matches /about with or without a trailing slash", () => {
+		expect(isAboutPath("/about")).toBe(true);
+		expect(isAboutPath("/about/")).toBe(true);
+	});
+
+	it("rejects nested or unrelated routes", () => {
+		expect(isAboutPath("/about/team")).toBe(false);
+		expect(isAboutPath("/posts/about")).toBe(false);
+		expect(isAboutPath("/")).toBe(false);
+	});
+});
+
+describe("isCommentsEnabledPath", () => {
+	it("enables comments on post articles and About", () => {
+		expect(isCommentsEnabledPath("/posts/github-250910")).toBe(true);
+		expect(isCommentsEnabledPath("/about")).toBe(true);
+		expect(isCommentsEnabledPath("/about/")).toBe(true);
+	});
+
+	it("keeps comments off indexes and other pages", () => {
+		expect(isCommentsEnabledPath("/posts")).toBe(false);
+		expect(isCommentsEnabledPath("/friends")).toBe(false);
+		expect(isCommentsEnabledPath("/")).toBe(false);
+		expect(isCommentsEnabledPath("/docs")).toBe(false);
 	});
 });
 

@@ -110,6 +110,9 @@ test.describe("friends: page content", () => {
 
 		await expect(page.getByRole("heading", { name: "Exchange" })).toBeVisible();
 		await expect(
+			page.locator(".friends-exchange__about"),
+		).toHaveAttribute("href", "/about#友链交换");
+		await expect(
 			page.locator(".friends-exchange__mail"),
 		).toHaveAttribute("href", /mailto:cloudeasoft@qq\.com/);
 	});
