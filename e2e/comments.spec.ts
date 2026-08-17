@@ -127,7 +127,7 @@ test.describe("Waline comment layout", () => {
 
 		const markdown = comments.locator("a.wl-action[title='Markdown Guide']");
 		await markdown.waitFor();
-		const sibling = comments.locator("button.wl-action").first();
+		const sibling = comments.locator("button.wl-action").filter({ visible: true }).first();
 		await sibling.waitFor();
 
 		const mdStyle = await markdown.evaluate((el) => {
@@ -141,14 +141,20 @@ test.describe("Waline comment layout", () => {
 			};
 		});
 
-		expect(mdStyle.display).toBe("inline-flex");
 		expect(mdStyle.paddingBottom).toBe("0px");
 		expect(mdStyle.backgroundImage).toBe("none");
 
 		const siblingStyle = await sibling.evaluate((el) => {
 			const style = getComputedStyle(el);
-			return { width: style.width, height: style.height };
+			return {
+				display: style.display,
+				width: style.width,
+				height: style.height,
+			};
 		});
+		// `.wl-actions` is a flex row, so specified `inline-flex` blockifies
+		// to used `flex` on both the Markdown <a> and sibling <button>s.
+		expect(mdStyle.display).toBe(siblingStyle.display);
 		expect(mdStyle.height).toBe(siblingStyle.height);
 		expect(mdStyle.width).toBe(siblingStyle.width);
 	});
