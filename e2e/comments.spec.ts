@@ -125,7 +125,7 @@ test.describe("Waline comment layout", () => {
 		));
 		expect(nestedInMarkdown).toBe(false);
 
-		const markdown = comments.locator('a.wl-action[title="Markdown Guide"]');
+		const markdown = comments.locator("a.wl-action[title='Markdown Guide']");
 		await markdown.waitFor();
 		const sibling = comments.locator("button.wl-action").first();
 		await sibling.waitFor();
