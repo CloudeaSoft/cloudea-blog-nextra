@@ -100,15 +100,15 @@ export const useMDXComponents: UseMDXComponents<typeof DEFAULT_COMPONENTS> = <T 
 			return (
 				<div
 					className={cn(
-						"flex px-10 py-10 gap-10",
-						"max-lg:flex-col max-lg:gap-0 max-lg:px-0 max-lg:py-0 max-lg:h-full max-lg:w-full",
+						"page-sheet flex px-10 py-10 gap-10",
+						"max-lg:flex-col max-lg:gap-0 max-lg:px-0 max-lg:py-0 max-lg:w-full",
 					)}
 				>
 					<MobileToc toc={toc} />
 					<article
 						className={cn(
-							"markdown-body lg:container px-8 py-8 max-lg:px-5 max-lg:py-6 prose max-md:prose-sm dark:prose-invert backdrop-blur-2xl rounded-2xl border-2 border-solid",
-							"max-lg:rounded-none max-lg:border-none! w-full min-h-full",
+							"page-sheet__panel markdown-body lg:container px-8 py-8 max-lg:px-5 max-lg:py-6 prose max-md:prose-sm dark:prose-invert backdrop-blur-2xl rounded-2xl border-2 border-solid",
+							"max-lg:rounded-none max-lg:border-none! max-lg:shadow-none w-full",
 						)}
 						dir="ltr"
 						data-pagefind-body
