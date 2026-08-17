@@ -6,6 +6,8 @@ import type { FriendCategory } from "./friends";
 
 type FriendsCategoriesProps = {
 	categories: FriendCategory[];
+	/** Keep YAML order (used by visual regression builds). */
+	stabilizeOrder?: boolean;
 };
 
 /** Fisher–Yates; returns a new array. */
@@ -27,17 +29,19 @@ function shuffle<T>(items: readonly T[]): T[] {
  */
 export const FriendsCategories: FC<FriendsCategoriesProps> = ({
 	categories,
+	stabilizeOrder = false,
 }) => {
 	const [ordered, setOrdered] = useState(categories);
 
 	useLayoutEffect(() => {
+		if (stabilizeOrder) return;
 		setOrdered(
 			categories.map((category) => ({
 				...category,
 				list: shuffle(category.list),
 			})),
 		);
-	}, [categories]);
+	}, [categories, stabilizeOrder]);
 
 	return (
 		<div className="friends-categories">

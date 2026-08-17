@@ -49,7 +49,12 @@ export default function FriendsPage() {
 								暂无友链 · No friends listed yet
 							</p>
 						)
-						: <FriendsCategories categories={categories} />}
+						: (
+							<FriendsCategories
+								categories={categories}
+								stabilizeOrder={process.env.VISUAL_REGRESSION === "1"}
+							/>
+						)}
 
 					<section className="friends-exchange mt-10 pt-8 border-t border-solid border-(--border-color)">
 						<h2 className="text-xl font-semibold text-(--first-text-color) m-0 mb-3">
