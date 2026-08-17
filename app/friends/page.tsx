@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Icon } from "@iconify-icon/react";
 import { Callout } from "nextra/components";
 import cn from "clsx";
 import { Comments } from "@/app/_components/mdx/comments";
@@ -12,8 +11,6 @@ export const metadata: Metadata = {
 	title: "Friends",
 	description: "Friend links — blogs and sites I follow and recommend.",
 };
-
-const EXCHANGE_EMAIL = "cloudeasoft@qq.com";
 
 const SITE_YAML = `name: 清露茶坊
 link: https://blog.cloudea.work
@@ -108,20 +105,6 @@ export default function FriendsPage() {
 						<pre className="friends-yaml">
 							<code>{APPLY_YAML}</code>
 						</pre>
-						<p className="m-0 mb-4 text-(--third-text-color) leading-relaxed">
-							You can also email:
-						</p>
-						<a
-							href={`mailto:${EXCHANGE_EMAIL}?subject=${encodeURIComponent("Friend link exchange")}`}
-							className="friends-exchange__mail inline-flex items-center gap-2 text-(--primary-color) no-underline hover:underline"
-						>
-							<Icon
-								icon="lucide:mail"
-								width={18}
-								height={18}
-							/>
-							{EXCHANGE_EMAIL}
-						</a>
 						<Comments />
 					</section>
 				</div>

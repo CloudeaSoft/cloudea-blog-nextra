@@ -134,9 +134,6 @@ test.describe("friends: page content", () => {
 			"aria-label",
 			"评论",
 		);
-		await expect(
-			page.locator(".friends-exchange__mail"),
-		).toHaveAttribute("href", /mailto:cloudeasoft@qq\.com/);
 	});
 
 	test("title and description stay single-line", async ({ page }) => {
