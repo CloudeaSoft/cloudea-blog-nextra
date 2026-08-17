@@ -26,15 +26,20 @@ export default async function PostPage() {
 	return (
 		<div
 			className={cn(
-				"pt-10 mb-7.5 flex justify-center",
+				"page-sheet pt-10 mb-7.5 flex justify-center",
 				"max-lg:pt-0 max-lg:mb-0",
 			)}
 		>
-			<div className={cn("max-w-250 relative w-[80%] h-full", "max-lg:w-full")}>
+			<div
+				className={cn(
+					"page-sheet__body max-w-250 relative w-[80%]",
+					"max-lg:w-full",
+				)}
+			>
 				<div
 					className={cn(
-						"p-7.5 border border-solid rounded-[18px] border-(--border-color) shadow-(--cloudea-box-shadow) bg-(--background-color-transparent-80)",
-						"max-lg:p-5 max-lg:rounded-none",
+						"page-sheet__panel p-7.5 border border-solid rounded-[18px] border-(--border-color) shadow-(--cloudea-box-shadow) bg-(--background-color-transparent-80)",
+						"max-lg:p-5 max-lg:rounded-none max-lg:shadow-none",
 					)}
 				>
 					<div>
