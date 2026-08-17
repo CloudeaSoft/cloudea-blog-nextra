@@ -27,7 +27,7 @@ export const Layout: FC<LayoutProps> = ({ children, ...themeConfig }) => {
 			>
 				<Navbar pageMap={pageMap} />
 
-				<main className="flex-1 w-full">
+				<main className="site-main w-full">
 					{banner}
 					<ViewTransitions>{children}</ViewTransitions>
 				</main>

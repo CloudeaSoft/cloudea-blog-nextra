@@ -35,6 +35,59 @@ body {
 	-webkit-overflow-scrolling: touch;
 }
 
+/*
+ * Main grows to fill leftover space under the navbar, but never shrinks
+ * below its content. `flex: 1 1 0%` (Tailwind flex-1) plus a percentage
+ * height chain on mobile sheets made tall opaque pages paint over the
+ * footer; `1 0 auto` keeps the footer in document flow instead.
+ */
+.app-scroll > .site-main {
+	flex: 1 0 auto;
+	min-width: 0;
+}
+
+.app-scroll > .site-footer {
+	flex-shrink: 0;
+	position: relative;
+	z-index: 1;
+}
+
+/*
+ * Mobile full-bleed sheets (friends / tools / posts / MDX): stretch the
+ * translucent panel down to the footer so the wallpaper does not leak in
+ * the leftover flex space. Desktop keeps the floating card + margin.
+ * Match Tailwind `lg` (64rem).
+ */
+@media (width < 64rem) {
+	.app-scroll > .site-main:has(.page-sheet) {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.app-scroll > .site-main:has(.page-sheet) > * {
+		flex: 1 0 auto;
+		width: 100%;
+	}
+
+	.page-sheet {
+		flex: 1 0 auto;
+		min-height: 100%;
+		width: 100%;
+		align-items: stretch;
+	}
+
+	.page-sheet__body {
+		display: flex;
+		flex-direction: column;
+		flex: 1 0 auto;
+		width: 100%;
+	}
+
+	.page-sheet__panel {
+		flex: 1 0 auto;
+	}
+}
+
 iconify-icon {
 	vertical-align: middle;
 }
