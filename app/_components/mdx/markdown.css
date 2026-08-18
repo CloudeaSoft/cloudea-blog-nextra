@@ -296,8 +296,9 @@
  * still inherits end radii because it is a scrollport Chromium will not clip.
  */
 .markdown-body .nextra-code {
+	--code-block-radius: 0.75rem;
 	border: 1px solid var(--border-color);
-	border-radius: 0.75rem;
+	border-radius: var(--code-block-radius);
 	overflow: hidden;
 	margin-bottom: 1rem;
 }
@@ -308,13 +309,14 @@
 
 .markdown-body .nextra-code > pre {
 	margin-bottom: 0;
-	border-end-start-radius: inherit;
-	border-end-end-radius: inherit;
+	/* Inner curve sits inside the 1px shell stroke. */
+	border-end-start-radius: calc(var(--code-block-radius) - 1px);
+	border-end-end-radius: calc(var(--code-block-radius) - 1px);
 	box-shadow: none;
 }
 
 .markdown-body .nextra-code > pre:only-child {
-	border-radius: inherit;
+	border-radius: calc(var(--code-block-radius) - 1px);
 }
 
 /* Language bar: fill + divider only. Outer stroke lives on the shell. */
