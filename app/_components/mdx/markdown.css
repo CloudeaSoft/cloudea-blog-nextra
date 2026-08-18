@@ -1,8 +1,7 @@
 /* GitHub-flavored styling for rendered Markdown (MDX) post content.
  *
- * Scoped to `.markdown-body` (the inner post wrapper in
+ * Scoped to `.markdown-body` (added to the article wrapper in
  * `mdx-components.tsx`) so it never leaks into other parts of the site.
- * Waline comments are a sibling of that wrapper, not a descendant.
  * Sizing and spacing follow GitHub's markdown rendering, while all colors
  * reference the theme tokens in `app/_components/layout/theme.scss`, so everything
  * adapts automatically between light and dark mode.
