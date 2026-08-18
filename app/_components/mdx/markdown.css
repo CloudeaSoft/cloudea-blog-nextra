@@ -271,7 +271,7 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Inline code (fenced blocks are handled by Nextra's Pre component)           */
+/* Inline code + fenced block chrome (Nextra Pre supplies copy / filename bar) */
 /* -------------------------------------------------------------------------- */
 
 .markdown-body :not(pre) > code {
@@ -287,6 +287,40 @@
 .markdown-body pre {
 	margin-top: 0;
 	margin-bottom: 1rem;
+}
+
+/*
+ * Rounding belongs on the fenced-block shell (`.nextra-code`). The language
+ * bar stays a square strip. `<pre>` is a scrollport (`overflow-x: auto`),
+ * which Chromium will not clip to an ancestor radius — it inherits the
+ * shell's *end* radii so the visible bottom follows the shell. Headerless
+ * blocks inherit the full radius. Spacing lives on the shell, not `<pre>`.
+ */
+.markdown-body .nextra-code {
+	border-radius: 0.75rem;
+	overflow: hidden;
+	margin-bottom: 1rem;
+}
+
+.markdown-body .nextra-code > * {
+	border-radius: 0;
+}
+
+.markdown-body .nextra-code > pre {
+	margin-bottom: 0;
+	border-end-start-radius: inherit;
+	border-end-end-radius: inherit;
+}
+
+.markdown-body .nextra-code > pre:only-child {
+	border-radius: inherit;
+}
+
+/* Filename / language header is the sibling div immediately before `pre`. */
+.markdown-body .nextra-code > div:has(+ pre) {
+	background-color: var(--third-background-color);
+	color: var(--third-text-color);
+	border-color: var(--border-color);
 }
 
 /* -------------------------------------------------------------------------- */

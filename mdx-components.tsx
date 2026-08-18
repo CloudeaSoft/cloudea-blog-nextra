@@ -4,11 +4,9 @@ import {
 	Callout,
 	Code,
 	Details,
-	Pre,
 	Summary,
 	Table,
 	withGitHubAlert,
-	withIcons,
 } from "nextra/components";
 import { useMDXComponents as getNextraMDXComponents } from "nextra/mdx-components";
 import type { MDXComponents, UseMDXComponents } from "nextra/mdx-components";
@@ -19,6 +17,7 @@ import { GoBack } from "@/app/_components/mdx/go-back";
 import { InPageAnchors } from "@/app/_components/mdx/in-page-anchors";
 import { FigureImage } from "@/app/_components/mdx/figure-image";
 import { Comments } from "@/app/_components/mdx/comments";
+import { CodePre } from "@/app/_components/mdx/code-pre";
 import { isValidDate } from "@/utils/is-valid-date";
 import { TOC } from "@/app/_components/mdx/toc";
 import { MobileToc } from "@/app/_components/mdx/toc-mobile";
@@ -74,7 +73,7 @@ const DEFAULT_COMPONENTS = getNextraMDXComponents({
 	h4: createHeading("h4"),
 	h5: createHeading("h5"),
 	h6: createHeading("h6"),
-	pre: withIcons(Pre),
+	pre: CodePre,
 	summary: Summary,
 	table: Table,
 	td: Table.Td,
