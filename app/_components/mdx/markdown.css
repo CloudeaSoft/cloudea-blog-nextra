@@ -289,22 +289,22 @@
 	margin-bottom: 1rem;
 }
 
-/* Match article images (0.75rem). Nextra Pre uses rounded-md (~6px). */
-.markdown-body .nextra-code {
-	border-radius: 0.75rem;
-	overflow: hidden;
-}
-
-.markdown-body .nextra-code > div:has(+ pre),
-.markdown-body .nextra-code > pre {
-	border-radius: 0;
-}
-
 /* Filename / language header is the sibling div immediately before `pre`. */
 .markdown-body .nextra-code > div:has(+ pre) {
 	background-color: var(--third-background-color);
 	color: var(--third-text-color);
 	border-color: var(--border-color);
+	border-radius: 0;
+}
+
+/* Round the code surface (Nextra Pre uses rounded-md ~6px), not the header. */
+.markdown-body .nextra-code > pre {
+	border-radius: 0.75rem;
+}
+
+.markdown-body .nextra-code > div:has(+ pre) + pre {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
 }
 
 /* -------------------------------------------------------------------------- */
