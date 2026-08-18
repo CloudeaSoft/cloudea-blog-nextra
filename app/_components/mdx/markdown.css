@@ -289,22 +289,26 @@
 	margin-bottom: 1rem;
 }
 
+/*
+ * Rounding belongs on the fenced-block shell (`.nextra-code`), which wraps
+ * the language bar and `<pre>`. Inner pieces stay square; overflow clips
+ * them to the shell. Direct-child reset only cancels Nextra's rounded-md /
+ * rounded-t-md utilities — the header has no radius of its own.
+ */
+.markdown-body .nextra-code {
+	border-radius: 0.75rem;
+	overflow: hidden;
+}
+
+.markdown-body .nextra-code > * {
+	border-radius: 0;
+}
+
 /* Filename / language header is the sibling div immediately before `pre`. */
 .markdown-body .nextra-code > div:has(+ pre) {
 	background-color: var(--third-background-color);
 	color: var(--third-text-color);
 	border-color: var(--border-color);
-	border-radius: 0;
-}
-
-/* Round the code surface (Nextra Pre uses rounded-md ~6px), not the header. */
-.markdown-body .nextra-code > pre {
-	border-radius: 0.75rem;
-}
-
-.markdown-body .nextra-code > div:has(+ pre) + pre {
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
 }
 
 /* -------------------------------------------------------------------------- */
