@@ -271,7 +271,7 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Inline code (fenced blocks are handled by Nextra's Pre component)           */
+/* Inline code + fenced block chrome (Nextra Pre supplies copy / filename bar) */
 /* -------------------------------------------------------------------------- */
 
 .markdown-body :not(pre) > code {
@@ -287,6 +287,13 @@
 .markdown-body pre {
 	margin-top: 0;
 	margin-bottom: 1rem;
+}
+
+/* Filename / language header is the sibling div immediately before `pre`. */
+.markdown-body .nextra-code > div:has(+ pre) {
+	background-color: var(--third-background-color);
+	color: var(--third-text-color);
+	border-color: var(--border-color);
 }
 
 /* -------------------------------------------------------------------------- */
