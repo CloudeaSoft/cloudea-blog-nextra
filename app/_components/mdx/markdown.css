@@ -292,17 +292,19 @@
 /*
  * One outline on the shell so the stroke follows the radius. Nextra paints a
  * header `border` plus an inset `ring` on `<pre>`; those square strokes get
- * clipped after rounding and look broken. Inner pieces stay square; `<pre>`
- * still inherits end radii because it is a scrollport Chromium will not clip.
+ * clipped after rounding and look broken. Use box-shadow for the shell stroke
+ * so it does not shrink the inner clip. `<pre>` still inherits end radii
+ * because it is a scrollport Chromium will not clip.
  */
 .markdown-body .nextra-code {
 	--code-block-radius: 0.75rem;
-	border: 1px solid var(--border-color);
+	border: 0;
 	border-radius: var(--code-block-radius);
 	overflow: hidden;
 	margin-bottom: 1rem;
-	/* Fill the 1px inner-curve gutter so the page color cannot show through. */
 	background-color: #fff;
+	/* Shadow follows the radius without shrinking the inner clip. */
+	box-shadow: 0 0 0 1px var(--border-color);
 }
 
 .dark .markdown-body .nextra-code {
@@ -315,14 +317,13 @@
 
 .markdown-body .nextra-code > pre {
 	margin-bottom: 0;
-	/* Inner curve sits inside the 1px shell stroke. */
-	border-end-start-radius: calc(var(--code-block-radius) - 1px);
-	border-end-end-radius: calc(var(--code-block-radius) - 1px);
+	border-end-start-radius: inherit;
+	border-end-end-radius: inherit;
 	box-shadow: none;
 }
 
 .markdown-body .nextra-code > pre:only-child {
-	border-radius: calc(var(--code-block-radius) - 1px);
+	border-radius: inherit;
 }
 
 /* Language bar: fill + divider only. Outer stroke lives on the shell. */
