@@ -74,6 +74,8 @@ test.describe("markdown code blocks", () => {
 	test("omits header on unmarked fences but keeps copy", async ({ page }) => {
 		await gotoLight(page, POST_WITHOUT_LANGUAGE);
 
+		await page.locator("details").first().locator("summary").click();
+
 		const blocks = fencedBlocks(page);
 		await expect(blocks.first()).toBeVisible();
 		await expect(codeHeaders(page)).toHaveCount(0);
