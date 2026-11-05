@@ -4,6 +4,10 @@ const meta: MetaRecord = {
 	"index": {
 		title: "Tools",
 	},
+	"mania-editor": {
+		title: "Mania Studio",
+		display: "hidden",
+	},
 	"hlsl-preview": {
 		title: "HLSL Preview",
 		display: "hidden",

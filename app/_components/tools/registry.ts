@@ -8,6 +8,13 @@ export type ToolEntry = {
 
 export const TOOLS: ToolEntry[] = [
 	{
+		id: "mania-editor",
+		title: "Mania Studio",
+		description: "Preview and edit osu!mania beatmaps: notes, holds, timing, audio, and local .osu / .osz import and export.",
+		href: "/tools/mania-editor",
+		icon: "mdi:piano",
+	},
+	{
 		id: "hlsl-preview",
 		title: "HLSL Preview",
 		description:
