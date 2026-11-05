@@ -8,6 +8,48 @@ test.beforeEach(async ({ page }) => {
 	await expect(page.getByRole("region", { name: "Mania Studio", exact: true })).toBeVisible();
 });
 
+test("automatically imports a dropped osz and confirms replacement of unsaved edits", async ({ page }) => {
+	const archive = zipSync({ "test.osu": strToU8(source) });
+	const transfer = await page.evaluateHandle((bytes) => {
+		const data = new DataTransfer();
+		data.items.add(new File([new Uint8Array(bytes)], "test.OSZ", { type: "application/octet-stream" }));
+		return data;
+	}, Array.from(archive));
+	const field = page.getByRole("application", { name: "Mania 谱面编辑区" });
+	await field.dispatchEvent("dragover", { dataTransfer: transfer });
+	await field.dispatchEvent("drop", { dataTransfer: transfer });
+	await expect(page.getByTestId("chart-title")).toHaveText("Artist - Test: song");
+	await expect(page.getByTestId("note-count")).toHaveText("3 音符");
+	await page.getByRole("button", { name: "新建难度", exact: true }).click();
+	await expect(page.getByTestId("note-count")).toHaveText("0 音符");
+	const messages: string[] = [];
+	page.once("dialog", async (dialog) => {
+		messages.push(dialog.message());
+		await dialog.dismiss();
+	});
+	await field.dispatchEvent("drop", { dataTransfer: transfer });
+	expect(messages).toEqual(["当前修改尚未保存到草稿。继续会替换工作区，是否继续？"]);
+	await expect(page.getByLabel("选择难度").locator("option")).toHaveCount(2);
+	await expect(page.getByTestId("note-count")).toHaveText("0 音符");
+	page.once("dialog", (dialog) => dialog.accept());
+	await field.dispatchEvent("drop", { dataTransfer: transfer });
+	await expect(page.getByLabel("选择难度").locator("option")).toHaveCount(1);
+	await expect(page.getByTestId("note-count")).toHaveText("3 音符");
+	await transfer.dispose();
+});
+
+test("uses Default for initial, added and reset difficulties", async ({ page }) => {
+	const selected = page.getByLabel("选择难度").locator("option:checked");
+	await expect(selected).toHaveText("Default · 4K");
+	await page.getByLabel("导入谱面文件").setInputFiles({ name: "test.osu", mimeType: "text/plain", buffer: Buffer.from(source) });
+	await expect(selected).toHaveText("4K · 4K");
+	await page.getByRole("button", { name: "新建难度", exact: true }).click();
+	await expect(selected).toHaveText("Default · 4K");
+	page.once("dialog", (dialog) => dialog.accept());
+	await page.getByRole("button", { name: "新建", exact: true }).click();
+	await expect(selected).toHaveText("Default · 4K");
+});
+
 test("fills the Tools workspace with the playfield and transport in view", async ({ page }, testInfo) => {
 	await expect(page.locator(".mania-header")).toHaveCount(0);
 	const editor = (await page.locator(".mania-studio").boundingBox())!;

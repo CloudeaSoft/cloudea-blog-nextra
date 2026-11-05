@@ -121,7 +121,7 @@ export function ManiaEditor() {
 		setStatus("已新建空白谱面");
 	}
 	async function importFile(file?: File) {
-		if (!file || !canReplace())
+		if (busy || !file || !canReplace())
 			return;
 		playback.pause();
 		await task(async () => {
@@ -313,7 +313,23 @@ export function ManiaEditor() {
 		}
 	}
 	return (
-		<section className="mania-studio" onKeyDown={keyDown} aria-label="Mania Studio" tabIndex={-1}>
+		<section
+			className="mania-studio"
+			onKeyDown={keyDown}
+			onDragOver={(event) => {
+				if (!event.dataTransfer.types.includes("Files")) return;
+				event.preventDefault();
+				event.dataTransfer.dropEffect = busy ? "none" : "copy";
+			}}
+			onDrop={(event) => {
+				if (!event.dataTransfer.types.includes("Files")) return;
+				event.preventDefault();
+				const file = Array.from(event.dataTransfer.files).find((file) => file.name.toLowerCase().endsWith(".osz"));
+				void importFile(file);
+			}}
+			aria-label="Mania Studio"
+			tabIndex={-1}
+		>
 			<fieldset className="mania-workspace" disabled={busy}>
 				<div className="mania-filebar">
 					<label className="mania-button mania-primary">
@@ -414,7 +430,7 @@ export function ManiaEditor() {
 						onClick={() => {
 							playback.pause();
 							const blank = createBeatmap(map.keys);
-							const next: Chart = { filename: assetPath(chart.filename, `difficulty-${newId().slice(0, 8)}.osu`)!, beatmap: { ...blank, metadata: { ...map.metadata, Version: `${map.keys}K New`, BeatmapID: "0" }, general: { ...blank.general, AudioFilename: map.general.AudioFilename }, timing: map.timing } };
+							const next: Chart = { filename: assetPath(chart.filename, `difficulty-${newId().slice(0, 8)}.osu`)!, beatmap: { ...blank, metadata: { ...map.metadata, Version: blank.metadata.Version, BeatmapID: "0" }, general: { ...blank.general, AudioFilename: map.general.AudioFilename }, timing: map.timing } };
 							setHistory((state) => commitHistory(state, [...state.present, next]));
 							setActiveIndex(charts.length);
 							setSelected([]);
