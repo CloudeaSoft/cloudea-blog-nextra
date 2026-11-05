@@ -1,0 +1,203 @@
+/* Scope the viewport shell to this tool; other Tools retain their page layout. */
+.app-scroll:has(.mania-studio) { overflow: hidden; }
+.app-scroll > .site-main:has(.mania-studio) { display: flex; flex: 1 1 0%; min-height: 0; }
+.tool-workspace:has(.mania-studio),
+body:has(.navbar-header[data-compact]) .tool-workspace:has(.mania-studio) { flex: 1; min-height: 0; height: 100%; }
+.tool-workspace__content:has(.mania-studio) { min-height: 0; height: 100%; }
+.tool-workspace__main:has(.mania-studio) { display: flex; min-height: 0; padding: 0; overflow: hidden; }
+.tool-workspace:has(.mania-studio) .tool-workspace__mobile-bar { flex-shrink: 0; }
+.mania-page { width: 100%; height: 100%; min-width: 0; min-height: 0; }
+
+.mania-studio {
+	--mania-accent: #e899bf;
+	--mania-accent-soft: #e899bf1a;
+	--mania-surface: #252832;
+	--mania-border: #3a3e4a;
+	--mania-ink: #edf0f5;
+	--mania-muted: #a8afbf;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	min-height: 0;
+	color: var(--mania-ink);
+	color-scheme: dark;
+	background: #181b24;
+	font-size: 12px;
+	overflow: hidden;
+}
+.mania-studio * { box-sizing: border-box; }
+.mania-studio button, .mania-button, .mania-studio input, .mania-studio select {
+	font: inherit;
+	color: inherit;
+	border: 1px solid var(--mania-border);
+	border-radius: 3px;
+	background: var(--mania-surface);
+}
+.mania-studio button, .mania-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 5px 8px; cursor: pointer; line-height: 1.4; white-space: nowrap; }
+.mania-studio button:hover, .mania-button:hover { border-color: var(--mania-accent); background: var(--mania-accent-soft); }
+.mania-studio button:disabled, .mania-studio fieldset:disabled .mania-button { opacity: .4; cursor: not-allowed; }
+.mania-studio :focus-visible { outline: none; }
+.mania-studio input, .mania-studio select { padding: 5px 6px; min-width: 0; max-width: 100%; }
+.mania-studio input[type="checkbox"] { accent-color: var(--mania-accent); padding: 0; width: 14px; height: 14px; }
+.mania-studio input[type="range"] { accent-color: var(--mania-accent); padding: 0; cursor: pointer; }
+.mania-studio .mania-primary { background: #a94b7b; border-color: #bd658f; color: #fff; }
+.mania-studio .mania-primary:hover { background: #bd5c8e; }
+.mania-studio .is-active { color: var(--mania-accent); background: var(--mania-accent-soft); border-color: #ab668b; }
+.mania-workspace { display: flex; flex-direction: column; height: 100%; min-width: 0; min-height: 0; border: 0; padding: 0; margin: 0; }
+.mania-filebar, .mania-chartbar { flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-bottom: 1px solid var(--mania-border); background: #252832; }
+.mania-filebar { white-space: nowrap; overflow-x: auto; scrollbar-width: thin; }
+.mania-filebar > * { flex-shrink: 0; }
+.mania-filebar button, .mania-filebar .mania-button { font-size: 11px; padding: 4px 8px; }
+.mania-filebar-actions { position: sticky; right: 0; z-index: 2; display: flex; align-items: center; gap: 8px; padding-left: 8px; background: #252832; box-shadow: -5px 0 8px #252832; }
+.mania-filebar .mania-help-toggle { width: 24px; height: 24px; padding: 0; border-radius: 50%; font-size: 16px; line-height: 1; }
+.mania-button { position: relative; overflow: hidden; }
+.mania-button input[type="file"] { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; padding: 0; }
+.mania-button:focus-within { outline: none; }
+.mania-spacer { flex: 1; }
+.mania-chartbar { gap: 10px; min-height: 42px; background: #20232d; }
+.mania-chart-info { flex: 1; min-width: 50px; }
+.mania-chart-info strong { display: block; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mania-difficulty { display: flex; align-items: center; gap: 6px; color: var(--mania-muted); min-width: 0; }
+.mania-difficulty select { width: 130px; color: var(--mania-ink); font-size: 11px; }
+.mania-stats { display: flex; gap: 8px; align-items: center; font: 10px ui-monospace, monospace; white-space: nowrap; color: var(--mania-muted); }
+.mania-stats strong { color: var(--mania-accent); }
+.mania-tabs { display: flex; align-items: center; gap: 3px; margin-left: auto; flex-shrink: 0; }
+.mania-tabs button { font-size: 11px; padding: 5px 8px; }
+.mania-ruler { flex: 0 0 28px; min-width: 0; overflow: hidden; background: #1b202c; border-bottom: 1px solid var(--mania-border); cursor: ew-resize; }
+.mania-ruler canvas { display: block; width: 100%; height: 28px; }
+.mania-body { position: relative; display: grid; grid-template-columns: 106px minmax(0, 1fr) 252px; flex: 1; min-height: 0; overflow: hidden; }
+.mania-toolbox { display: flex; flex-direction: column; min-height: 0; gap: 12px; padding: 10px 7px; overflow-y: auto; scrollbar-width: thin; background: #20232d; border-right: 1px solid var(--mania-border); }
+.mania-toolbar { display: flex; flex-direction: column; gap: 14px; }
+.mania-segment { display: flex; flex-direction: column; gap: 5px; }
+.mania-segment button { justify-content: flex-start; min-height: 40px; padding: 8px 5px; font-size: 11px; border-left-width: 3px; }
+.mania-inline { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--mania-muted); white-space: nowrap; }
+.mania-inline select { padding: 4px; color: var(--mania-ink); }
+.mania-compose { display: flex; align-items: stretch; justify-content: center; min-width: 0; min-height: 0; background: radial-gradient(ellipse at 50% 65%, #252c3c, #171b25 75%); overflow: hidden; }
+.mania-playfield { display: block; width: 100%; height: 100%; min-height: 0; touch-action: none; background: #10141f; cursor: crosshair; border-left: 1px solid #303747; border-right: 1px solid #303747; }
+.mania-playfield[data-mode="select"] { cursor: default; }
+.mania-stage { display: flex; justify-content: center; flex: 1; min-width: 0; min-height: 0; }
+.mania-overview { position: relative; flex: 0 0 34px; min-height: 0; margin: 6px 5px; overflow: hidden; background: #10141f; border: 1px solid #41495b; touch-action: none; cursor: pointer; }
+.mania-overview canvas { display: block; width: 100%; height: 100%; pointer-events: none; }
+.mania-overview-window { position: absolute; left: 0; right: 0; min-height: 2px; background: #94baff22; border: 1px solid #94baff88; pointer-events: none; }
+.mania-overview-position { position: absolute; left: 0; right: 0; height: 2px; background: #fff; pointer-events: none; transform: translateY(-50%); }
+.mania-editbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin-top: auto; }
+.mania-editbar button { padding: 5px 2px; font-size: 10px; }
+.mania-selection-count { grid-column: 1 / -1; text-align: center; font-size: 10px; color: var(--mania-muted); padding-top: 5px; }
+.mania-inspector { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: #20232d; border-left: 1px solid var(--mania-border); }
+.mania-inspector-heading { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid var(--mania-border); font-size: 11px; color: var(--mania-muted); }
+.mania-studio .mania-inspector-close { display: none; }
+.mania-panel { flex: 1; padding: 12px; border: 0; margin: 0; min-width: 0; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+.mania-form { display: grid; gap: 10px; min-width: 0; }
+.mania-form h3, .mania-form h4 { margin: 0; font-size: 12px; font-weight: 600; }
+.mania-muted { color: var(--mania-muted); font-size: 11px; line-height: 1.75; margin: 0; }
+.mania-field { display: grid; gap: 4px; min-width: 0; }
+.mania-field > span { font-size: 11px; color: var(--mania-muted); }
+.mania-field input, .mania-field select { width: 100%; }
+.mania-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.mania-sounds { display: flex; flex-wrap: wrap; gap: 8px; }
+.mania-timing-list { display: grid; gap: 4px; max-height: 150px; overflow-y: auto; }
+.mania-timing-list button { display: flex; justify-content: flex-start; gap: 6px; padding: 6px; font-size: 10px; }
+.mania-timing-list strong { margin-left: auto; font-size: 10px; }
+.mania-dot { width: 6px; height: 6px; background: #50b795; border-radius: 50%; flex-shrink: 0; }
+.mania-dot.is-red { background: #e97483; }
+.mania-studio .mania-danger { color: #ff9ba8; }
+.mania-transport { flex-shrink: 0; display: grid; grid-template-columns: 210px minmax(0, 1fr); grid-template-rows: 44px 28px 28px; gap: 3px 16px; padding: 7px 12px; border-top: 1px solid var(--mania-border); background: #272a35; }
+.mania-transport-main { grid-column: 1; grid-row: 1 / 4; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 3px 8px; align-items: center; }
+.mania-studio .mania-play { grid-column: 1; grid-row: 1 / 3; width: 36px; height: 36px; padding: 0; border-radius: 50%; background: #b75b8b; border-color: #d47eab; color: #fff; }
+.mania-clock { grid-column: 2; display: grid; gap: 1px; }
+.mania-clock strong { font: 18px ui-monospace, monospace; letter-spacing: -.04em; }
+.mania-clock span { color: var(--mania-muted); font: 9px ui-monospace, monospace; }
+.mania-transport-main > .mania-inline { grid-column: 2; font-size: 10px; }
+.mania-transport-main > .mania-inline select { padding: 1px 4px; }
+.mania-timeline { grid-column: 2; grid-row: 1; position: relative; min-width: 0; height: 44px; }
+.mania-timeline-track { position: absolute; inset: 0 7px; }
+.mania-timeline-axis { position: absolute; top: 20px; left: 0; right: 0; height: 2px; background: #929aab; }
+.mania-timeline-label { position: absolute; top: 32px; color: var(--mania-muted); font: 9px ui-monospace, monospace; transform: translateX(-50%); pointer-events: none; }
+.mania-timeline-label:first-of-type { transform: none; }
+.mania-timeline-label:last-of-type { transform: translateX(-100%); }
+.mania-studio .mania-timeline input { appearance: none; position: absolute; z-index: 1; top: 10px; left: -1px; width: calc(100% + 2px); height: 22px; margin: 0; padding: 0; border: 0; background: transparent; border-radius: 0; }
+.mania-timeline input::-webkit-slider-runnable-track { height: 22px; background: transparent; }
+.mania-timeline input::-webkit-slider-thumb { appearance: none; width: 2px; height: 22px; border: 0; border-radius: 0; background: #fff; box-shadow: 0 0 3px #000; }
+.mania-timeline input::-moz-range-track { height: 22px; background: transparent; }
+.mania-timeline input::-moz-range-thumb { width: 2px; height: 22px; border: 0; border-radius: 0; background: #fff; }
+.mania-studio .mania-timeline-marker { position: absolute; z-index: 2; width: 8px; min-width: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; transform: translateX(-50%); }
+.mania-timeline-marker::after { content: ""; position: absolute; left: 3px; top: 0; width: 2px; height: 100%; background: currentColor; pointer-events: none; }
+.mania-studio .mania-timeline-marker:hover { background: #ffffff26; filter: brightness(1.3); }
+.mania-timeline-marker.is-red { top: 7px; height: 13px; color: #ff646e; }
+.mania-timeline-marker.is-green { top: 14px; height: 6px; color: #55d68b; }
+.mania-timeline-marker.is-bookmark { top: 22px; height: 9px; color: #4ba3ff; }
+.mania-timeline-marker.is-preview { top: 0; height: 7px; color: #ffd54f; }
+.mania-timeline-marker.is-preview::after { left: 5px; width: 1px; height: 31px; }
+.mania-transport-options { grid-column: 2; grid-row: 2; display: flex; align-items: center; gap: 12px; min-width: 0; }
+.mania-view-controls { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.mania-transport-options input[type="number"] { width: 78px; padding: 3px; }
+.mania-transport-options input[type="range"] { width: 60px; }
+.mania-check { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; white-space: nowrap; }
+.mania-loop { grid-column: 2; grid-row: 3; display: flex; align-items: center; gap: 5px; min-width: 0; font-size: 10px; color: var(--mania-muted); }
+.mania-loop input[type="number"] { width: 72px; padding: 3px; }
+.mania-loop button { padding: 3px 6px; font-size: 10px; }
+.mania-bookmarks { grid-column: 1 / -1; display: flex; gap: 4px; min-width: 0; }
+.mania-bookmarks button { width: 25px; height: 22px; font-size: 12px; padding: 0; flex-shrink: 0; }
+.mania-error { flex-shrink: 0; background: #482b37; color: #ffb1bc; border-bottom: 1px solid #7c475a; padding: 5px 10px; display: flex; gap: 10px; align-items: center; font-size: 11px; }
+.mania-error button { margin-left: auto; padding: 0 7px; }
+.mania-status { flex-shrink: 0; display: flex; justify-content: space-between; gap: 10px; padding: 4px 10px; min-height: 22px; border-top: 1px solid var(--mania-border); background: #1c1f28; font-size: 10px; color: var(--mania-muted); }
+.mania-status span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mania-help { position: absolute; z-index: 30; top: 42px; right: 8px; bottom: 28px; width: min(460px, calc(100% - 16px)); padding: 16px; border: 1px solid var(--mania-border); border-radius: 5px; background: #252832; box-shadow: 0 8px 40px #0008; overflow-y: auto; color: var(--mania-muted); font-size: 12px; line-height: 1.8; }
+.mania-help header { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--mania-ink); }
+.mania-help p { margin: 12px 0; }
+.mania-help a { color: var(--mania-accent); text-decoration: underline; }
+.mania-draft-dialog { width: min(480px, calc(100vw - 24px)); max-height: calc(100dvh - 32px); margin: auto; padding: 18px; overflow-y: auto; color: var(--mania-ink); background: #252832; border: 1px solid var(--mania-border); border-radius: 6px; box-shadow: 0 12px 48px #0008; }
+.mania-draft-dialog::backdrop { background: #0009; }
+.mania-draft-dialog h2 { margin: 0 0 16px; font-size: 16px; font-weight: 600; }
+.mania-draft-dialog fieldset { min-width: 0; margin: 0; padding: 0; border: 0; display: grid; gap: 14px; }
+.mania-draft-list { display: grid; gap: 6px; max-height: 45dvh; overflow-y: auto; }
+.mania-draft-row { display: flex; align-items: center; gap: 10px; padding: 10px; min-width: 0; border: 1px solid var(--mania-border); border-radius: 4px; cursor: pointer; }
+.mania-draft-row:has(input:checked) { border-color: var(--mania-accent); background: var(--mania-accent-soft); }
+.mania-draft-row input { flex-shrink: 0; accent-color: var(--mania-accent); }
+.mania-draft-row > span { display: grid; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.mania-draft-row strong { font-size: 12px; }
+.mania-draft-row small { color: var(--mania-muted); font-size: 10px; }
+.mania-draft-dialog footer { display: flex; justify-content: flex-end; gap: 8px; }
+@media (min-width: 1600px) { .mania-body { grid-template-columns: 116px minmax(0, 1fr) 290px; } }
+@media (max-width: 1200px) { .mania-stats { gap: 5px; font-size: 9px; } .mania-difficulty > span { display: none; } }
+@media (max-width: 800px) {
+	.mania-chartbar { position: relative; flex-wrap: wrap; gap: 5px 8px; padding: 4px 7px; }
+	.mania-chartbar > button { padding: 4px 6px; font-size: 10px; }
+	.mania-difficulty select { width: 115px; padding: 3px; }
+	.mania-stats { width: 100%; padding: 2px 0; }
+	.mania-tabs { position: absolute; bottom: 3px; right: 7px; z-index: 1; }
+	.mania-tabs button { font-size: 10px; padding: 3px 6px; }
+	.mania-body { grid-template-columns: 64px minmax(0, 1fr); }
+	.mania-toolbox { padding: 8px 4px; gap: 8px; }
+	.mania-segment button { justify-content: center; flex-direction: column; gap: 4px; min-height: 45px; font-size: 10px; padding: 4px 1px; }
+	.mania-toolbar { gap: 10px; }
+	.mania-toolbar > button { font-size: 10px; padding: 4px 1px; }
+	.mania-editbar { grid-template-columns: 1fr; }
+	.mania-editbar button { padding: 3px 1px; }
+	.mania-selection-count { font-size: 9px; }
+	.mania-inspector { display: none; position: absolute; top: 0; right: 0; bottom: 0; width: min(300px, calc(100% - 64px)); z-index: 4; box-shadow: -8px 0 24px #0006; }
+	.mania-inspector.is-open { display: flex; }
+	.mania-studio .mania-inspector-close { display: inline-flex; padding: 0 7px; font-size: 18px; }
+	.mania-overview { flex-basis: 24px; margin: 5px 3px; }
+	.mania-transport { grid-template-columns: 130px minmax(0, 1fr); grid-template-rows: 44px 36px 36px 28px; gap: 3px 8px; padding: 5px 7px; }
+	.mania-transport-main { grid-row: 2 / 4; gap: 2px 6px; grid-template-columns: 30px minmax(0, 1fr); }
+	.mania-studio .mania-play { width: 30px; height: 30px; }
+	.mania-clock strong { font-size: 14px; }
+	.mania-clock span { font-size: 8px; }
+	.mania-timeline { grid-column: 1 / -1; }
+	.mania-transport-options { grid-column: 2; grid-row: 2 / 4; flex-wrap: wrap; gap: 4px 8px; align-content: start; }
+	.mania-transport-options .mania-inline { font-size: 10px; }
+	.mania-view-controls { gap: 8px; }
+	.mania-transport-options input[type="number"] { width: 62px; }
+	.mania-transport-options input[type="range"] { width: 40px; }
+	.mania-transport-options select { padding: 2px; }
+	.mania-loop { grid-column: 1 / -1; grid-row: 4; gap: 4px; }
+	.mania-loop input[type="number"] { width: 56px; }
+	.mania-loop button { padding: 3px 4px; }
+	.mania-status { font-size: 9px; padding: 3px 7px; }
+}
+@media (max-height: 600px) and (min-width: 801px) {
+	.mania-toolbar { gap: 6px; }
+	.mania-segment button { min-height: 30px; }
+	.mania-toolbox { padding-top: 5px; gap: 6px; }
+}
