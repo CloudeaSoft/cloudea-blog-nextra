@@ -9,6 +9,7 @@ describe("mania format", () => {
 		map.notes = lanes.map((lane) => createNote(lane, 1000));
 		const restored = parseBeatmap(serializeBeatmap(map));
 		expect(restored.keys).toBe(keys);
+		expect(restored.metadata.Version).toBe("Default");
 		expect(restored.notes.map((note) => note.lane)).toEqual(lanes);
 	});
 	it.each([0, 11, 18, 4.5])("rejects unsupported key count %s on import and export", (keys) => {

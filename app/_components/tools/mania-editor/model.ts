@@ -172,7 +172,7 @@ export function serializeBeatmap(map: Beatmap): string {
 	return `osu file format v${map.format}\r\n\r\n${Object.entries(output).map(([name, lines]) => `[${name}]\r\n${lines.join("\r\n").trimEnd()}`).join("\r\n\r\n")}\r\n`;
 }
 export function createBeatmap(keys = 4): Beatmap {
-	return parseBeatmap(`osu file format v14\n[General]\nAudioFilename:\nMode:3\nSampleSet:Normal\n[Editor]\nBeatDivisor:4\n[Metadata]\nTitle:Untitled\nArtist:Unknown\nCreator:Mapper\nVersion:${keys}K\nBeatmapID:0\nBeatmapSetID:-1\n[Difficulty]\nCircleSize:${keys}\nHPDrainRate:5\nOverallDifficulty:8\nSliderMultiplier:1.4\nSliderTickRate:1\n[Events]\n[TimingPoints]\n0,500,4,1,0,80,1,0\n[HitObjects]\n`);
+	return parseBeatmap(`osu file format v14\n[General]\nAudioFilename:\nMode:3\nSampleSet:Normal\n[Editor]\nBeatDivisor:4\n[Metadata]\nTitle:Untitled\nArtist:Unknown\nCreator:Mapper\nVersion:Default\nBeatmapID:0\nBeatmapSetID:-1\n[Difficulty]\nCircleSize:${keys}\nHPDrainRate:5\nOverallDifficulty:8\nSliderMultiplier:1.4\nSliderTickRate:1\n[Events]\n[TimingPoints]\n0,500,4,1,0,80,1,0\n[HitObjects]\n`);
 }
 export function createNote(lane: number, time: number, endTime = time): Note {
 	return { id: newId(), lane, time: Math.round(time), endTime: Math.round(endTime), type: endTime > time ? 128 : 1, hitSound: 0, sample: "0:0:0:0:" };
