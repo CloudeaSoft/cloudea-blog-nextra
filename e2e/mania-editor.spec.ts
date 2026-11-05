@@ -569,6 +569,73 @@ test("toggles playback with Space after clicking the timeline without a focus ri
 	await expect(page.getByRole("button", { name: "播放", exact: true })).toBeVisible();
 });
 
+for (const sampleType of ["default", "custom", "broken"] as const) {
+	test(`plays ${sampleType} key samples and respects the hitsound switch`, async ({ page }) => {
+		await page.evaluate(() => {
+			const output = { samples: 0, peak: 0 };
+			(window as unknown as { keyAudio: typeof output }).keyAudio = output;
+			const start = AudioBufferSourceNode.prototype.start;
+			AudioBufferSourceNode.prototype.start = function (...args) {
+				if (this.buffer) {
+					output.samples++;
+					for (const value of this.buffer.getChannelData(0)) output.peak = Math.max(output.peak, Math.abs(value));
+				}
+				return start.apply(this, args);
+			};
+		});
+		const customName = sampleType === "default" ? "" : "key.wav";
+		const map = source.slice(0, source.indexOf("[HitObjects]")) + `[HitObjects]\n64,192,200,1,0,0:0:0:0:${customName}\n`;
+		const archive = zipSync({
+			"key.osu": strToU8(map),
+			...(customName ? { "key.wav": sampleType === "custom" ? audioFixture() : strToU8("invalid audio") } : {}),
+		});
+		await page.getByLabel("导入谱面文件").setInputFiles({ name: "key.osz", mimeType: "application/octet-stream", buffer: Buffer.from(archive) });
+		await page.getByRole("button", { name: "播放", exact: true }).click();
+		await expect.poll(() => page.evaluate(() => (window as unknown as { keyAudio: { samples: number } }).keyAudio.samples)).toBe(1);
+		const peak = await page.evaluate(() => (window as unknown as { keyAudio: { peak: number } }).keyAudio.peak);
+		// A deliberately silent custom WAV must override the audible default.
+		if (sampleType === "custom") expect(peak).toBe(0);
+		else expect(peak).toBeGreaterThan(0.01);
+		await page.getByRole("button", { name: "暂停", exact: true }).click();
+		await expect(page.locator(".mania-studio").getByRole("alert")).toHaveCount(0);
+		const count = await page.evaluate(() => (window as unknown as { keyAudio: { samples: number } }).keyAudio.samples);
+		await page.getByRole("checkbox", { name: "音效", exact: true }).uncheck();
+		await page.getByLabel("当前位置 (ms)").fill("0");
+		await page.getByRole("button", { name: "播放", exact: true }).click();
+		await expect.poll(async () => Number(await page.getByLabel("当前位置 (ms)").inputValue())).toBeGreaterThan(500);
+		await page.getByRole("button", { name: "暂停", exact: true }).click();
+		expect(await page.evaluate(() => (window as unknown as { keyAudio: { samples: number } }).keyAudio.samples)).toBe(count);
+	});
+}
+
+test("cancels playback while default key sounds are loading", async ({ page }) => {
+	let release!: () => void;
+	let requested!: () => void;
+	const gate = new Promise<void>((resolve) => {
+		release = resolve;
+	});
+	const request = new Promise<void>((resolve) => {
+		requested = resolve;
+	});
+	await page.route("**/audio/mania/normal-hitnormal.wav", async (route) => {
+		requested();
+		await gate;
+		await route.continue();
+	});
+	await page.getByRole("button", { name: "播放", exact: true }).click();
+	await request;
+	await page.getByRole("button", { name: "暂停", exact: true }).click();
+	const response = page.waitForResponse("**/audio/mania/normal-hitnormal.wav");
+	release();
+	await response;
+	await expect(page.getByRole("button", { name: "播放", exact: true })).toBeVisible();
+	await expect(page.getByLabel("当前位置 (ms)")).toHaveValue("0");
+	await page.getByRole("button", { name: "播放", exact: true }).click();
+	await expect.poll(async () => Number(await page.getByLabel("当前位置 (ms)").inputValue())).toBeGreaterThan(200);
+	await page.getByRole("button", { name: "暂停", exact: true }).click();
+	await expect(page.locator(".mania-studio").getByRole("alert")).toHaveCount(0);
+});
+
 test("attaches real audio, plays, seeks and loops without losing the attached file", async ({ page }) => {
 	const errors: string[] = [];
 	page.on("pageerror", (error) => errors.push(error.message));

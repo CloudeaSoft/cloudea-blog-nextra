@@ -1,8 +1,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { type Beatmap, type Note, type Project } from "./model";
+import { type Beatmap, type Project } from "./model";
 import { findAsset } from "./archive";
-import { timingAt } from "./timing";
+import { HitSoundPlayer, resolveHitSamples } from "./hitsounds";
 type Loop = {
 	enabled: boolean;
 	start: number;
@@ -19,7 +19,9 @@ export function usePlayback(map: Beatmap, filename: string, assets: Project["ass
 	const [loop, setLoop] = useState<Loop>({ enabled: false, start: 0, end: 5000 });
 	const audio = useRef<HTMLAudioElement | null>(null);
 	const context = useRef<AudioContext | null>(null);
-	const buffers = useRef(new Map<Uint8Array, Promise<AudioBuffer | null>>());
+	const sounds = useRef<HitSoundPlayer | null>(null);
+	const startVersion = useRef(0);
+	const starting = useRef(false);
 	const current = useRef(time);
 	const active = useRef(false);
 	const previous = useRef(0);
@@ -32,6 +34,9 @@ export function usePlayback(map: Beatmap, filename: string, assets: Project["ass
 	const endRef = useRef(end);
 	endRef.current = end;
 	const pause = useCallback(() => {
+		startVersion.current++;
+		starting.current = false;
+		sounds.current?.stop();
 		active.current = false;
 		audio.current?.pause();
 		setPlaying(false);
@@ -39,6 +44,10 @@ export function usePlayback(map: Beatmap, filename: string, assets: Project["ass
 	const seek = useCallback((value: number) => {
 		if (!Number.isFinite(value))
 			return;
+		startVersion.current++;
+		if (starting.current) setPlaying(false);
+		starting.current = false;
+		sounds.current?.stop();
 		const next = Math.max(0, Math.min(endRef.current, value));
 		current.current = next;
 		previous.current = next;
@@ -52,7 +61,7 @@ export function usePlayback(map: Beatmap, filename: string, assets: Project["ass
 		previous.current = 0;
 		setTime(0);
 		setDuration(0);
-		buffers.current.clear();
+		sounds.current?.clearCustom();
 		if (!bytes) {
 			audio.current = null;
 			return;
@@ -84,79 +93,50 @@ export function usePlayback(map: Beatmap, filename: string, assets: Project["ass
 		}
 	}, [rate, volume, bytes]);
 	const toggle = useCallback(async () => {
-		if (active.current) {
+		if (active.current || starting.current) {
 			pause();
 			return;
 		}
+		const cfg = config.current;
+		if (cfg.loop.enabled && (current.current < cfg.loop.start || current.current >= cfg.loop.end))
+			seek(cfg.loop.start);
+		else if (current.current >= endRef.current - 1 || (audio.current && current.current >= cfg.duration))
+			seek(0);
+		const version = ++startVersion.current;
+		starting.current = true;
+		setPlaying(true);
 		try {
 			context.current ??= new AudioContext();
+			sounds.current ??= new HitSoundPlayer(context.current);
 			await context.current.resume();
-			const cfg = config.current;
-			if (cfg.loop.enabled && (current.current < cfg.loop.start || current.current >= cfg.loop.end))
-				seek(cfg.loop.start);
-			else if (current.current >= endRef.current - 1 || (audio.current && current.current >= cfg.duration))
-				seek(0);
+			if (cfg.hitsounds) await sounds.current.prepare();
+			if (version !== startVersion.current) return;
 			if (audio.current) {
-				audio.current.playbackRate = cfg.rate;
-				audio.current.volume = cfg.volume;
+				audio.current.playbackRate = config.current.rate;
+				audio.current.volume = config.current.volume;
 				await audio.current.play();
 			}
+			if (version !== startVersion.current) return;
 			previous.current = current.current - 0.01;
 			active.current = true;
 			setPlaying(true);
 		} catch (error) {
+			if (version !== startVersion.current) return;
 			pause();
 			config.current.onError(`无法播放：${error instanceof Error ? error.message : "音频不可用"}`);
+		} finally {
+			if (version === startVersion.current) starting.current = false;
 		}
 	}, [pause, seek]);
 	useEffect(() => {
+		if (!hitsounds) sounds.current?.stop();
+		else if (sounds.current) void sounds.current.prepare().catch(() => {
+			config.current.onError("无法载入默认击打音，请重试。");
+		});
+	}, [hitsounds]);
+	useEffect(() => {
 		let frame = 0;
 		let stamp = performance.now();
-		const sound = (note: Note) => {
-			const ctx = context.current;
-			if (!ctx)
-				return;
-			const cfg = config.current;
-			const point = timingAt(cfg.map, note.time);
-			const parts = note.sample.split(":");
-			const level = (Number(parts[3]) || point.volume) / 100 * cfg.volume;
-			const normalSet = Number(parts[0]) || point.sampleSet;
-			const additionSet = Number(parts[1]) || normalSet;
-			const index = Number(parts[2]) || point.sampleIndex;
-			const custom = parts.slice(4).join(":");
-			const names = custom ? [custom] : ["normal", ...(note.hitSound & 2 ? ["whistle"] : []), ...(note.hitSound & 4 ? ["finish"] : []), ...(note.hitSound & 8 ? ["clap"] : [])].map((kind) => `${["", "normal", "soft", "drum"][kind === "normal" ? normalSet : additionSet]}-hit${kind}${index > 1 ? index : ""}`);
-			const playAt = ctx.currentTime;
-			for (const [i, name] of names.entries()) {
-				const data = custom ? findAsset(cfg.assets, cfg.filename, name) : ["wav", "ogg", "mp3"].map((ext) => findAsset(cfg.assets, cfg.filename, `${name}.${ext}`)).find(Boolean);
-				if (data) {
-					let pending = buffers.current.get(data);
-					if (!pending) {
-						pending = ctx.decodeAudioData(new Uint8Array(data).buffer).catch(() => null);
-						buffers.current.set(data, pending);
-					}
-					void pending.then((buffer) => {
-						if (!buffer || !active.current || ctx.currentTime - playAt > 0.15)
-							return;
-						const source = ctx.createBufferSource();
-						const gain = ctx.createGain();
-						source.buffer = buffer;
-						gain.gain.value = level;
-						source.connect(gain).connect(ctx.destination);
-						source.start();
-					});
-				} else {
-					// Original synthetic fallback: no osu! skin or game resources are bundled.
-					const oscillator = ctx.createOscillator();
-					const gain = ctx.createGain();
-					oscillator.frequency.value = [880, 1500, 440, 220][i] || 880;
-					gain.gain.setValueAtTime(level * 0.16, playAt);
-					gain.gain.exponentialRampToValueAtTime(0.001, playAt + 0.045);
-					oscillator.connect(gain).connect(ctx.destination);
-					oscillator.start(playAt);
-					oscillator.stop(playAt + 0.05);
-				}
-			}
-		};
 		const tick = (now: number) => {
 			const dt = now - stamp;
 			stamp = now;
@@ -175,7 +155,7 @@ export function usePlayback(map: Beatmap, filename: string, assets: Project["ass
 						if (note.time > next)
 							break;
 						if (note.time > previous.current)
-							sound(note);
+							sounds.current?.play(resolveHitSamples(cfg.map, note, cfg.filename, cfg.assets), cfg.volume, cfg.onError);
 					}
 				}
 				previous.current = next;
@@ -190,6 +170,8 @@ export function usePlayback(map: Beatmap, filename: string, assets: Project["ass
 		return () => cancelAnimationFrame(frame);
 	}, [pause, seek]);
 	useEffect(() => () => {
+		startVersion.current++;
+		sounds.current?.stop();
 		void context.current?.close();
 	}, []);
 	return { time, playing, rate, setRate, volume, setVolume, hitsounds, setHitsounds, duration, end, loop, setLoop, hasAudio: !!bytes, seek, pause, toggle };
