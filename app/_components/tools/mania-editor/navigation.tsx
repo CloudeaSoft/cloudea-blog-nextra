@@ -94,6 +94,19 @@ export function SongTimeline({ map, time, end, disabled, onSeek }: NavigationPro
 			result.push({ id: "preview", time: preview, kind: "preview", label: `预览点 ${preview} ms` });
 		return result;
 	}, [map.timing, map.editor.Bookmarks, map.general.PreviewTime]);
+	// Thousands of unchanged marker buttons should not reconcile with the playhead.
+	const markerButtons = useMemo(() => markers.filter((marker) => marker.time <= end).map((marker) => (
+		<button
+			type="button"
+			key={marker.id}
+			className={`mania-timeline-marker is-${marker.kind}`}
+			style={{ left: `${Math.max(0, marker.time) / end * 100}%` }}
+			aria-label={marker.label}
+			title={marker.label}
+			disabled={disabled}
+			onClick={() => onSeek(marker.time)}
+		/>
+	)), [markers, end, disabled, onSeek]);
 	return (
 		<div className="mania-timeline" role="group" aria-label="歌曲时间轴">
 			<div className="mania-timeline-track">
@@ -101,18 +114,7 @@ export function SongTimeline({ map, time, end, disabled, onSeek }: NavigationPro
 				{Array.from({ length: 5 }, (_, i) => (
 					<span className="mania-timeline-label" key={i} style={{ left: `${i * 25}%` }}>{`${Math.floor(end * i / 4 / 60000)}:${String(Math.floor(end * i / 4 / 1000 % 60)).padStart(2, "0")}`}</span>
 				))}
-				{markers.filter((marker) => marker.time <= end).map((marker) => (
-					<button
-						type="button"
-						key={marker.id}
-						className={`mania-timeline-marker is-${marker.kind}`}
-						style={{ left: `${Math.max(0, marker.time) / end * 100}%` }}
-						aria-label={marker.label}
-						title={marker.label}
-						disabled={disabled}
-						onClick={() => onSeek(marker.time)}
-					/>
-				))}
+				<div className="mania-timeline-markers">{markerButtons}</div>
 				<input aria-label="播放进度" type="range" min={0} max={end} step={1} value={time} disabled={disabled} onChange={(event) => onSeek(Number(event.target.value))} />
 			</div>
 		</div>

@@ -45,7 +45,7 @@ function rounded(ctx: CanvasRenderingContext2D, x: number, y: number, width: num
 	ctx.fill();
 }
 
-type NoteAppearance = {
+export type NoteAppearance = {
 	x: number;
 	laneWidth: number;
 	head: number;

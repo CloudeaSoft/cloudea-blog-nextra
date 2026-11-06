@@ -479,7 +479,7 @@ export function ManiaEditor() {
 					</div>
 				)}
 
-				<TimeRuler disabled={busy} map={map} time={playback.time} windowMs={windowMs} divisor={divisor} onZoom={(direction) => setWindowMs((current) => Math.max(500, Math.min(10000, current + direction * 250)))} />
+				<TimeRuler disabled={busy} map={map} clock={playback.clock} windowMs={windowMs} divisor={divisor} onZoom={(direction) => setWindowMs((current) => Math.max(500, Math.min(10000, current + direction * 250)))} />
 				<div className="mania-body">
 					<aside className="mania-toolbox" aria-label="编辑工具箱">
 						<div className="mania-toolbar">
@@ -531,7 +531,7 @@ export function ManiaEditor() {
 					<div className="mania-compose">
 						<DensityOverview disabled={busy} map={map} time={playback.time} end={playback.end} windowMs={windowMs} divisor={divisor} onSeek={playback.seek} />
 						<div className="mania-stage">
-							<Playfield disabled={busy} map={map} time={playback.time} end={playback.end} playing={playback.playing} preview={preview} windowMs={windowMs} divisor={divisor} mode={mode} selected={selected} onSelect={setSelected} onEdit={edit} onSeek={playback.seek} onSnapStep={(direction) => setDivisor((current) => SNAP_DIVISORS[Math.max(0, Math.min(SNAP_DIVISORS.length - 1, SNAP_DIVISORS.indexOf(current) + direction))])} onError={report} />
+							<Playfield disabled={busy} map={map} time={playback.time} clock={playback.clock} end={playback.end} playing={playback.playing} preview={preview} windowMs={windowMs} divisor={divisor} mode={mode} selected={selected} onSelect={setSelected} onEdit={edit} onSeek={playback.seek} onSnapStep={(direction) => setDivisor((current) => SNAP_DIVISORS[Math.max(0, Math.min(SNAP_DIVISORS.length - 1, SNAP_DIVISORS.indexOf(current) + direction))])} onError={report} />
 						</div>
 					</div>
 					<aside className={inspectorOpen ? "mania-inspector is-open" : "mania-inspector"}>
