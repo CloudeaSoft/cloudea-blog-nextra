@@ -1,9 +1,12 @@
 "use client";
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { type Beatmap, type Note, createNote } from "./model";
-import { beatLines, scrollDistance, snapTime, stepGridTime } from "./timing";
+import { beatLines, snapTime, stepGridTime } from "./timing";
 import { editNotes, moveNotes } from "./editing";
-import { columnAccent, drawDefaultNote, noteBounds } from "./note-skin";
+import { columnAccent, noteBounds } from "./note-skin";
+import { createNoteRenderer } from "./note-renderer";
+import { createNoteIndex, createScrollPosition } from "./render-index";
+import { type PlaybackClock, usePlaybackFrame } from "./use-playback-frame";
 export type EditMode = "select" | "note" | "hold";
 type Position = {
 	lane: number;
@@ -24,6 +27,7 @@ type Props = {
 	map: Beatmap;
 	time: number;
 	playing: boolean;
+	clock: PlaybackClock;
 	end: number;
 	preview: boolean;
 	windowMs: number;
@@ -48,7 +52,11 @@ export function Playfield(props: Props) {
 	const bottom = size.height - 44;
 	const laneWidth = (right - left) / map.keys;
 	const scale = (bottom - 20) / windowMs;
-	const yAt = (at: number) => bottom - (preview ? scrollDistance(map, time, at) : at - time) * scale;
+	const scrollPosition = useMemo(() => createScrollPosition(map.timing), [map.timing]);
+	const noteIndex = useMemo(() => createNoteIndex(map.notes), [map.notes]);
+	const renderNote = useMemo(() => createNoteRenderer(), []);
+	const selection = useMemo(() => new Set(selected), [selected]);
+	const yAt = (at: number) => bottom - (preview ? scrollPosition(at) - scrollPosition(time) : at - time) * scale;
 	useEffect(() => {
 		const element = canvas.current!;
 		const observer = new ResizeObserver(([entry]) => setSize({ width: entry.contentRect.width, height: entry.contentRect.height }));
@@ -73,17 +81,21 @@ export function Playfield(props: Props) {
 	useEffect(() => {
 		setGesture(null);
 	}, [map, preview, props.disabled, windowMs, divisor]);
-	useEffect(() => {
+	usePlaybackFrame(props.clock, (time) => {
 		const element = canvas.current;
 		if (!element)
 			return;
 		const ratio = window.devicePixelRatio || 1;
-		element.width = Math.round(size.width * ratio);
-		element.height = Math.round(size.height * ratio);
-		const ctx = element.getContext("2d");
+		const width = Math.round(size.width * ratio);
+		const height = Math.round(size.height * ratio);
+		if (element.width !== width) element.width = width;
+		if (element.height !== height) element.height = height;
+		const ctx = element.getContext("2d", { alpha: false });
 		if (!ctx)
 			return;
-		ctx.scale(ratio, ratio);
+		ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+		const origin = preview ? scrollPosition(time) : time;
+		const yAt = (at: number) => bottom - ((preview ? scrollPosition(at) : at) - origin) * scale;
 		ctx.fillStyle = "#10141f";
 		ctx.fillRect(0, 0, size.width, size.height);
 		for (let lane = 0; lane < map.keys; lane++) {
@@ -107,25 +119,33 @@ export function Playfield(props: Props) {
 				ctx.fillText((line.time / 1000).toFixed(2), left - 7, y + 3);
 			}
 		}
-		const selection = new Set(selected);
 		const drawNote = (note: Note, ghost = false) => {
 			const head = yAt(note.time);
 			const tail = yAt(note.endTime);
 			const bounds = noteBounds(head, tail, laneWidth);
 			if (bounds.top > bottom || head < 0)
 				return;
-			ctx.save();
-			ctx.beginPath();
-			ctx.rect(left, 24, right - left, bottom - 24);
-			ctx.clip();
-			drawDefaultNote(ctx, { x: left + note.lane * laneWidth + 2, laneWidth, head, tail, accent: columnAccent(map.keys, note.lane), selected: selection.has(note.id), ghost });
-			ctx.restore();
+			if (ghost) {
+				ctx.save();
+				ctx.beginPath();
+				ctx.rect(left, 24, right - left, bottom - 24);
+				ctx.clip();
+			}
+			renderNote(ctx, { x: left + note.lane * laneWidth + 2, laneWidth, head, tail, accent: columnAccent(map.keys, note.lane), selected: selection.has(note.id), ghost }, ratio);
+			if (ghost) ctx.restore();
 		};
-		for (const note of map.notes) {
+		// Share one clip for the whole note pass instead of saving/clipping each sprite.
+		ctx.save();
+		ctx.beginPath();
+		ctx.rect(left, 24, right - left, bottom - 24);
+		ctx.clip();
+		for (let i = noteIndex.firstVisible(time - 500); i < map.notes.length; i++) {
+			const note = map.notes[i];
 			if (note.time > time + windowMs * (preview ? 10 : 1.1)) break;
 			if (note.endTime < time - 500) continue;
 			drawNote(note);
 		}
+		ctx.restore();
 		if (gesture) {
 			if (gesture.kind === "box") {
 				ctx.fillStyle = "#a5c5ff22";
@@ -155,7 +175,6 @@ export function Playfield(props: Props) {
 		ctx.textAlign = "left";
 		ctx.font = "11px monospace";
 		ctx.fillText(preview ? "PREVIEW / SV" : "COMPOSE / TIME", left + 8, 16);
-		// Rendering intentionally follows every playhead frame and drag update.
 	});
 	function position(event: {
 		currentTarget: HTMLCanvasElement;

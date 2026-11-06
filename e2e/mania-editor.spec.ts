@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 import { strToU8, zipSync, unzipSync, strFromU8 } from "fflate";
 import { source } from "../app/_components/tools/mania-editor/__tests__/fixture";
+import { readFileSync } from "node:fs";
+import { transpileModule, ModuleKind, ScriptTarget } from "typescript";
 
 test.beforeEach(async ({ page }) => {
 	await page.route("**/vercount.one/**", (route) => route.abort());
@@ -76,11 +78,16 @@ test("fills the Tools workspace with the playfield and transport in view", async
 });
 
 test("restores the regular Tools layout after leaving the editor", async ({ page }, testInfo) => {
+	await expect(page.locator(".site-background-layer").first()).toHaveCSS("display", "none");
+	await expect(page.locator(".site-background-atmosphere")).toHaveCSS("display", "none");
+	expect(await page.locator(".tool-workspace").evaluate((element) => getComputedStyle(element, "::before").backdropFilter)).toBe("none");
 	if (testInfo.project.name === "mobile-chromium") await page.getByRole("button", { name: "Open tool navigation" }).click();
 	await page.getByRole("link", { name: "HLSL Preview", exact: true }).click();
 	await expect(page.getByRole("heading", { name: "HLSL Preview", exact: true })).toBeVisible();
 	expect(await page.locator(".tool-workspace__main").evaluate((element) => parseFloat(getComputedStyle(element).paddingTop))).toBeGreaterThan(0);
 	await expect(page.locator(".mania-studio")).toHaveCount(0);
+	await expect(page.locator(".site-background-layer").first()).not.toHaveCSS("display", "none");
+	expect(await page.locator(".tool-workspace").evaluate((element) => getComputedStyle(element, "::before").backdropFilter)).not.toBe("none");
 });
 
 test("lands wheel scrolling on the grid after an arbitrary seek and uses the selection pointer", async ({ page }) => {
@@ -844,4 +851,107 @@ test("switches archive difficulties without losing edits and renders a populated
 	await page.screenshot({ path: testInfo.outputPath("mania-workspace-dark.png"), fullPage: true });
 	await page.locator(".mania-transport").scrollIntoViewIfNeeded();
 	await page.screenshot({ path: testInfo.outputPath("mania-transport.png"), fullPage: true });
+});
+
+test("draws each playback frame without resizing canvases or rendering the UI at frame rate", async ({ page }) => {
+	await page.route("**/vercount.one/**", (route) => route.abort());
+	await page.goto("/tools/mania-editor");
+	await page.getByLabel("导入谱面文件").setInputFiles({ name: "test.osu", mimeType: "text/plain", buffer: Buffer.from(source) });
+	await page.getByLabel("音效", { exact: true }).uncheck();
+	await page.getByRole("button", { name: "播放", exact: true }).click();
+	const stats = await page.evaluate(() => new Promise<{ frames: number; draws: number; updates: number; resizes: number; gradients: number }>((resolve) => {
+		const stats = { frames: 0, draws: 0, updates: 0, resizes: 0, gradients: 0 };
+		const observer = new MutationObserver(() => stats.updates++);
+		observer.observe(document.querySelector(".mania-clock strong")!, { characterData: true, childList: true, subtree: true });
+		const canvas = document.querySelector<HTMLCanvasElement>(".mania-playfield")!;
+		const ctx = canvas.getContext("2d")!;
+		const original = ctx.fillText;
+		const gradient = ctx.createLinearGradient;
+		ctx.createLinearGradient = function (...args: Parameters<typeof gradient>) {
+			stats.gradients++;
+			return gradient.apply(this, args);
+		};
+		ctx.fillText = function (...args: Parameters<typeof original>) {
+			if (args[0] === "COMPOSE / TIME") stats.draws++;
+			return original.apply(this, args);
+		};
+		const descriptor = Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype, "width")!;
+		Object.defineProperty(HTMLCanvasElement.prototype, "width", {
+			...descriptor,
+			set(value: number) {
+				stats.resizes++;
+				descriptor.set!.call(this, value);
+			},
+		});
+		const start = performance.now();
+		function tick(now: number) {
+			stats.frames++;
+			if (now - start < 1200) return requestAnimationFrame(tick);
+			observer.disconnect();
+			ctx.fillText = original;
+			ctx.createLinearGradient = gradient;
+			Object.defineProperty(HTMLCanvasElement.prototype, "width", descriptor);
+			resolve(stats);
+		}
+		requestAnimationFrame(tick);
+	}));
+	expect(stats.draws).toBeGreaterThanOrEqual(stats.frames - 3);
+	expect(stats.draws).toBeLessThanOrEqual(stats.frames + 3);
+	// Do not require a particular display refresh rate in CI or remote desktops.
+	expect(stats.updates).toBeLessThanOrEqual(26);
+	expect(stats.resizes).toBeLessThanOrEqual(2);
+	expect(stats.gradients).toBe(0);
+	await page.getByRole("button", { name: "暂停", exact: true }).click();
+	const position = page.getByLabel("当前位置 (ms)", { exact: true });
+	const paused = await position.inputValue();
+	await page.waitForTimeout(100);
+	expect(await position.inputValue()).toBe(paused);
+	await position.fill("1700");
+	await expect(page.locator(".mania-clock strong")).toHaveText("00:01.700");
+	await expect(page.getByRole("slider", { name: "全曲音符密度总览" })).toHaveAttribute("aria-valuenow", "1700");
+});
+
+test("cached note sprites preserve caps, short holds, selection and translucent ghosts at different pixel ratios", async ({ page }) => {
+	const compile = (filename: string) => transpileModule(readFileSync(`app/_components/tools/mania-editor/${filename}.ts`, "utf8"), {
+		compilerOptions: { module: ModuleKind.CommonJS, target: ScriptTarget.ES2022 },
+	}).outputText;
+	const comparisons = await page.evaluate(({ skinCode, rendererCode }) => {
+		const skin = {} as typeof import("../app/_components/tools/mania-editor/note-skin");
+		const renderer = {} as typeof import("../app/_components/tools/mania-editor/note-renderer");
+		// Execute the real drawing modules in a browser with a real Canvas, without mocks.
+		new Function("exports", skinCode)(skin);
+		new Function("exports", "require", rendererCode)(renderer, () => skin);
+		const draw = renderer.createNoteRenderer();
+		const results: { ratio: number; laneWidth: number; span: number; selected: boolean; ghost: boolean; error: number }[] = [];
+		for (const ratio of [1, 1.25, 2]) {
+			for (const laneWidth of [24, 55.5, 64]) {
+				for (const span of [0, 5, 80, 250]) {
+					for (const state of ["normal", "selected", "ghost"]) {
+						const note = { x: 10.25, head: 310.75, tail: 310.75 - span, laneWidth, accent: "#d5235a", selected: state === "selected", ghost: state === "ghost" };
+						const images = [false, true].map((cached) => {
+							const canvas = document.createElement("canvas");
+							canvas.width = Math.ceil(90 * ratio);
+							canvas.height = Math.ceil(330 * ratio);
+							const ctx = canvas.getContext("2d")!;
+							ctx.scale(ratio, ratio);
+							ctx.fillStyle = "#151b28";
+							ctx.fillRect(0, 0, 90, 330);
+							if (cached) draw(ctx, note, ratio);
+							else skin.drawDefaultNote(ctx, note);
+							return ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+						});
+						let difference = 0;
+						for (let i = 0; i < images[0].length; i++) difference += Math.abs(images[0][i] - images[1][i]);
+						results.push({ ratio, laneWidth, span, selected: note.selected, ghost: note.ghost, error: difference / images[0].length });
+					}
+				}
+			}
+		}
+		return results;
+	}, { skinCode: compile("note-skin"), rendererCode: compile("note-renderer") });
+	for (const comparison of comparisons) {
+		// Subpixel bitmap filtering can differ at edges; colours/caps/body must remain equivalent.
+		expect(comparison.error, JSON.stringify(comparison)).toBeLessThan(1);
+		if (comparison.ghost || comparison.span === 5) expect(comparison.error).toBe(0);
+	}
 });

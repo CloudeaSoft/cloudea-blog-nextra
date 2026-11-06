@@ -2,10 +2,11 @@
 import { useEffect, useRef, useState } from "react";
 import type { Beatmap } from "./model";
 import { beatLines } from "./timing";
+import { type PlaybackClock, usePlaybackFrame } from "./use-playback-frame";
 
 type Props = {
 	map: Beatmap;
-	time: number;
+	clock: PlaybackClock;
 	windowMs: number;
 	divisor: number;
 	disabled: boolean;
@@ -34,15 +35,17 @@ export function TimeRuler(props: Props) {
 			element.removeEventListener("wheel", wheel);
 		};
 	}, []);
-	const { map, time, windowMs, divisor } = props;
-	useEffect(() => {
+	const { map, windowMs, divisor } = props;
+	usePlaybackFrame(props.clock, (time) => {
 		const element = canvas.current!;
 		const ratio = window.devicePixelRatio || 1;
-		element.width = Math.round(width * ratio);
-		element.height = 28 * ratio;
+		const pixelWidth = Math.round(width * ratio);
+		const pixelHeight = Math.round(28 * ratio);
+		if (element.width !== pixelWidth) element.width = pixelWidth;
+		if (element.height !== pixelHeight) element.height = pixelHeight;
 		const ctx = element.getContext("2d");
 		if (!ctx) return;
-		ctx.scale(ratio, ratio);
+		ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 		ctx.clearRect(0, 0, width, 28);
 		ctx.font = "10px monospace";
 		const scale = Math.max(1, width - 24) / windowMs;
@@ -62,7 +65,7 @@ export function TimeRuler(props: Props) {
 		}
 		ctx.fillStyle = "#7adbd5";
 		ctx.fillRect(12, 1, 2, 27);
-	}, [map, time, windowMs, divisor, width]);
+	});
 	return (
 		<div className="mania-ruler" role="group" aria-label="时间标尺" aria-disabled={props.disabled}>
 			<canvas ref={canvas} aria-hidden="true" />

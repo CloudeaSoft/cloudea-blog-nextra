@@ -1,4 +1,11 @@
 /* Scope the viewport shell to this tool; other Tools retain their page layout. */
+/* The opaque editor does not need the full-screen animated/blurred wallpaper.
+ * Keeping those layers alive makes every playback frame expensive to composite. */
+body:has(.mania-studio) .site-background-layer,
+body:has(.mania-studio) .site-background-atmosphere { display: none; }
+.tool-workspace:has(.mania-studio)::before,
+.tool-workspace:has(.mania-studio) .tool-workspace__sidebar,
+.tool-workspace:has(.mania-studio) .tool-workspace__mobile-bar { backdrop-filter: none; }
 .app-scroll:has(.mania-studio) { overflow: hidden; }
 .app-scroll > .site-main:has(.mania-studio) { display: flex; flex: 1 1 0%; min-height: 0; }
 .tool-workspace:has(.mania-studio),
@@ -111,6 +118,9 @@ body:has(.navbar-header[data-compact]) .tool-workspace:has(.mania-studio) { flex
 .mania-transport-main > .mania-inline select { padding: 1px 4px; }
 .mania-timeline { grid-column: 2; grid-row: 1; position: relative; min-width: 0; height: 44px; }
 .mania-timeline-track { position: absolute; inset: 0 7px; }
+/* Keep the static marker layer out of the moving range thumb's layout/paint work. */
+.mania-timeline-markers { position: absolute; inset: 0; z-index: 2; pointer-events: none; contain: layout style; will-change: transform; }
+.mania-timeline-markers > button { pointer-events: auto; }
 .mania-timeline-axis { position: absolute; top: 20px; left: 0; right: 0; height: 2px; background: #929aab; }
 .mania-timeline-label { position: absolute; top: 32px; color: var(--mania-muted); font: 9px ui-monospace, monospace; transform: translateX(-50%); pointer-events: none; }
 .mania-timeline-label:first-of-type { transform: none; }

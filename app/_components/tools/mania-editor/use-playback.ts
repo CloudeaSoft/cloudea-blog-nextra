@@ -1,8 +1,10 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type Beatmap, type Project } from "./model";
 import { findAsset } from "./archive";
 import { HitSoundPlayer, resolveHitSamples } from "./hitsounds";
+import { createNoteIndex } from "./render-index";
+import type { PlaybackClock } from "./use-playback-frame";
 type Loop = {
 	enabled: boolean;
 	start: number;
@@ -24,12 +26,24 @@ export function usePlayback(map: Beatmap, filename: string, assets: Project["ass
 	const starting = useRef(false);
 	const current = useRef(time);
 	const active = useRef(false);
+	const listeners = useRef(new Set<(time: number) => void>());
+	const clock = useMemo<PlaybackClock>(() => ({
+		getTime: () => current.current,
+		isPlaying: () => active.current,
+		subscribe: (listener) => {
+			listeners.current.add(listener);
+			return () => {
+				listeners.current.delete(listener);
+			};
+		},
+	}), []);
 	const previous = useRef(0);
-	const config = useRef({ map, filename, assets, rate, volume, hitsounds, loop, duration, onError });
-	config.current = { map, filename, assets, rate, volume, hitsounds, loop, duration, onError };
+	const noteIndex = useMemo(() => createNoteIndex(map.notes), [map.notes]);
+	const config = useRef({ map, filename, assets, rate, volume, hitsounds, loop, duration, onError, noteIndex });
+	config.current = { map, filename, assets, rate, volume, hitsounds, loop, duration, onError, noteIndex };
 	const bytes = findAsset(assets, filename, map.general.AudioFilename);
-	const lastNote = map.notes.reduce((last, n) => Math.max(last, n.endTime), 0);
-	const lastMarker = [Number(map.general.PreviewTime) || 0, ...map.timing.map((point) => point.time), ...(map.editor.Bookmarks || "").split(",").map(Number)].reduce((last, at) => Number.isFinite(at) ? Math.max(last, at) : last, 0);
+	const lastNote = useMemo(() => map.notes.reduce((last, n) => Math.max(last, n.endTime), 0), [map.notes]);
+	const lastMarker = useMemo(() => [Number(map.general.PreviewTime) || 0, ...map.timing.map((point) => point.time), ...(map.editor.Bookmarks || "").split(",").map(Number)].reduce((last, at) => Number.isFinite(at) ? Math.max(last, at) : last, 0), [map.general.PreviewTime, map.timing, map.editor.Bookmarks]);
 	const end = Math.max(duration, lastNote + 2000, lastMarker, 10000);
 	const endRef = useRef(end);
 	endRef.current = end;
@@ -39,6 +53,7 @@ export function usePlayback(map: Beatmap, filename: string, assets: Project["ass
 		sounds.current?.stop();
 		active.current = false;
 		audio.current?.pause();
+		setTime(current.current);
 		setPlaying(false);
 	}, []);
 	const seek = useCallback((value: number) => {
@@ -137,6 +152,7 @@ export function usePlayback(map: Beatmap, filename: string, assets: Project["ass
 	useEffect(() => {
 		let frame = 0;
 		let stamp = performance.now();
+		let lastUiUpdate = 0;
 		const tick = (now: number) => {
 			const dt = now - stamp;
 			stamp = now;
@@ -151,16 +167,22 @@ export function usePlayback(map: Beatmap, filename: string, assets: Project["ass
 						void audio.current.play().catch(() => pause());
 				}
 				if (cfg.hitsounds && next - previous.current < 250) {
-					for (const note of cfg.map.notes) {
+					for (let i = cfg.noteIndex.after(previous.current); i < cfg.map.notes.length; i++) {
+						const note = cfg.map.notes[i];
 						if (note.time > next)
 							break;
-						if (note.time > previous.current)
-							sounds.current?.play(resolveHitSamples(cfg.map, note, cfg.filename, cfg.assets), cfg.volume, cfg.onError);
+						sounds.current?.play(resolveHitSamples(cfg.map, note, cfg.filename, cfg.assets), cfg.volume, cfg.onError);
 					}
 				}
 				previous.current = next;
 				current.current = Math.min(next, endRef.current);
-				setTime(current.current);
+				for (const listener of listeners.current) listener(current.current);
+				// Canvas follows every frame; controls need only 20 updates per second.
+				// Seeking and pausing still publish their exact position immediately.
+				if (now - lastUiUpdate >= 50) {
+					setTime(current.current);
+					lastUiUpdate = now;
+				}
 				if (next >= endRef.current || audio.current?.ended)
 					pause();
 			}
@@ -174,5 +196,5 @@ export function usePlayback(map: Beatmap, filename: string, assets: Project["ass
 		sounds.current?.stop();
 		void context.current?.close();
 	}, []);
-	return { time, playing, rate, setRate, volume, setVolume, hitsounds, setHitsounds, duration, end, loop, setLoop, hasAudio: !!bytes, seek, pause, toggle };
+	return { time, clock, playing, rate, setRate, volume, setVolume, hitsounds, setHitsounds, duration, end, loop, setLoop, hasAudio: !!bytes, seek, pause, toggle };
 }
